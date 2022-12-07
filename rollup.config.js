@@ -2,7 +2,7 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 
 export default {
-  input: './oscd-save.ts',
+  input: './oscd-publisher.ts',
   output: {
     sourcemap: true,        // Add source map to build output
     format:'es',            // ES module type export
