@@ -175,8 +175,9 @@ export class OscdTextfield extends TextField {
         style="margin-left: 12px;"
         ?checked=${!this.null}
         ?disabled=${this.disabledSwitch}
-        @change=${() => {
+        @click=${() => {
           this.null = !this.nullSwitch!.selected;
+          this.dispatchEvent(new Event('input'));
         }}
       ></mwc-switch>`;
     }
