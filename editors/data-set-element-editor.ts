@@ -1,9 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 
 import '@material/mwc-list/mwc-list-item';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openscd/open-scd-core';
 
 import '../foundation/components/oscd-textfield.js';
@@ -11,6 +11,7 @@ import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
 
 import { identity } from '../foundation/identities/identity.js';
 import { updateDateSetName } from '../foundation/utils/dataSet.js';
+import { removeFCDA } from '../foundation/utils/fcda.js';
 
 @customElement('data-set-element-editor')
 export class DataSetElementEditor extends LitElement {
@@ -97,11 +98,18 @@ export class DataSetElementEditor extends LitElement {
             'fc',
           ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
 
-          return html`<mwc-list-item selected twoline value="${identity(fcda)}"
+          return html`<mwc-list-item hasMeta selected twoline value="${identity(
+            fcda
+          )}"
             ><span>${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}</span
             ><span slot="secondary"
               >${`${ldInst}/${prefix}${lnClass}${lnInst}`}</span
             ></span>
+            <span slot="meta"><mwc-icon-button icon="delete" @click=${() =>
+              this.dispatchEvent(
+                newEditEvent(removeFCDA(fcda))
+              )}></mwc-icon-button>
+            </span>
           </mwc-list-item>`;
         })}</oscd-filtered-list
       >`;
@@ -158,6 +166,10 @@ export class DataSetElementEditor extends LitElement {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    mwc-list-item {
+      --mdc-list-item-meta-size: 48px;
     }
 
     *[iconTrailing='search'] {
