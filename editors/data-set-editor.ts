@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
@@ -6,6 +7,8 @@ import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
 
+import { newEditEvent } from '@openscd/open-scd-core';
+
 import './data-set-element-editor.js';
 import '../foundation/components/oscd-filtered-list.js';
 import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';
@@ -13,6 +16,7 @@ import type { OscdFilteredList } from '../foundation/components/oscd-filtered-li
 import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
+import { removeDataSet } from '../foundation/utils/dataSet.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {
@@ -87,9 +91,16 @@ export class DataSetEditor extends LitElement {
 
         const dataSets = Array.from(ied.querySelectorAll('DataSet')).map(
           dataSet =>
-            html`<mwc-list-item twoline value="${identity(dataSet)}"
+            html`<mwc-list-item hasMeta twoline value="${identity(dataSet)}"
               ><span>${dataSet.getAttribute('name')}</span
               ><span slot="secondary">${identity(dataSet)}</span>
+              <span slot="meta"
+                ><mwc-icon-button
+                  icon="delete"
+                  @click=${() =>
+                    this.dispatchEvent(newEditEvent(removeDataSet(dataSet)))}
+                ></mwc-icon-button>
+              </span>
             </mwc-list-item>`
         );
 
@@ -121,6 +132,10 @@ export class DataSetEditor extends LitElement {
 
     data-set-element-editor {
       flex: auto;
+    }
+
+    mwc-list-item {
+      --mdc-list-item-meta-size: 48px;
     }
   `;
 }
