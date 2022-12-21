@@ -1,10 +1,16 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, queryAll, state } from 'lit/decorators.js';
 
 import '@material/mwc-list/mwc-list-item';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { newEditEvent } from '@openscd/open-scd-core';
+
 import '../foundation/components/oscd-textfield.js';
+import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+
 import { identity } from '../foundation/identities/identity.js';
+import { updateDateSetName } from '../foundation/utils/dataSet.js';
 
 @customElement('data-set-element-editor')
 export class DataSetElementEditor extends LitElement {
@@ -26,23 +32,59 @@ export class DataSetElementEditor extends LitElement {
     return this.element ? this.element.getAttribute('desc') : 'UNDEFINED';
   }
 
+  @state()
+  private someInputDiff = false;
+
+  private onInputChange(): void {
+    this.someInputDiff = Array.from(this.inputs ?? []).some(
+      input => this.element?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveChanges(): void {
+    if (!this.element) return;
+
+    const attributes: Record<string, string | null> = {};
+    for (const input of this.inputs ?? [])
+      if (this.element.getAttribute(input.label) !== input.maybeValue)
+        attributes[input.label] = input.maybeValue;
+
+    this.dispatchEvent(
+      newEditEvent(updateDateSetName(this.element, attributes))
+    );
+
+    this.onInputChange();
+  }
+
+  @queryAll('oscd-textfield') inputs?: OscdTextfield[];
+
   private renderContent(): TemplateResult {
     return html`<oscd-textfield
+        id="${identity(this.element)}"
+        tag="${this.element?.tagName ?? ''}"
         label="name"
         .maybeValue=${this.name}
         helper="scl.name"
         required
-        disabled
+        @input=${() => this.onInputChange()}
       >
       </oscd-textfield>
       <oscd-textfield
+        id="${identity(this.element)}"
         label="desc"
         .maybeValue=${this.desc}
         helper="scl.desc"
         nullable
-        disabled
+        @input=${() => this.onInputChange()}
       >
       </oscd-textfield>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.someInputDiff}
+        @click=${() => this.saveChanges()}
+      ></mwc-button>
       <oscd-filtered-list
         >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
           const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
@@ -59,7 +101,7 @@ export class DataSetElementEditor extends LitElement {
             ><span>${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}</span
             ><span slot="secondary"
               >${`${ldInst}/${prefix}${lnClass}${lnInst}`}</span
-            >
+            ></span>
           </mwc-list-item>`;
         })}</oscd-filtered-list
       >`;
@@ -93,6 +135,11 @@ export class DataSetElementEditor extends LitElement {
     .content > * {
       display: block;
       margin: 4px 8px 16px;
+    }
+
+    .save {
+      display: flex;
+      align-self: flex-end;
     }
 
     h2 {
