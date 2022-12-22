@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
@@ -5,6 +6,8 @@ import '@material/mwc-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
+
+import { newEditEvent } from '@openscd/open-scd-core';
 
 import './data-set-element-editor.js';
 import '../foundation/components/oscd-filtered-list.js';
@@ -15,6 +18,7 @@ import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
 import { smvIcon } from '../foundation/icons.js';
+import { removeControlBlock } from '../foundation/utils/controlBlocks.js';
 
 @customElement('sampled-value-control-editor')
 export class SampledValueControlEditor extends LitElement {
@@ -115,13 +119,25 @@ export class SampledValueControlEditor extends LitElement {
         const sampledValueControls = Array.from(
           ied.querySelectorAll('SampledValueControl')
         ).map(
-          reportCb =>
+          smvControl =>
             html`<mwc-list-item
+              hasMeta
               twoline
-              value="${identity(reportCb)}"
+              value="${identity(smvControl)}"
               graphic="icon"
-              ><span>${reportCb.getAttribute('name')}</span
-              ><span slot="secondary">${identity(reportCb)}</span>
+              ><span>${smvControl.getAttribute('name')}</span
+              ><span slot="secondary">${identity(smvControl)}</span>
+              <span slot="meta"
+                ><mwc-icon-button
+                  icon="delete"
+                  @click=${() => {
+                    this.dispatchEvent(
+                      newEditEvent(removeControlBlock(smvControl))
+                    );
+                    this.requestUpdate();
+                  }}
+                ></mwc-icon-button>
+              </span>
               <mwc-icon slot="graphic">${smvIcon}</mwc-icon>
             </mwc-list-item>`
         );
@@ -161,6 +177,10 @@ export class SampledValueControlEditor extends LitElement {
       grid-gap: 12px;
       padding: 8px 12px 16px;
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    mwc-list-item {
+      --mdc-list-item-meta-size: 48px;
     }
 
     data-set-element-editor {

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
@@ -5,6 +6,8 @@ import '@material/mwc-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
+
+import { newEditEvent } from '@openscd/open-scd-core';
 
 import './data-set-element-editor.js';
 import './report-control-element-editor.js';
@@ -14,6 +17,7 @@ import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
 import { reportIcon } from '../foundation/icons.js';
+import { removeControlBlock } from '../foundation/utils/controlBlocks.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {
@@ -113,11 +117,23 @@ export class ReportControlEditor extends LitElement {
         const reports = Array.from(ied.querySelectorAll('ReportControl')).map(
           reportCb =>
             html`<mwc-list-item
+              hasMeta
               twoline
               value="${identity(reportCb)}"
               graphic="icon"
               ><span>${reportCb.getAttribute('name')}</span
               ><span slot="secondary">${identity(reportCb)}</span>
+              <span slot="meta"
+                ><mwc-icon-button
+                  icon="delete"
+                  @click=${() => {
+                    this.dispatchEvent(
+                      newEditEvent(removeControlBlock(reportCb))
+                    );
+                    this.requestUpdate();
+                  }}
+                ></mwc-icon-button>
+              </span>
               <mwc-icon slot="graphic">${reportIcon}</mwc-icon>
             </mwc-list-item>`
         );
@@ -157,6 +173,10 @@ export class ReportControlEditor extends LitElement {
       grid-gap: 12px;
       padding: 8px 12px 16px;
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    mwc-list-item {
+      --mdc-list-item-meta-size: 48px;
     }
 
     data-set-element-editor {

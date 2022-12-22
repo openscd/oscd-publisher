@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
@@ -5,6 +6,8 @@ import '@material/mwc-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
+
+import { newEditEvent } from '@openscd/open-scd-core';
 
 import './data-set-element-editor.js';
 import './gse-control-element-editor.js';
@@ -14,6 +17,7 @@ import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
 import { gooseIcon } from '../foundation/icons.js';
+import { removeControlBlock } from '../foundation/utils/controlBlocks.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {
@@ -105,13 +109,25 @@ export class GseControlEditor extends LitElement {
           <li divider role="separator"></li>`;
 
         const gseControls = Array.from(ied.querySelectorAll('GSEControl')).map(
-          reportCb =>
+          gseControl =>
             html`<mwc-list-item
+              hasMeta
               twoline
-              value="${identity(reportCb)}"
+              value="${identity(gseControl)}"
               graphic="icon"
-              ><span>${reportCb.getAttribute('name')}</span
-              ><span slot="secondary">${identity(reportCb)}</span>
+              ><span>${gseControl.getAttribute('name')}</span
+              ><span slot="secondary">${identity(gseControl)}</span>
+              <span slot="meta"
+                ><mwc-icon-button
+                  icon="delete"
+                  @click=${() => {
+                    this.dispatchEvent(
+                      newEditEvent(removeControlBlock(gseControl))
+                    );
+                    this.requestUpdate();
+                  }}
+                ></mwc-icon-button>
+              </span>
               <mwc-icon slot="graphic">${gooseIcon}</mwc-icon>
             </mwc-list-item>`
         );
@@ -159,6 +175,10 @@ export class GseControlEditor extends LitElement {
 
     gse-control-element-editor {
       grid-column: 2 / 4;
+    }
+
+    mwc-list-item {
+      --mdc-list-item-meta-size: 48px;
     }
 
     @media (max-width: 950px) {
