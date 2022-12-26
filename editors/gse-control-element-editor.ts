@@ -1,12 +1,24 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import {
+  customElement,
+  property,
+  query,
+  queryAll,
+  state,
+} from 'lit/decorators.js';
 
 import '@material/mwc-formfield';
 import '@material/mwc-checkbox';
+import type { Checkbox } from '@material/mwc-checkbox';
+
+import { newEditEvent } from '@openscd/open-scd-core';
 
 import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
 import '../foundation/components/oscd-textfield.js';
+import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+
 import {
   maxLength,
   patterns,
@@ -14,6 +26,7 @@ import {
   typePattern,
 } from '../foundation/pattern.js';
 import { identity } from '../foundation/identities/identity.js';
+import { checkGSEDiff, updateGSE } from '../foundation/utils/gse.js';
 
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
@@ -38,6 +51,40 @@ export class GseControlElementEditor extends LitElement {
         `GSE[ldInst="${ldInst}"][cbName="${cbName}"]`
     );
   }
+
+  @state()
+  private gSEdiff = false;
+
+  private onGSEInputChange(): void {
+    if (Array.from(this.inputs ?? []).some(input => !input.checkValidity())) {
+      this.gSEdiff = false;
+      return;
+    }
+
+    const gSEAttrs: Record<string, string | null> = {};
+    for (const input of this.inputs ?? [])
+      gSEAttrs[input.label] = input.maybeValue;
+
+    this.gSEdiff = checkGSEDiff(this.gSE!, gSEAttrs, this.instType?.checked);
+  }
+
+  private saveGSEChanges(): void {
+    if (!this.gSE) return;
+
+    const gSEAttrs: Record<string, string | null> = {};
+    for (const input of this.inputs ?? [])
+      gSEAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(
+      newEditEvent(updateGSE(this.gSE, gSEAttrs, this.instType?.checked))
+    );
+
+    this.onGSEInputChange();
+  }
+
+  @queryAll('.content.gse > oscd-textfield') inputs?: OscdTextfield[];
+
+  @query('#instType') instType?: Checkbox;
 
   private renderGseContent(): TemplateResult {
     const { gSE } = this;
@@ -65,23 +112,23 @@ export class GseControlElementEditor extends LitElement {
           null;
     });
 
-    return html`<div class="content">
+    return html`<div class="content gse">
       <h3>Communication Settings (GSE)</h3>
       <mwc-formfield label="connectedap.wizard.addschemainsttype"
         ><mwc-checkbox
           id="instType"
           ?checked="${hasInstType}"
-          disabled
+          @change=${this.onGSEInputChange}
         ></mwc-checkbox></mwc-formfield
       >${Object.entries(attributes).map(
         ([key, value]) =>
           html`<oscd-textfield
             label="${key}"
-            ?nullable=${typeNullable[key]}
             .maybeValue=${value}
             pattern="${typePattern[key]!}"
             required
-            disabled
+            @input=${this.onGSEInputChange}
+            ?nullable=${typeNullable[key]}
           ></oscd-textfield>`
       )}<oscd-textfield
         label="MinTime"
@@ -89,7 +136,7 @@ export class GseControlElementEditor extends LitElement {
         nullable
         suffix="ms"
         type="number"
-        disabled
+        @input=${this.onGSEInputChange}
       ></oscd-textfield
       ><oscd-textfield
         label="MaxTime"
@@ -97,8 +144,15 @@ export class GseControlElementEditor extends LitElement {
         nullable
         suffix="ms"
         type="number"
-        disabled
+        @input=${this.onGSEInputChange}
       ></oscd-textfield>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.gSEdiff}
+        @click=${() => this.saveGSEChanges()}
+      ></mwc-button>
     </div>`;
   }
 
@@ -198,12 +252,18 @@ export class GseControlElementEditor extends LitElement {
     }
 
     .content {
+      display: flex;
+      flex-direction: column;
       border-left: thick solid var(--mdc-theme-on-primary);
     }
 
     .content > * {
       display: block;
       margin: 4px 8px 16px;
+    }
+
+    .save {
+      align-self: flex-end;
     }
 
     h2,
