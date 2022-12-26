@@ -106,7 +106,7 @@ export class OscdCheckbox extends LitElement {
     if (this.nullable) {
       return html`<mwc-switch
         style="margin-left: 12px;"
-        ?checked=${!this.null}
+        ?selected=${!this.null}
         ?disabled=${this.disabled}
         @change=${() => {
           this.null = !this.nullSwitch!.selected;

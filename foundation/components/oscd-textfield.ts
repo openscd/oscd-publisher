@@ -173,7 +173,7 @@ export class OscdTextfield extends TextField {
     if (this.nullable) {
       return html`<mwc-switch
         style="margin-left: 12px;"
-        ?checked=${!this.null}
+        ?selected=${!this.null}
         ?disabled=${this.disabledSwitch}
         @click=${() => {
           this.null = !this.nullSwitch!.selected;
