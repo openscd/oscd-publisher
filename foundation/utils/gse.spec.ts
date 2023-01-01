@@ -2,10 +2,12 @@
 import { expect } from '@open-wc/testing';
 import { Insert, isInsert, isRemove, Remove } from '@openscd/open-scd-core';
 
-import { checkGSEDiff, updateGSE } from './gse.js';
+import { checkGSEDiff, referencedGSE, updateGSE } from './gse.js';
 import {
   nulledGSE,
+  orphanGSEControl,
   partlyInstType,
+  simpleReferenceGSE,
   withInstType,
   woInstType,
 } from './gse.testfiles.js';
@@ -394,5 +396,22 @@ describe('Utility function for GSE element', () => {
         ((actions[0] as Insert).node as Element)?.textContent ?? null
       ).to.equal('1234');
     });
+  });
+
+  describe('referencedGSE', () => {
+    it('return null for orphan GSEcontrol', () =>
+      expect(referencedGSE(findElement(orphanGSEControl, 'GSEControl')!)).to.be
+        .null);
+
+    it('return null for missing GSE', () =>
+      expect(referencedGSE(findElement(simpleReferenceGSE, 'GSEControl')!)).to
+        .be.null);
+
+    it('return null for missing GSE', () =>
+      expect(
+        referencedGSE(
+          findElement(simpleReferenceGSE, 'GSEControl[name="someGse2"]')!
+        )
+      ).to.not.be.null);
   });
 });

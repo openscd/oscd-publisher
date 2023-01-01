@@ -4,7 +4,8 @@ import { Remove, Update } from '@openscd/open-scd-core';
 import { removeDataSet } from './dataSet.js';
 import { matchExtRefCtrlBlockAttr, unsubscribe } from './extRef.js';
 
-function findCtrlBlockSubscription(ctrlBlock: Element): Element[] {
+/** @returns all ExtRef element subscribed to a controlBlock */
+export function findCtrlBlockSubscription(ctrlBlock: Element): Element[] {
   const doc = ctrlBlock.ownerDocument;
   const iedName = ctrlBlock.closest('IED')!.getAttribute('name');
 

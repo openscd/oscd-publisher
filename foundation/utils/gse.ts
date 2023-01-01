@@ -11,6 +11,21 @@ const gSEselectors: Record<string, string> = {
   'VLAN-PRIORITY': ':scope > Address > P[type="VLAN-PRIORITY"]',
 };
 
+/** @returns a `GSE` element referenced to `GSEControl` element or `null` */
+export function referencedGSE(gseControl: Element): Element | null {
+  const iedName = gseControl.closest('IED')?.getAttribute('name');
+  const apName = gseControl.closest('AccessPoint')?.getAttribute('name');
+  const ldInst = gseControl.closest('LDevice')?.getAttribute('inst');
+  const cbName = gseControl.getAttribute('name');
+
+  return gseControl.ownerDocument.querySelector(
+    `Communication 
+      > SubNetwork
+      > ConnectedAP[iedName="${iedName}"][apName="${apName}"] 
+      > GSE[ldInst="${ldInst}"][cbName="${cbName}"]`
+  );
+}
+
 /** @returns Whether the `gSE`s element attributes or instType has changed */
 export function checkGSEDiff(
   gSE: Element,
