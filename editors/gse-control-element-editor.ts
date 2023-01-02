@@ -17,6 +17,8 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
 import '../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
+import type { OscdSelect } from '../foundation/components/oscd-select.js';
 import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
 
 import {
@@ -27,6 +29,7 @@ import {
 } from '../foundation/pattern.js';
 import { identity } from '../foundation/identities/identity.js';
 import { checkGSEDiff, updateGSE } from '../foundation/utils/gse.js';
+import { updateGseControl } from '../foundation/utils/gsecontrol.js';
 
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
@@ -55,14 +58,53 @@ export class GseControlElementEditor extends LitElement {
   @state()
   private gSEdiff = false;
 
+  @state()
+  private gSEControlDiff = false;
+
+  private onGSEControlInputChange(): void {
+    if (
+      Array.from(this.gSEControlInputs ?? []).some(
+        input => !input.checkValidity()
+      )
+    ) {
+      this.gSEControlDiff = false;
+      return;
+    }
+
+    const gSEControlAttrs: Record<string, string | null> = {};
+    for (const input of this.gSEControlInputs ?? [])
+      gSEControlAttrs[input.label] = input.maybeValue;
+
+    this.gSEControlDiff = Array.from(this.gSEControlInputs ?? []).some(
+      input => this.element?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveGSEControlChanges(): void {
+    if (!this.element) return;
+
+    const gSEControlAttrs: Record<string, string | null> = {};
+    for (const input of this.gSEControlInputs ?? [])
+      if (this.element?.getAttribute(input.label) !== input.maybeValue)
+        gSEControlAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(
+      newEditEvent(updateGseControl(this.element, gSEControlAttrs))
+    );
+
+    this.onGSEControlInputChange();
+  }
+
   private onGSEInputChange(): void {
-    if (Array.from(this.inputs ?? []).some(input => !input.checkValidity())) {
+    if (
+      Array.from(this.gSEInputs ?? []).some(input => !input.checkValidity())
+    ) {
       this.gSEdiff = false;
       return;
     }
 
     const gSEAttrs: Record<string, string | null> = {};
-    for (const input of this.inputs ?? [])
+    for (const input of this.gSEInputs ?? [])
       gSEAttrs[input.label] = input.maybeValue;
 
     this.gSEdiff = checkGSEDiff(this.gSE!, gSEAttrs, this.instType?.checked);
@@ -72,7 +114,7 @@ export class GseControlElementEditor extends LitElement {
     if (!this.gSE) return;
 
     const gSEAttrs: Record<string, string | null> = {};
-    for (const input of this.inputs ?? [])
+    for (const input of this.gSEInputs ?? [])
       gSEAttrs[input.label] = input.maybeValue;
 
     this.dispatchEvent(
@@ -82,7 +124,12 @@ export class GseControlElementEditor extends LitElement {
     this.onGSEInputChange();
   }
 
-  @queryAll('.content.gse > oscd-textfield') inputs?: OscdTextfield[];
+  @queryAll('.content.gse > oscd-textfield') gSEInputs?: OscdTextfield[];
+
+  @queryAll(
+    '.content.gsecontrol > oscd-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > oscd-checkbox'
+  )
+  gSEControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -166,7 +213,15 @@ export class GseControlElementEditor extends LitElement {
       'securityEnabled',
     ].map(attr => this.element?.getAttribute(attr));
 
-    return html`<div class="content">
+    const reservedGseControlNames = Array.from(
+      this.element.parentElement?.querySelectorAll('GSEControl') ?? []
+    )
+      .map(gseControl => gseControl.getAttribute('name')!)
+      .filter(
+        gseControlName => gseControlName !== this.element.getAttribute('name')
+      );
+
+    return html`<div class="content gsecontrol">
       <oscd-textfield
         label="name"
         .maybeValue=${name}
@@ -175,15 +230,16 @@ export class GseControlElementEditor extends LitElement {
         validationMessage="textfield.required"
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
+        .reservedValues=${reservedGseControlNames}
         dialogInitialFocus
-        disabled
+        @input=${this.onGSEControlInputChange}
       ></oscd-textfield>
       <oscd-textfield
         label="desc"
         .maybeValue=${desc}
         nullable
         helper="scl.desc"
-        disabled
+        @input=${this.onGSEControlInputChange}
       ></oscd-textfield>
       <oscd-select
         label="type"
@@ -191,7 +247,7 @@ export class GseControlElementEditor extends LitElement {
         helper="scl.type"
         nullable
         required
-        disabled
+        @selected=${this.onGSEControlInputChange}
         >${['GOOSE', 'GSSE'].map(
           gseControlType =>
             html`<mwc-list-item value="${gseControlType}"
@@ -205,14 +261,14 @@ export class GseControlElementEditor extends LitElement {
         helper="scl.id"
         required
         validationMessage="textfield.nonempty"
-        disabled
+        @input=${this.onGSEControlInputChange}
       ></oscd-textfield>
       <oscd-checkbox
         label="fixedOffs"
         .maybeValue=${fixedOffs}
         nullable
         helper="scl.fixedOffs"
-        disabled
+        @input=${this.onGSEControlInputChange}
       ></oscd-checkbox>
       <oscd-select
         label="securityEnabled"
@@ -220,7 +276,7 @@ export class GseControlElementEditor extends LitElement {
         nullable
         required
         helper="scl.securityEnable"
-        disabled
+        @selected=${this.onGSEControlInputChange}
         >${['None', 'Signature', 'SignatureAndEncryption'].map(
           securityType =>
             html`<mwc-list-item value="${securityType}"
@@ -228,6 +284,13 @@ export class GseControlElementEditor extends LitElement {
             >`
         )}</oscd-select
       >
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.gSEControlDiff}
+        @click=${() => this.saveGSEControlChanges()}
+      ></mwc-button>
     </div>`;
   }
 
