@@ -82,6 +82,11 @@ export class OscdCheckbox extends LitElement {
 
   @query('mwc-checkbox') checkbox?: Checkbox;
 
+  // eslint-disable-next-line class-methods-use-this
+  checkValidity(): boolean {
+    return true;
+  }
+
   private nulled: boolean | null = null;
 
   private enable(): void {
@@ -108,8 +113,9 @@ export class OscdCheckbox extends LitElement {
         style="margin-left: 12px;"
         ?selected=${!this.null}
         ?disabled=${this.disabled}
-        @change=${() => {
+        @click=${() => {
           this.null = !this.nullSwitch!.selected;
+          this.dispatchEvent(new Event('input'));
         }}
       ></mwc-switch>`;
     }
@@ -128,6 +134,7 @@ export class OscdCheckbox extends LitElement {
             ><mwc-checkbox
               ?checked=${this.initChecked}
               ?disabled=${this.deactivateCheckbox || this.disabled}
+              @change=${() => this.dispatchEvent(new Event('input'))}
             ></mwc-checkbox
           ></mwc-formfield>
         </div>

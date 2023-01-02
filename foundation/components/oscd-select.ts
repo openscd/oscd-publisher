@@ -93,8 +93,9 @@ export class OscdSelect extends Select {
         style="margin-left: 12px;"
         ?selected=${!this.null}
         ?disabled=${this.disabledSwitch}
-        @change=${() => {
+        @click=${() => {
           this.null = !this.nullSwitch!.selected;
+          this.dispatchEvent(new Event('selected'));
         }}
       ></mwc-switch>`;
     }
