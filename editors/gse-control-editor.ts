@@ -3,9 +3,12 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+import '@material/mwc-dialog';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
+import type { Dialog } from '@material/mwc-dialog';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
+import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
@@ -17,7 +20,10 @@ import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
 import { gooseIcon } from '../foundation/icons.js';
-import { removeControlBlock } from '../foundation/utils/controlBlocks.js';
+import {
+  findCtrlBlockSubscription,
+  removeControlBlock,
+} from '../foundation/utils/controlBlocks.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {
@@ -35,8 +41,12 @@ export class GseControlEditor extends LitElement {
 
   @query('mwc-button') selectGSEControlButton!: Button;
 
+  @query('mwc-dialog') selectDataSetDialog!: Dialog;
+
   /** Resets selected GOOSE and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
+    super.update(props);
+
     if (props.has('doc') && this.selectedGseControl) {
       const newGseControl = updateElementReference(
         this.doc,
@@ -51,8 +61,31 @@ export class GseControlEditor extends LitElement {
       if (!newGseControl && this.selectionList && this.selectionList.selected)
         (this.selectionList.selected as ListItem).selected = false;
     }
+  }
 
-    super.update(props);
+  private selectDataSet(): void {
+    const dataSetElement = (
+      this.selectDataSetDialog.querySelector(
+        'oscd-filtered-list'
+      ) as OscdFilteredList
+    ).selected;
+    if (!dataSetElement) return;
+
+    const dataSetName = (dataSetElement as ListItemBase).value;
+    const dataSet = this.selectedGseControl?.parentElement?.querySelector(
+      `DataSet[name="${dataSetName}"]`
+    );
+    if (!dataSet) return;
+
+    this.dispatchEvent(
+      newEditEvent({
+        element: this.selectedGseControl!,
+        attributes: { datSet: dataSetName },
+      })
+    );
+    this.selectedDataSet = dataSet;
+
+    this.selectDataSetDialog.close();
   }
 
   private selectGSEControl(evt: Event): void {
@@ -71,12 +104,49 @@ export class GseControlEditor extends LitElement {
     }
   }
 
+  private renderSelectDataSetDialog(): TemplateResult {
+    return html`
+      <mwc-dialog heading="Select Data Set">
+        <oscd-filtered-list activatable @selected=${() => this.selectDataSet()}
+          >${Array.from(
+            this.selectedGseControl?.parentElement?.querySelectorAll(
+              'DataSet'
+            ) ?? []
+          ).map(
+            dataSet =>
+              html`<mwc-list-item
+                twoline
+                ?selected=${(this.selectedDataSet?.getAttribute('name') ??
+                  'UNDEFINED') ===
+                (dataSet.getAttribute('name') ?? 'UNDEFINED')}
+                value="${dataSet.getAttribute('name') ?? 'UNDEFINED'}"
+                ><span>${dataSet.getAttribute('name') ?? 'UNDEFINED'}</span>
+                <span slot="secondary">${identity(dataSet)}</span>
+              </mwc-list-item>`
+          )}
+        </oscd-filtered-list>
+      </mwc-dialog>
+    `;
+  }
+
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectedGseControl !== undefined)
       return html`<div class="elementeditorcontainer">
-        <data-set-element-editor
-          .element=${this.selectedDataSet!}
-        ></data-set-element-editor>
+        <div class="content dataSet">
+          ${this.renderSelectDataSetDialog()}
+          <data-set-element-editor
+            .element=${this.selectedDataSet!}
+            .showHeader=${false}
+          >
+            <mwc-icon-button
+              slot="change"
+              icon="change_circle"
+              ?disabled=${!!findCtrlBlockSubscription(this.selectedGseControl)
+                .length}
+              @click=${() => this.selectDataSetDialog.show()}
+            ></mwc-icon-button
+          ></data-set-element-editor>
+        </div>
         <gse-control-element-editor
           .doc=${this.doc}
           .element=${this.selectedGseControl}
@@ -139,6 +209,7 @@ export class GseControlEditor extends LitElement {
 
   private renderToggleButton(): TemplateResult {
     return html`<mwc-button
+      class="change scl element"
       outlined
       label="publisher.selectbutton GOOSE"
       @click=${() => {
@@ -167,6 +238,10 @@ export class GseControlEditor extends LitElement {
       grid-gap: 12px;
       padding: 8px 12px 16px;
       grid-template-columns: repeat(3, 1fr);
+    }
+    .content.dataSet {
+      display: flex;
+      flex-direction: column;
     }
 
     data-set-element-editor {

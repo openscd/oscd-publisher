@@ -5,7 +5,9 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import '@material/mwc-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
+import type { Dialog } from '@material/mwc-dialog';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
+import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
@@ -18,7 +20,10 @@ import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
 import { smvIcon } from '../foundation/icons.js';
-import { removeControlBlock } from '../foundation/utils/controlBlocks.js';
+import {
+  findCtrlBlockSubscription,
+  removeControlBlock,
+} from '../foundation/utils/controlBlocks.js';
 
 @customElement('sampled-value-control-editor')
 export class SampledValueControlEditor extends LitElement {
@@ -36,8 +41,12 @@ export class SampledValueControlEditor extends LitElement {
 
   @query('mwc-button') selectSampledValueControlButton!: Button;
 
+  @query('mwc-dialog') selectDataSetDialog!: Dialog;
+
   /** Resets selected SMV and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
+    super.update(props);
+
     if (props.has('doc') && this.selectedSampledValueControl) {
       const newSampledValueControl = updateElementReference(
         this.doc,
@@ -56,8 +65,32 @@ export class SampledValueControlEditor extends LitElement {
       )
         (this.selectionList.selected as ListItem).selected = false;
     }
+  }
 
-    super.update(props);
+  private selectDataSet(): void {
+    const dataSetElement = (
+      this.selectDataSetDialog.querySelector(
+        'oscd-filtered-list'
+      ) as OscdFilteredList
+    ).selected;
+    if (!dataSetElement) return;
+
+    const dataSetName = (dataSetElement as ListItemBase).value;
+    const dataSet =
+      this.selectedSampledValueControl?.parentElement?.querySelector(
+        `DataSet[name="${dataSetName}"]`
+      );
+    if (!dataSet) return;
+
+    this.dispatchEvent(
+      newEditEvent({
+        element: this.selectedSampledValueControl!,
+        attributes: { datSet: dataSetName },
+      })
+    );
+    this.selectedDataSet = dataSet;
+
+    this.selectDataSetDialog.close();
   }
 
   private selectSMVControl(evt: Event): void {
@@ -79,12 +112,50 @@ export class SampledValueControlEditor extends LitElement {
     }
   }
 
+  private renderSelectDataSetDialog(): TemplateResult {
+    return html`
+      <mwc-dialog heading="Select Data Set">
+        <oscd-filtered-list activatable @selected=${() => this.selectDataSet()}
+          >${Array.from(
+            this.selectedSampledValueControl?.parentElement?.querySelectorAll(
+              'DataSet'
+            ) ?? []
+          ).map(
+            dataSet =>
+              html`<mwc-list-item
+                twoline
+                ?selected=${(this.selectedDataSet?.getAttribute('name') ??
+                  'UNDEFINED') ===
+                (dataSet.getAttribute('name') ?? 'UNDEFINED')}
+                value="${dataSet.getAttribute('name') ?? 'UNDEFINED'}"
+                ><span>${dataSet.getAttribute('name') ?? 'UNDEFINED'}</span>
+                <span slot="secondary">${identity(dataSet)}</span>
+              </mwc-list-item>`
+          )}
+        </oscd-filtered-list>
+      </mwc-dialog>
+    `;
+  }
+
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectedSampledValueControl !== undefined)
       return html`<div class="elementeditorcontainer">
-        <data-set-element-editor
-          .element=${this.selectedDataSet!}
-        ></data-set-element-editor>
+        <div class="content dataSet">
+          ${this.renderSelectDataSetDialog()}
+          <data-set-element-editor
+            .element=${this.selectedDataSet!}
+            .showHeader=${false}
+          >
+            <mwc-icon-button
+              slot="change"
+              icon="change_circle"
+              ?disabled=${!!findCtrlBlockSubscription(
+                this.selectedSampledValueControl
+              ).length}
+              @click=${() => this.selectDataSetDialog.show()}
+            ></mwc-icon-button
+          ></data-set-element-editor>
+        </div>
         <sampled-value-control-element-editor
           .doc=${this.doc}
           .element=${this.selectedSampledValueControl}
@@ -149,6 +220,7 @@ export class SampledValueControlEditor extends LitElement {
 
   private renderToggleButton(): TemplateResult {
     return html`<mwc-button
+      class="change scl element"
       outlined
       label="'publisher.selectbutton', { type: 'SMV' })}"
       @click=${() => {
@@ -179,6 +251,10 @@ export class SampledValueControlEditor extends LitElement {
       grid-template-columns: repeat(3, 1fr);
     }
 
+    .content.dataSet {
+      display: flex;
+      flex-direction: column;
+    }
     mwc-list-item {
       --mdc-list-item-meta-size: 48px;
     }

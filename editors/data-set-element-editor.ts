@@ -2,6 +2,7 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 
+import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 
 import { newEditEvent } from '@openscd/open-scd-core';
@@ -58,6 +59,19 @@ export class DataSetElementEditor extends LitElement {
   }
 
   @queryAll('oscd-textfield') inputs?: OscdTextfield[];
+
+  // eslint-disable-next-line class-methods-use-this
+  private renderHeader(subtitle: string | number): TemplateResult {
+    return html`<h2>
+      <div style="display:flex; flex-direction:row;">
+        <div style="flex:auto;">
+          <div>DataSet</div>
+          <div class="headersubtitle">${subtitle}</div>
+        </div>
+        <slot name="change"></slot>
+      </div>
+    </h2>`;
+  }
 
   private renderContent(): TemplateResult {
     return html`<oscd-textfield
@@ -118,18 +132,11 @@ export class DataSetElementEditor extends LitElement {
   render(): TemplateResult {
     if (this.element)
       return html`<div class="content">
-        <h2>
-          <div>DataSet</div>
-          <div class="headersubtitle">${identity(this.element)}</div>
-        </h2>
-        ${this.renderContent()}
+        ${this.renderHeader(identity(this.element))}${this.renderContent()}
       </div>`;
 
     return html`<div class="content">
-      <h2>
-        <div>DataSet</div>
-        <div class="headersubtitle">publisher.nodataset</div>
-      </h2>
+      ${this.renderHeader('publisher.nocontent')}
     </div>`;
   }
 

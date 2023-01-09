@@ -43,7 +43,7 @@ export const styles = css`
     display: none;
   }
 
-  mwc-button {
+  .change.scl.element {
     display: none;
   }
 
@@ -64,7 +64,6 @@ export const styles = css`
       height: auto;
       top: 110px;
       left: 8px;
-      background-color: var(--mdc-theme-surface);
       z-index: 1;
       box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
         0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
@@ -82,7 +81,7 @@ export const styles = css`
       display: none;
     }
 
-    mwc-button {
+    .change.scl.element {
       display: flex;
       margin: 4px 8px 8px;
     }
