@@ -1,18 +1,70 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, queryAll, state } from 'lit/decorators.js';
+import {
+  customElement,
+  property,
+  query,
+  queryAll,
+  state,
+} from 'lit/decorators.js';
 
 import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-dialog';
+import type { Dialog } from '@material/mwc-dialog';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
 import '../foundation/components/oscd-textfield.js';
+import '../foundation/components/oscd-finder-list.js';
 import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+import type { OscdFinderList } from '../foundation/components/oscd-finder-list.js';
 
 import { identity } from '../foundation/identities/identity.js';
 import { updateDateSetName } from '../foundation/utils/dataSet.js';
-import { removeFCDA } from '../foundation/utils/fcda.js';
+import { addFCDAs, addFCDOs, removeFCDA } from '../foundation/utils/fcda.js';
+import {
+  getDataAttributeChildren,
+  getDataObjectChildren,
+  getDisplayString,
+  getReader,
+} from './foundation.js';
+import { selector } from '../foundation/identities/selector.js';
+
+function dataAttributePaths(doc: XMLDocument, paths: string[][]): Element[][] {
+  const daPaths: Element[][] = [];
+  for (const path of paths) {
+    const daPath: Element[] = [];
+    for (const section of path) {
+      const [tag, id] = section.split(': ');
+      const ancestor = doc.querySelector(selector(tag, id));
+      if (ancestor) daPath.push(ancestor);
+    }
+    daPaths.push(daPath);
+  }
+
+  return daPaths;
+}
+
+function functionaContraintPaths(
+  doc: XMLDocument,
+  paths: string[][]
+): { path: Element[]; fc: string }[] {
+  const fcPaths: { path: Element[]; fc: string }[] = [];
+  for (const path of paths) {
+    const doPath: Element[] = [];
+    let fc = '';
+    for (const section of path) {
+      const [tag, id] = section.split(': ');
+      if (tag === 'FC') fc = id;
+      const ancestor = doc.querySelector(selector(tag, id));
+      if (ancestor) doPath.push(ancestor);
+    }
+    fcPaths.push({ path: doPath, fc });
+  }
+
+  return fcPaths;
+}
 
 @customElement('data-set-element-editor')
 export class DataSetElementEditor extends LitElement {
@@ -58,7 +110,41 @@ export class DataSetElementEditor extends LitElement {
     this.onInputChange();
   }
 
+  private saveDataObjects(): void {
+    const finder =
+      this.dataObjectPicker?.querySelector<OscdFinderList>('oscd-finder-list');
+    const paths = finder?.paths ?? [];
+
+    const actions = addFCDOs(
+      this.element!,
+      functionaContraintPaths(this.element!.ownerDocument, paths)
+    );
+
+    this.dispatchEvent(newEditEvent(actions));
+    this.dataObjectPicker?.close();
+  }
+
+  private saveDataAttributes(): void {
+    const finder =
+      this.dataAttributePicker?.querySelector<OscdFinderList>(
+        'oscd-finder-list'
+      );
+    const paths = finder?.paths ?? [];
+
+    const actions = addFCDAs(
+      this.element!,
+      dataAttributePaths(this.element!.ownerDocument, paths)
+    );
+
+    this.dispatchEvent(newEditEvent(actions));
+    this.dataAttributePicker?.close();
+  }
+
   @queryAll('oscd-textfield') inputs?: OscdTextfield[];
+
+  @query('#dapicker') dataAttributePicker?: Dialog;
+
+  @query('#dopicker') dataObjectPicker?: Dialog;
 
   // eslint-disable-next-line class-methods-use-this
   private renderHeader(subtitle: string | number): TemplateResult {
@@ -71,6 +157,66 @@ export class DataSetElementEditor extends LitElement {
         <slot name="change"></slot>
       </div>
     </h2>`;
+  }
+
+  private renderDataObjectPicker(): TemplateResult {
+    const server = this.element?.closest('Server')!;
+
+    return html` <mwc-button
+        label="Add data object"
+        icon="playlist_add"
+        @click=${() => this.dataObjectPicker?.show()}
+      ></mwc-button
+      ><mwc-dialog id="dopicker" heading="Add Data Attributes"
+        ><oscd-finder-list
+          multi
+          .paths=${[[`Server: ${identity(server)}`]]}
+          .read=${getReader(server.ownerDocument, getDataObjectChildren)}
+          .getDisplayString=${getDisplayString}
+          .getTitle=${(path: string[]) => path[path.length - 1]}
+        ></oscd-finder-list>
+        <mwc-button
+          slot="secondaryAction"
+          label="close"
+          @click=${() => this.dataObjectPicker?.close()}
+        ></mwc-button>
+        <mwc-button
+          slot="primaryAction"
+          label="save"
+          icon="save"
+          @click=${this.saveDataObjects}
+        ></mwc-button>
+      </mwc-dialog>`;
+  }
+
+  private renderDataAttributePicker(): TemplateResult {
+    const server = this.element?.closest('Server')!;
+
+    return html` <mwc-button
+        label="Add data attribute"
+        icon="playlist_add"
+        @click=${() => this.dataAttributePicker?.show()}
+      ></mwc-button
+      ><mwc-dialog id="dapicker" heading="Add Data Attributes"
+        ><oscd-finder-list
+          multi
+          .paths=${[[`Server: ${identity(server)}`]]}
+          .read=${getReader(server.ownerDocument, getDataAttributeChildren)}
+          .getDisplayString=${getDisplayString}
+          .getTitle=${(path: string[]) => path[path.length - 1]}
+        ></oscd-finder-list>
+        <mwc-button
+          slot="secondaryAction"
+          label="close"
+          @click=${() => this.dataAttributePicker?.close()}
+        ></mwc-button>
+        <mwc-button
+          slot="primaryAction"
+          label="save"
+          icon="save"
+          @click=${this.saveDataAttributes}
+        ></mwc-button>
+      </mwc-dialog>`;
   }
 
   private renderContent(): TemplateResult {
@@ -100,6 +246,9 @@ export class DataSetElementEditor extends LitElement {
         ?disabled=${!this.someInputDiff}
         @click=${() => this.saveChanges()}
       ></mwc-button>
+      <div style="display: flex; flex-direction:row;align-self: center;">
+        ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
+      </div>
       <oscd-filtered-list
         >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
           const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
