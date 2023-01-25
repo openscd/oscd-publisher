@@ -3,7 +3,7 @@ import { expect } from '@open-wc/testing';
 
 import { Remove, Update } from '@openscd/open-scd-core';
 
-import { removeDataSet, updateDateSetName } from './dataSet.js';
+import { addDataSet, removeDataSet, updateDateSetName } from './dataSet.js';
 import {
   orphanDataSet,
   validDataSet,
@@ -131,6 +131,95 @@ describe('DataSet related util functions', () => {
     it('including the subscriber supervision', () => {
       expect((actions[12] as Remove).node).to.equal(doi);
       expect((actions[13] as Remove).node).to.equal(ln);
+    });
+  });
+
+  describe('addDataSet', () => {
+    const simplescl = `
+    <IED>
+      <AccessPoint name="AP1">
+        <LDevice inst="first">
+          <LN0 lnClass="LLN0" inst="1">
+            <DataSet name="newDataSet_001"/>
+          </LN0>
+          <LN lnClass="MMXU" inst="1">
+            <DataSet name="newDataSet_001"/>
+            <DataSet name="newDataSet_003"/>
+            <DataSet name="newDataSet_004"/>
+          </LN>
+        <LN lnClass="MMXU" inst="2" />
+        </LDevice>
+      </AccessPoint>
+    </IED>`;
+
+    const invalidIed = `
+    <AccessPoint name="AP1">
+      <LDevice inst="first">
+        <LN0 lnClass="LLN0" inst="1">
+          <DataSet name="newDataSet_001"/>
+        </LN0>
+        <LN lnClass="MMXU" inst="1">
+          <DataSet name="newDataSet_001"/>
+          <DataSet name="newDataSet_002"/>
+          <DataSet name="newDataSet_004"/>
+        </LN>
+      </LDevice>
+      <LDevice inst="second">
+      </LDevice>
+    </AccessPoint>`;
+
+    const ied = new DOMParser()
+      .parseFromString(simplescl, 'application/xml')
+      .querySelector('IED')!;
+
+    const ln = new DOMParser()
+      .parseFromString(simplescl, 'application/xml')
+      .querySelector('LN')!;
+
+    const ln1 = new DOMParser()
+      .parseFromString(simplescl, 'application/xml')
+      .querySelector('LN[inst="2"]')!;
+
+    const ln0 = new DOMParser()
+      .parseFromString(simplescl, 'application/xml')
+      .querySelector('LN0')!;
+
+    const invalidParent = new DOMParser()
+      .parseFromString(invalidIed, 'application/xml')
+      .querySelector('LDevice[inst="second"]')!;
+
+    it('add new DataSet to first LN0', () => {
+      const insert = addDataSet(ied);
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.exist;
+      expect(insert?.node).to.have.attribute('name', 'newDataSet_002');
+    });
+
+    it('add new DataSet to LN0', () => {
+      const insert = addDataSet(ln0);
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.exist;
+      expect(insert?.node).to.have.attribute('name', 'newDataSet_002');
+    });
+
+    it('add new DataSet to first LN', () => {
+      const insert = addDataSet(ln);
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.exist;
+      expect(insert?.node).to.have.attribute('name', 'newDataSet_002');
+    });
+
+    it('add new DataSet to first empty LN', () => {
+      const insert = addDataSet(ln1);
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.exist;
+      expect(insert?.node).to.have.attribute('name', 'newDataSet_001');
+    });
+
+    it('returns null with invalid parent', () => {
+      const insert = addDataSet(invalidParent);
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.not.exist;
     });
   });
 });
