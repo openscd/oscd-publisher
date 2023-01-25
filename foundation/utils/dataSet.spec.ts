@@ -221,5 +221,16 @@ describe('DataSet related util functions', () => {
       // eslint-disable-next-line no-unused-expressions
       expect(insert).to.not.exist;
     });
+
+    it('allows to set DataSet attributes directly', () => {
+      const insert = addDataSet(ln, {
+        name: 'newDataSet_001',
+        desc: 'someDesc',
+      });
+      // eslint-disable-next-line no-unused-expressions
+      expect(insert).to.exist;
+      expect(insert?.node).to.have.attribute('name', 'newDataSet_001');
+      expect(insert?.node).to.have.attribute('desc', 'someDesc');
+    });
   });
 });

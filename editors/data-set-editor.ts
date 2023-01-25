@@ -3,6 +3,7 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
@@ -16,7 +17,7 @@ import type { OscdFilteredList } from '../foundation/components/oscd-filtered-li
 import { styles, updateElementReference } from '../foundation.js';
 import { selector } from '../foundation/identities/selector.js';
 import { identity } from '../foundation/identities/identity.js';
-import { removeDataSet } from '../foundation/utils/dataSet.js';
+import { addDataSet, removeDataSet } from '../foundation/utils/dataSet.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {
@@ -74,6 +75,7 @@ export class DataSetEditor extends LitElement {
       class="selectionlist"
       >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
         const ieditem = html`<mwc-list-item
+            hasMeta
             class="listitem header"
             noninteractive
             graphic="icon"
@@ -86,6 +88,15 @@ export class DataSetEditor extends LitElement {
           >
             <span>${ied.getAttribute('name')}</span>
             <mwc-icon slot="graphic">developer_board</mwc-icon>
+            <mwc-icon-button
+              slot="meta"
+              icon="playlist_add"
+              @click=${() => {
+                const insertDataSet = addDataSet(ied);
+                if (insertDataSet)
+                  this.dispatchEvent(newEditEvent(insertDataSet));
+              }}
+            ></mwc-icon-button>
           </mwc-list-item>
           <li divider role="separator"></li>`;
 
@@ -132,6 +143,10 @@ export class DataSetEditor extends LitElement {
 
     data-set-element-editor {
       flex: auto;
+    }
+
+    mwc-icon-button[icon='playlist_add'] {
+      pointer-events: all;
     }
 
     mwc-list-item {

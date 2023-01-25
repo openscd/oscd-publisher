@@ -79,17 +79,26 @@ function uniqueDataSetName(anyLn: Element): string {
   return newName;
 }
 
-/** @returns Action inserting new `DataSet` to [[`parent`]] element */
-export function addDataSet(parent: Element): Insert | null {
+/**
+ * @parent Parent element such as `LN0`, `LN`, `LDevice`, `AccessPoint` and `IED`
+ * @attributes DataSet element attributes. Required but missing attributes
+ *             will be added automatically.
+ ** @returns Action inserting new `DataSet` to [[`parent`]] element */
+
+export function addDataSet(
+  parent: Element,
+  attributes: Record<string, string | null> = {}
+): Insert | null {
   const anyLn =
     parent.tagName === 'LN' || parent.tagName === 'LN0'
       ? parent
       : parent.querySelector('LN0, LN');
   if (!anyLn) return null;
 
-  const dataSet = createElement(anyLn.ownerDocument, 'DataSet', {
-    name: uniqueDataSetName(anyLn),
-  });
+  // eslint-disable-next-line no-param-reassign
+  if (!attributes.name) attributes.name = uniqueDataSetName(anyLn);
+
+  const dataSet = createElement(anyLn.ownerDocument, 'DataSet', attributes);
 
   return {
     parent: anyLn,
