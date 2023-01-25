@@ -95,6 +95,8 @@ export class DataSetEditor extends LitElement {
                 const insertDataSet = addDataSet(ied);
                 if (insertDataSet)
                   this.dispatchEvent(newEditEvent(insertDataSet));
+
+                this.requestUpdate();
               }}
             ></mwc-icon-button>
           </mwc-list-item>
@@ -108,8 +110,10 @@ export class DataSetEditor extends LitElement {
               <span slot="meta"
                 ><mwc-icon-button
                   icon="delete"
-                  @click=${() =>
-                    this.dispatchEvent(newEditEvent(removeDataSet(dataSet)))}
+                  @click=${() => {
+                    this.dispatchEvent(newEditEvent(removeDataSet(dataSet)));
+                    this.requestUpdate();
+                  }}
                 ></mwc-icon-button>
               </span>
             </mwc-list-item>`
