@@ -246,6 +246,7 @@ export class DataSetElementEditor extends LitElement {
         ?disabled=${!this.someInputDiff}
         @click=${() => this.saveChanges()}
       ></mwc-button>
+      <hr color="lightgrey" />
       <div style="display: flex; flex-direction:row;align-self: center;">
         ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
       </div>
