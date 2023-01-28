@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Insert, Remove } from '@openscd/open-scd-core';
+import { appIdGenerator, mACAddressGenerator } from './generators.js';
 import { getReference } from './scldata.js';
 
 const gSEselectors: Record<string, string> = {
@@ -185,4 +186,78 @@ export function updateGSE(
     : [];
 
   return addressActions.concat(timeActions);
+}
+
+type GSeOptions = {
+  pTypes: Record<string, string | null>;
+  minTime?: string;
+  maxTime?: string;
+};
+
+/** @returns Action inserting new `GSE` to [[`connectedAp`]] element */
+export function addGSE(
+  connectedAp: Element,
+  attributes: { ldInst: string; cbName: string },
+  options: GSeOptions = { pTypes: {} }
+): Insert[] {
+  const actions: Insert[] = [];
+  const gSE = createElement(connectedAp.ownerDocument, 'GSE', attributes);
+  const address = createElement(gSE.ownerDocument, 'Address', {});
+
+  if (!options.pTypes['MAC-Address'])
+    // eslint-disable-next-line no-param-reassign
+    options.pTypes['MAC-Address'] = mACAddressGenerator(
+      connectedAp.ownerDocument,
+      'GSE'
+    )();
+
+  if (!options.pTypes.APPID)
+    // eslint-disable-next-line no-param-reassign
+    options.pTypes.APPID = appIdGenerator(connectedAp.ownerDocument, 'GSE')();
+
+  Object.entries(options.pTypes)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .filter(([_, value]) => value !== null)
+    .forEach(([type, value]) => {
+      const child = createElement(gSE.ownerDocument, 'P', { type });
+
+      child.textContent = value;
+      address.appendChild(child);
+    });
+
+  actions.push({
+    parent: connectedAp,
+    node: gSE,
+    reference: getReference(connectedAp, 'GSE'),
+  });
+
+  actions.push({
+    parent: gSE,
+    node: address,
+    reference: getReference(gSE, 'Address'),
+  });
+
+  const newMinTime = createElement(gSE.ownerDocument, 'MinTime', {
+    unit: 's',
+    multiplier: 'm',
+  });
+  newMinTime.textContent = options.minTime ?? '10';
+  actions.push({
+    parent: gSE,
+    node: newMinTime,
+    reference: getReference(gSE, 'MinTime'),
+  });
+
+  const newMaxTime = createElement(gSE.ownerDocument, 'MaxTime', {
+    unit: 's',
+    multiplier: 'm',
+  });
+  newMaxTime.textContent = options.maxTime ?? '10000';
+  actions.push({
+    parent: gSE,
+    node: newMaxTime,
+    reference: getReference(gSE, 'MaxTime'),
+  });
+
+  return actions;
 }

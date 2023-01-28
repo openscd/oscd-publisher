@@ -2,8 +2,9 @@
 import { expect } from '@open-wc/testing';
 import { Insert, isInsert, isRemove, Remove } from '@openscd/open-scd-core';
 
-import { checkGSEDiff, referencedGSE, updateGSE } from './gse.js';
+import { addGSE, checkGSEDiff, referencedGSE, updateGSE } from './gse.js';
 import {
+  multiReferenceGSE,
   nulledGSE,
   orphanGSEControl,
   partlyInstType,
@@ -83,6 +84,15 @@ function testTimeChange(gSE: Element, key: string, value: string | null): void {
   expect((actions[0 + offset] as Insert).reference).to.exist;
   expect(actions[1 + offset]).to.satisfies(isRemove);
   expect((actions[1 + offset] as Remove).node).to.equal(oldTime);
+}
+
+function expectAddress(
+  address: Element,
+  pTypes: Record<string, string | null>
+): void {
+  Array.from(address.querySelectorAll('P')).forEach(pType =>
+    expect(pType.textContent).to.equal(pTypes[pType.getAttribute('type')!])
+  );
 }
 
 describe('Utility function for GSE element', () => {
@@ -413,5 +423,96 @@ describe('Utility function for GSE element', () => {
           findElement(simpleReferenceGSE, 'GSEControl[name="someGse2"]')!
         )
       ).to.not.be.null);
+  });
+
+  describe('addGSE', () => {
+    const connectedAp = new DOMParser()
+      .parseFromString(multiReferenceGSE, 'application/xml')
+      .querySelector('ConnectedAP')!;
+
+    const gseAttrs = { ldInst: 'someLDInst', cbName: 'someGse1' };
+    const pTypes = {
+      'MAC-Address': '01-0C-CD-01-00-00',
+      APPID: '0000',
+      'VLAN-ID': '000',
+      'VLAN-PRIORITY': '4',
+    };
+    const minTime = '11';
+    const maxTime = '10001';
+
+    it('returns a set of insert actions creating a new GSE', () => {
+      const actions = addGSE(connectedAp, gseAttrs, {
+        pTypes,
+        minTime,
+        maxTime,
+      });
+      expect(actions.length).to.equal(4);
+
+      expect(((actions[0] as Insert).node as Element).tagName).to.equal('GSE');
+      expect((actions[0] as Insert).node).to.have.attribute(
+        'cbName',
+        'someGse1'
+      );
+      expect((actions[0] as Insert).node).to.have.attribute(
+        'ldInst',
+        'someLDInst'
+      );
+
+      expect(((actions[1] as Insert).node as Element).tagName).to.equal(
+        'Address'
+      );
+      expectAddress((actions[1] as Insert).node as Element, pTypes);
+
+      expect(((actions[2] as Insert).node as Element).tagName).to.equal(
+        'MinTime'
+      );
+      expect(((actions[2] as Insert).node as Element).textContent).to.equal(
+        minTime
+      );
+
+      expect(((actions[3] as Insert).node as Element).tagName).to.equal(
+        'MaxTime'
+      );
+      expect(((actions[3] as Insert).node as Element).textContent).to.equal(
+        maxTime
+      );
+    });
+
+    it('returns a set of insert actions creating a new GSE', () => {
+      const actions = addGSE(connectedAp, gseAttrs);
+      expect(actions.length).to.equal(4);
+
+      expect(((actions[0] as Insert).node as Element).tagName).to.equal('GSE');
+      expect((actions[0] as Insert).node).to.have.attribute(
+        'cbName',
+        'someGse1'
+      );
+      expect((actions[0] as Insert).node).to.have.attribute(
+        'ldInst',
+        'someLDInst'
+      );
+
+      expect(((actions[1] as Insert).node as Element).tagName).to.equal(
+        'Address'
+      );
+      expectAddress((actions[1] as Insert).node as Element, {
+        'MAC-Address': '01-0C-CD-01-00-01',
+        APPID: '0001',
+      });
+
+      expect(((actions[2] as Insert).node as Element).tagName).to.equal(
+        'MinTime'
+      );
+      expect(((actions[2] as Insert).node as Element).textContent).to.equal(
+        '10'
+      );
+
+      expect(((actions[3] as Insert).node as Element).tagName).to.equal(
+        'MaxTime'
+      );
+      expect(((actions[3] as Insert).node as Element).textContent).to.equal(
+        '10000'
+      );
+    });
   });
 });
