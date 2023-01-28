@@ -141,7 +141,7 @@ export class GseControlEditor extends LitElement {
           >
             <mwc-icon-button
               slot="change"
-              icon="change_circle"
+              icon="swap_vert"
               ?disabled=${!!findCtrlBlockSubscription(this.selectedGseControl)
                 .length}
               @click=${() => this.selectDataSetDialog.show()}

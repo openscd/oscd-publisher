@@ -148,7 +148,7 @@ export class SampledValueControlEditor extends LitElement {
           >
             <mwc-icon-button
               slot="change"
-              icon="change_circle"
+              icon="swap_vert"
               ?disabled=${!!findCtrlBlockSubscription(
                 this.selectedSampledValueControl
               ).length}
