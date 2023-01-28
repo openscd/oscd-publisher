@@ -24,6 +24,7 @@ import {
   findCtrlBlockSubscription,
   removeControlBlock,
 } from '../foundation/utils/controlBlocks.js';
+import { addGSEControl } from '../foundation/utils/gsecontrol.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {
@@ -107,7 +108,7 @@ export class GseControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <oscd-filtered-list activatable @selected=${() => this.selectDataSet()}
+        <oscd-filtered-list activatable @action=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedGseControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -164,6 +165,7 @@ export class GseControlEditor extends LitElement {
       >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
         const ieditem = html`<mwc-list-item
             class="listitem header"
+            hasMeta
             noninteractive
             graphic="icon"
             value="${Array.from(ied.querySelectorAll('GSEControl'))
@@ -175,6 +177,16 @@ export class GseControlEditor extends LitElement {
           >
             <span>${ied.getAttribute('name')}</span>
             <mwc-icon slot="graphic">developer_board</mwc-icon>
+            <mwc-icon-button
+              slot="meta"
+              icon="playlist_add"
+              @click=${() => {
+                const insert = addGSEControl(ied);
+                if (insert) this.dispatchEvent(newEditEvent(insert));
+
+                this.requestUpdate();
+              }}
+            ></mwc-icon-button>
           </mwc-list-item>
           <li divider role="separator"></li>`;
 
@@ -254,6 +266,10 @@ export class GseControlEditor extends LitElement {
 
     mwc-list-item {
       --mdc-list-item-meta-size: 48px;
+    }
+
+    mwc-icon-button[icon='playlist_add'] {
+      pointer-events: all;
     }
 
     @media (max-width: 950px) {
