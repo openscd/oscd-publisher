@@ -52,7 +52,14 @@ describe('Utility functions for GSEControl element', () => {
         expect(actions.length).to.equal(1);
         expect(actions[0]).to.satisfy(isUpdate);
         expect((actions[0] as Update).element).to.equal(gseControl);
-        expect((actions[0] as Update).attributes).to.deep.equal(buildAttr());
+        expect((actions[0] as Update).attributes).to.deep.equal({
+          desc: 'someDesc',
+          type: 'GSSE',
+          appID: 'someNewAppID',
+          fixedOffs: 'true',
+          securityEnabled: 'someSecEna',
+          confRev: '20001',
+        });
       });
     });
 
@@ -67,9 +74,15 @@ describe('Utility functions for GSEControl element', () => {
         expect(actions.length).to.equal(2);
         expect(actions[0]).to.satisfy(isUpdate);
         expect((actions[0] as Update).element).to.equal(gseControl);
-        expect((actions[0] as Update).attributes).to.deep.equal(
-          buildAttr(true)
-        );
+        expect((actions[0] as Update).attributes).to.deep.equal({
+          name: 'someNewGseName',
+          desc: 'someDesc',
+          type: 'GSSE',
+          appID: 'someNewAppID',
+          fixedOffs: 'true',
+          securityEnabled: 'someSecEna',
+          confRev: '10000',
+        });
 
         expect(actions[1]).to.satisfy(isUpdate);
         expect((actions[1] as Update).element.tagName).to.equal('ExtRef');
@@ -88,9 +101,15 @@ describe('Utility functions for GSEControl element', () => {
         expect(actions.length).to.equal(5);
         expect(actions[0]).to.satisfy(isUpdate);
         expect((actions[0] as Update).element).to.equal(gseControl);
-        expect((actions[0] as Update).attributes).to.deep.equal(
-          buildAttr(true)
-        );
+        expect((actions[0] as Update).attributes).to.deep.equal({
+          name: 'someNewGseName',
+          desc: 'someDesc',
+          type: 'GSSE',
+          appID: 'someNewAppID',
+          fixedOffs: 'true',
+          securityEnabled: 'someSecEna',
+          confRev: '20001',
+        });
 
         expect(actions[1]).to.satisfy(isUpdate);
         expect((actions[1] as Update).element.tagName).to.equal('ExtRef');
@@ -126,9 +145,15 @@ describe('Utility functions for GSEControl element', () => {
         expect(actions.length).to.equal(5);
         expect(actions[0]).to.satisfy(isUpdate);
         expect((actions[0] as Update).element).to.equal(gseControl);
-        expect((actions[0] as Update).attributes).to.deep.equal(
-          buildAttr(true)
-        );
+        expect((actions[0] as Update).attributes).to.deep.equal({
+          name: 'someNewGseName',
+          desc: 'someDesc',
+          type: 'GSSE',
+          appID: 'someNewAppID',
+          fixedOffs: 'true',
+          securityEnabled: 'someSecEna',
+          confRev: '10000',
+        });
 
         expect(actions[1]).to.satisfy(isUpdate);
         expect((actions[1] as Update).element.tagName).to.equal('ExtRef');

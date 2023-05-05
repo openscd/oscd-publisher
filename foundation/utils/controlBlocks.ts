@@ -4,6 +4,11 @@ import { Remove, Update } from '@openscd/open-scd-core';
 import { removeDataSet } from './dataSet.js';
 import { matchExtRefCtrlBlockAttr, unsubscribe } from './extRef.js';
 
+/** @returns Updated confRev attribute for control block */
+export function updatedConfRev(ctrlBlock: Element): string {
+  return `${parseInt(ctrlBlock.getAttribute('confRev') ?? '0', 10) + 10000}`;
+}
+
 /** @returns all ExtRef element subscribed to a controlBlock */
 export function findCtrlBlockSubscription(ctrlBlock: Element): Element[] {
   const doc = ctrlBlock.ownerDocument;

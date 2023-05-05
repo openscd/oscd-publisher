@@ -75,7 +75,10 @@ describe('DataSet related util functions', () => {
           'GSEControl',
           'SampledValueControl',
         ]);
-        expect(update.attributes).to.deep.equal({ datSet: 'someNewName' });
+        expect(update.attributes).to.deep.equal({
+          datSet: 'someNewName',
+          confRev: '10000',
+        });
       }
     });
   });
@@ -97,21 +100,39 @@ describe('DataSet related util functions', () => {
     );
 
     it('removes DataSet also removes/updates dependant data', () =>
-      expect(actions.length).to.equal(14));
+      expect(actions.length).to.equal(26));
 
     it('including the DataSet itself', () =>
       expect((actions[0] as Remove).node).to.equal(dataSet));
 
     it('including control Block updates', () => {
-      expect((actions[1] as Update).attributes).to.deep.equal({ datSet: null });
-      expect((actions[2] as Update).attributes).to.deep.equal({ datSet: null });
-      expect((actions[3] as Update).attributes).to.deep.equal({ datSet: null });
+      expect((actions[1] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
+      expect((actions[2] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
+      expect((actions[3] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
     });
 
     it('including external references', () => {
-      expect((actions[1] as Update).attributes).to.deep.equal({ datSet: null });
-      expect((actions[2] as Update).attributes).to.deep.equal({ datSet: null });
-      expect((actions[3] as Update).attributes).to.deep.equal({ datSet: null });
+      expect((actions[1] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
+      expect((actions[2] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
+      expect((actions[3] as Update).attributes).to.deep.equal({
+        datSet: null,
+        confRev: '10000',
+      });
     });
 
     it('including the data itself', () => {

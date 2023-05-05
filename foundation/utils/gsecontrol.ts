@@ -7,6 +7,7 @@ import { connectedAp } from './connectedAp.js';
 import {
   controlBlockObjectReference,
   findCtrlBlockSubscription,
+  updatedConfRev,
 } from './controlBlocks.js';
 import { addGSE, referencedGSE } from './gse.js';
 import { getReference } from './scldata.js';
@@ -29,6 +30,8 @@ export function updateGseControl(
   gseControl: Element,
   attrs: Record<string, string | null>
 ): (Update | Remove | Insert)[] {
+  attrs.confRev = updatedConfRev(gseControl); // +10000 for update
+
   const ctrlBlockUpdates: (Update | Remove | Insert)[] = [
     { element: gseControl, attributes: attrs },
   ];

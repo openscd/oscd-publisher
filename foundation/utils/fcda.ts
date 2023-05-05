@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Insert, Remove, Update } from '@openscd/open-scd-core';
 
-import { controlBlocks } from './controlBlocks.js';
+import { controlBlocks, updatedConfRev } from './controlBlocks.js';
 import {
   matchExtRefCtrlBlockAttr,
   matchExtRefFcda,
@@ -80,7 +80,14 @@ export function removeFCDAs(fCDAs: Element[]): (Update | Remove)[] {
     ...unsubscribe(fCDAs.flatMap(fCDA => findFcdaSubscription(fCDA)))
   );
 
-  return removeFCDAsActions.concat(extRefActions);
+  const controlBlockUpdates: Update[] = fCDAs.flatMap(fCDA =>
+    controlBlocks(fCDA).map(element => ({
+      element,
+      attributes: { confRev: updatedConfRev(element) },
+    }))
+  );
+
+  return removeFCDAsActions.concat(extRefActions, controlBlockUpdates);
 }
 
 /** @returns Action array removing FCDA and its subscriber information */

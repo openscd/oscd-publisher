@@ -17,6 +17,7 @@ import {
   controlBlockObjectReference,
   controlBlocks,
   removeControlBlock,
+  updatedConfRev,
 } from './controlBlocks.js';
 
 function findElement(str: string, selector: string): Element {
@@ -176,7 +177,7 @@ describe('Control block related util functions', () => {
       const dataSet = ctrlBlock1.ownerDocument.querySelector(
         'DataSet[name="smvDataSet"]'
       );
-      expect(actions.length).equals(8);
+      expect(actions.length).equals(10);
       expect((actions[1] as Remove).node).equal(dataSet);
       expect(((actions[3] as Remove).node as Element).tagName).equal('FCDA');
       expect(((actions[4] as Remove).node as Element).tagName).equal('FCDA');
@@ -184,5 +185,21 @@ describe('Control block related util functions', () => {
       expect(((actions[6] as Remove).node as Element).tagName).equal('ExtRef');
       expect(((actions[7] as Remove).node as Element).tagName).equal('Inputs');
     });
+  });
+
+  describe('updatedConfRev', () => {
+    const rptControl = new DOMParser()
+      .parseFromString(`<ReportControl confRev="1"/> `, 'application/xml')
+      .querySelector('ReportControl')!;
+
+    const gseControl = new DOMParser()
+      .parseFromString(`<GSEControl /> `, 'application/xml')
+      .querySelector('GSEControl')!;
+
+    it('increments existing confRev', () =>
+      expect(updatedConfRev(rptControl)).equals('10001'));
+
+    it('increments missing confRev', () =>
+      expect(updatedConfRev(gseControl)).equals('10000'));
   });
 });
