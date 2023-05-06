@@ -23,6 +23,7 @@ import {
   findCtrlBlockSubscription,
   removeControlBlock,
 } from '../foundation/utils/controlBlocks.js';
+import { addReportControl } from '../foundation/utils/reportcontrol.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {
@@ -170,6 +171,7 @@ export class ReportControlEditor extends LitElement {
       >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
         const ieditem = html`<mwc-list-item
             class="listitem header"
+            hasMeta
             noninteractive
             graphic="icon"
             value="${Array.from(ied.querySelectorAll('ReportControl'))
@@ -181,6 +183,16 @@ export class ReportControlEditor extends LitElement {
           >
             <span>${ied.getAttribute('name')}</span>
             <mwc-icon slot="graphic">developer_board</mwc-icon>
+            <mwc-icon-button
+              slot="meta"
+              icon="playlist_add"
+              @click=${() => {
+                const insert = addReportControl(ied);
+                if (insert) this.dispatchEvent(newEditEvent(insert));
+
+                this.requestUpdate();
+              }}
+            ></mwc-icon-button>
           </mwc-list-item>
           <li divider role="separator"></li>`;
 
@@ -252,6 +264,10 @@ export class ReportControlEditor extends LitElement {
     }
     mwc-list-item {
       --mdc-list-item-meta-size: 48px;
+    }
+
+    mwc-icon-button[icon='playlist_add'] {
+      pointer-events: all;
     }
 
     data-set-element-editor {

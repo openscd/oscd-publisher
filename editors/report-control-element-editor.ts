@@ -339,7 +339,6 @@ export class ReportControlElementEditor extends LitElement {
         label="rptID"
         .maybeValue=${rptID}
         nullable
-        required
         helper="report.rptID"
         @input=${this.onReportControlInputChange}
       ></oscd-textfield
