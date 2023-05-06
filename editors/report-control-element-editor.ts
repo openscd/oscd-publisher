@@ -1,11 +1,48 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import {
+  customElement,
+  property,
+  query,
+  queryAll,
+  state,
+} from 'lit/decorators.js';
+
+import { newEditEvent } from '@openscd/open-scd-core';
 
 import '../foundation/components/oscd-checkbox.js';
-import '../foundation/components/oscd-textfield.js';
 import '../foundation/components/oscd-select.js';
+import '../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
+import type { OscdSelect } from '../foundation/components/oscd-select.js';
+import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+
 import { maxLength, patterns } from '../foundation/pattern.js';
 import { identity } from '../foundation/identities/identity.js';
+import {
+  updateMaxClients,
+  updateOptFields,
+  updateReportControl,
+} from '../foundation/utils/reportcontrol.js';
+
+function checkRptEnabledValidity(
+  rptEnabled: Element | null,
+  input: OscdTextfield
+): boolean {
+  if (!input.checkValidity()) return false;
+
+  if (!rptEnabled) return true;
+
+  const clientLNs = Array.from(
+    rptEnabled.querySelectorAll(':scope > ClientLN')
+  );
+  const maxRpt = input.maybeValue ?? '0';
+
+  if (clientLNs.length <= parseInt(maxRpt, 10)) return true;
+
+  input.setCustomValidity(`There are ${clientLNs.length} clientLNs`);
+  return false;
+}
 
 @customElement('report-control-element-editor')
 export class ReportControlElementEditor extends LitElement {
@@ -16,6 +53,151 @@ export class ReportControlElementEditor extends LitElement {
   /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   element!: Element;
+
+  @state()
+  private optFieldsDiff = false;
+
+  @state()
+  private trgOpsDiff = false;
+
+  @state()
+  private reportControlDiff = false;
+
+  private onOptFieldsInputChange(): void {
+    const optFields = this.element.querySelector(':scope > OptFields');
+
+    if (
+      Array.from(this.optFieldsInputs ?? []).some(
+        input => !input.checkValidity()
+      )
+    ) {
+      this.optFieldsDiff = false;
+      return;
+    }
+
+    const optFieldsAttrs: Record<string, string | null> = {};
+    for (const input of this.optFieldsInputs ?? [])
+      optFieldsAttrs[input.label] = input.maybeValue;
+
+    this.optFieldsDiff = Array.from(this.optFieldsInputs ?? []).some(
+      input => optFields?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveOptFieldChanges(): void {
+    const optFields = this.element.querySelector(':scope > OptFields');
+
+    if (!optFields) return;
+
+    const optFieldAttrs: Record<string, string | null> = {};
+    for (const input of this.optFieldsInputs ?? [])
+      if (optFields.getAttribute(input.label) !== input.maybeValue)
+        optFieldAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(newEditEvent(updateOptFields(optFields, optFieldAttrs)));
+
+    this.onOptFieldsInputChange();
+  }
+
+  private onTrgOpsInputChange(): void {
+    const trgOps = this.element.querySelector(':scope > TrgOps');
+
+    if (
+      Array.from(this.trgOpsInputs ?? []).some(input => !input.checkValidity())
+    ) {
+      this.trgOpsDiff = false;
+      return;
+    }
+
+    const trgOpsAttrs: Record<string, string | null> = {};
+    for (const input of this.trgOpsInputs ?? [])
+      trgOpsAttrs[input.label] = input.maybeValue;
+
+    this.trgOpsDiff = Array.from(this.trgOpsInputs ?? []).some(
+      input => trgOps?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveTrgOpsChanges(): void {
+    const trgOps = this.element.querySelector(':scope > TrgOps');
+
+    if (!trgOps) return;
+
+    const trgOpsAttrs: Record<string, string | null> = {};
+    for (const input of this.trgOpsInputs ?? [])
+      if (trgOps.getAttribute(input.label) !== input.maybeValue)
+        trgOpsAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(newEditEvent(updateOptFields(trgOps, trgOpsAttrs)));
+
+    this.onTrgOpsInputChange();
+  }
+
+  private onReportControlInputChange(): void {
+    const reportControl = this.element;
+    const rptEnabled = reportControl.querySelector(':scope > RptEnabled');
+
+    const someInvalidAttrs = Array.from(this.reportControlInputs ?? []).some(
+      input => !input.checkValidity()
+    );
+    if (
+      someInvalidAttrs ||
+      !checkRptEnabledValidity(rptEnabled, this.rptEnabledInput)
+    ) {
+      this.reportControlDiff = false;
+      return;
+    }
+
+    const reportControlAttrs: Record<string, string | null> = {};
+    for (const input of this.reportControlInputs ?? [])
+      reportControlAttrs[input.label] = input.maybeValue;
+
+    const someAttrDiff = Array.from(this.reportControlInputs ?? []).some(
+      input => reportControl?.getAttribute(input.label) !== input.maybeValue
+    );
+    const rptEnabledDiff =
+      (rptEnabled?.getAttribute('max') ?? null) !==
+      this.rptEnabledInput.maybeValue;
+    this.reportControlDiff = someAttrDiff || rptEnabledDiff;
+  }
+
+  private saveReportControlChanges(): void {
+    const reportControl = this.element;
+
+    const reportControlAttrs: Record<string, string | null> = {};
+    for (const input of this.reportControlInputs ?? [])
+      if (reportControl.getAttribute(input.label) !== input.maybeValue)
+        reportControlAttrs[input.label] = input.maybeValue;
+
+    const reportControlActions = updateReportControl(
+      reportControl,
+      reportControlAttrs
+    );
+
+    const max = this.rptEnabledInput.maybeValue;
+    const rptEnabledAction = updateMaxClients(reportControl, max);
+
+    if (!rptEnabledAction)
+      this.dispatchEvent(newEditEvent(reportControlActions));
+    else
+      this.dispatchEvent(
+        newEditEvent([...reportControlActions, rptEnabledAction])
+      );
+
+    this.onReportControlInputChange();
+  }
+
+  @queryAll('.content.optfields > oscd-checkbox')
+  optFieldsInputs?: OscdCheckbox[];
+
+  @queryAll('.content.trgops > oscd-checkbox')
+  trgOpsInputs?: OscdCheckbox[];
+
+  @queryAll('.report.attributes')
+  reportControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
+
+  @query('.rptenabled.attributes')
+  rptEnabledInput!: OscdTextfield;
 
   private renderOptFieldsContent(): TemplateResult {
     const [
@@ -41,26 +223,35 @@ export class ReportControlElementEditor extends LitElement {
         this.element.querySelector('OptFields')?.getAttribute(attr) ?? null
     );
 
-    return html`<h3>Optional Fields</h3>
-      ${Object.entries({
-        seqNum,
-        timeStamp,
-        dataSet,
-        reasonCode,
-        dataRef,
-        entryID,
-        configRef,
-        bufOvfl,
-      }).map(
-        ([key, value]) =>
-          html`<oscd-checkbox
-            label="${key}"
-            .maybeValue=${value}
-            nullable
-            helper="scl.key"
-            disabled
-          ></oscd-checkbox>`
-      )}`;
+    return html`<div class="content optfields">
+        <h3>Optional Fields</h3>
+        ${Object.entries({
+          seqNum,
+          timeStamp,
+          dataSet,
+          reasonCode,
+          dataRef,
+          entryID,
+          configRef,
+          bufOvfl,
+        }).map(
+          ([key, value]) =>
+            html`<oscd-checkbox
+              label="${key}"
+              .maybeValue=${value}
+              nullable
+              helper="scl.key"
+              @input=${this.onOptFieldsInputChange}
+            ></oscd-checkbox>`
+        )}
+      </div>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.optFieldsDiff}
+        @click=${() => this.saveOptFieldChanges()}
+      ></mwc-button>`;
   }
 
   private renderTrgOpsContent(): TemplateResult {
@@ -74,17 +265,26 @@ export class ReportControlElementEditor extends LitElement {
       attr => this.element.querySelector('TrgOps')?.getAttribute(attr) ?? null
     );
 
-    return html` <h3>Trigger Options</h3>
-      ${Object.entries({ dchg, qchg, dupd, period, gi }).map(
-        ([key, value]) =>
-          html`<oscd-checkbox
-            label="${key}"
-            .maybeValue=${value}
-            nullable
-            helper="scl.key"
-            disabled
-          ></oscd-checkbox>`
-      )}`;
+    return html`<div class="content trgops">
+        <h3>Trigger Options</h3>
+        ${Object.entries({ dchg, qchg, dupd, period, gi }).map(
+          ([key, value]) =>
+            html`<oscd-checkbox
+              label="${key}"
+              .maybeValue=${value}
+              nullable
+              helper="scl.key"
+              @input=${this.onTrgOpsInputChange}
+            ></oscd-checkbox>`
+        )}
+      </div>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.trgOpsDiff}
+        @click=${() => this.saveTrgOpsChanges()}
+      ></mwc-button>`;
   }
 
   private renderChildElements(): TemplateResult {
@@ -106,77 +306,93 @@ export class ReportControlElementEditor extends LitElement {
     const max =
       this.element.querySelector('RptEnabled')?.getAttribute('max') ?? null;
 
-    return html`<div class="content">
+    return html`<div class="content reportcontrol">
       <oscd-textfield
+        class="report attributes"
         label="name"
         .maybeValue=${name}
-        helper="'scl.name')}"
+        helper="scl.name"
         required
         validationMessage="'textfield.required')}"
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
-        disabled
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield
       ><oscd-textfield
+        class="report attributes"
         label="desc"
         .maybeValue=${desc}
         nullable
-        helper="'scl.desc')}"
-        disabled
+        helper="scl.desc"
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield
       ><oscd-checkbox
+        class="report attributes"
         label="buffered"
         .maybeValue=${buffered}
-        helper="'scl.buffered')}"
-        disabled
+        helper="scl.buffered"
+        @input=${this.onReportControlInputChange}
       ></oscd-checkbox
       ><oscd-textfield
+        class="report attributes"
         label="rptID"
         .maybeValue=${rptID}
         nullable
         required
-        helper="'report.rptID')}"
-        disabled
+        helper="report.rptID"
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield
       ><oscd-checkbox
+        class="report attributes"
         label="indexed"
         .maybeValue=${indexed}
         nullable
-        helper="'scl.indexed')}"
-        disabled
+        helper="scl.indexed"
+        @input=${this.onReportControlInputChange}
       ></oscd-checkbox
       ><oscd-textfield
+        class="rptenabled attributes"
         label="max Clients"
         .maybeValue=${max}
-        helper="'scl.maxReport')}"
+        helper="scl.maxReport"
         nullable
         type="number"
+        min="0"
         suffix="#"
-        disabled
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield
       ><oscd-textfield
+        class="report attributes"
         label="bufTime"
         .maybeValue=${bufTime}
-        helper="'scl.bufTime')}"
+        helper="scl.bufTime"
         nullable
         required
         type="number"
         min="0"
         suffix="ms"
-        disabled
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield
       ><oscd-textfield
+        class="report attributes"
         label="intgPd"
         .maybeValue=${intgPd}
-        helper="'scl.intgPd')}"
+        helper="scl.intgPd"
         nullable
         required
         type="number"
         min="0"
         suffix="ms"
-        disabled
+        @input=${this.onReportControlInputChange}
       ></oscd-textfield>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.reportControlDiff}
+        @click=${() => this.saveReportControlChanges()}
+      ></mwc-button>
     </div>`;
   }
 
@@ -192,8 +408,8 @@ export class ReportControlElementEditor extends LitElement {
           ${this.renderReportControlContent()}${this.renderChildElements()}
         </div>`;
 
-    return html`<div class="content">
-      <h2>'publisher.nodataset')}</h2>
+    return html`<div class="parentcontent">
+      <h2>'publisher.nodataset'</h2>
     </div>`;
   }
 
@@ -206,12 +422,18 @@ export class ReportControlElementEditor extends LitElement {
     }
 
     .content {
+      display: flex;
+      flex-direction: column;
       border-left: thick solid var(--mdc-theme-on-primary);
     }
 
     .content > * {
       display: block;
       margin: 4px 8px 16px;
+    }
+
+    .save {
+      align-self: flex-end;
     }
 
     h2,
@@ -236,7 +458,7 @@ export class ReportControlElementEditor extends LitElement {
     }
 
     @media (max-width: 950px) {
-      .content {
+      .parentcontent {
         border-left: 0px solid var(--mdc-theme-on-primary);
       }
     }
