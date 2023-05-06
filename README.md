@@ -14,7 +14,7 @@ This is an editor plugin for [open-scd-core](https://github.com/openscd/open-scd
 
 ## Quick access tp the plugin
 
-https://shorturl.at/kvR14
+https://shorturl.at/avzBL
 
 ## Linting and formatting
 
