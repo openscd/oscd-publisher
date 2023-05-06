@@ -1,10 +1,20 @@
-# \<oscd-save>
-
-This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
+# \<oscd-publisher>
 
 ## What is this?
 
-This is the first plugin for [open-scd-core](https://github.com/openscd/open-scd-core#readme), the new core editor engine for OpenSCD. `demo/index.html` shows how you can use the same generic "Open File" plugin as both a menu and editor plugin at the same time. Start up a demo server with `npm start` and see for yourself!
+This is an editor plugin for [open-scd-core](https://github.com/openscd/open-scd-core#readme), the new core editor engine for OpenSCD. With this plugin you can edit control block and related elements and its data sets. Start up a demo server with `npm start` and see for yourself!
+
+## Missing features
+
+- create `ReportControl` elements
+- create `SampledValueControl` elements
+- edit `SampledValueControl` elements
+- re-allocate control blocks in data model (new once are allocated the first logicals device `LLN0`)
+- re-arrange `FCDA` element in the `DataSet`
+
+## Quick access tp the plugin
+
+https://shorturl.at/kvR14
 
 ## Linting and formatting
 
@@ -22,8 +32,6 @@ npm run format
 
 ## Testing with Web Test Runner
 
-> This demo plugin does nothing much that could be tested as it relies exclusively on built-in browser components to do its job. We therefore currently have no tests. If you find something that could be tested, please feel free!
-
 To execute a single test run:
 
 ```bash
@@ -35,7 +43,6 @@ To run the tests in interactive watch mode run:
 ```bash
 npm run test:watch
 ```
-
 
 ## Tooling configs
 
@@ -51,4 +58,4 @@ npm start
 
 To run a local development server that serves the basic demo located in `demo/index.html`
 
-&copy; 2022 OMICRON electronics GmbH
+&copy; Jakob Vogelsang
