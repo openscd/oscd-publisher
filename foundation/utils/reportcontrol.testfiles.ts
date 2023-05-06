@@ -9,6 +9,18 @@ export const existingRptControl = `
     <RptEnabled max="6" /> 
 </ReportControl>`;
 
+export const defaultReport = `
+<ReportControl name="newReportControl_002" buffered="true" rptID="" bufTime="100" confRev="0" />`;
+
+export const completeReport = `
+<ReportControl name="someName" desc="someDesc" buffered="true" rptID="someRptID" indexed="true" bufTime="200" intgPd="40" confRev="45" ><TrgOps dchg="true" qchg="true" dupd="true" period="true" gi="true"/><OptFields seqNum="true" timeStamp="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true" /><RptEnabled max="8" /></ReportControl>`;
+
+export const defaultIntgPdReport = `
+<ReportControl name="someName" desc="someDesc" buffered="true" rptID="someRptID" indexed="true" bufTime="200" intgPd="1000" confRev="0" ><TrgOps period="true"/></ReportControl>`;
+
+export const defaultPeriodReport = `
+<ReportControl name="someName" desc="someDesc" buffered="true" rptID="someRptID" indexed="true" bufTime="200" intgPd="342" confRev="0" ><TrgOps period="true"/></ReportControl>`;
+
 export const subscribedReport = `
 <SCL version="2007">
 <IED name="sinkIED">
@@ -40,7 +52,9 @@ export const subscribedReport = `
                             serviceType="Report" />
                     </Inputs>
                 </LN0>
+                <LN lnClass="LGOS" inst="1" lnType="someLGOSType" />
             </LDevice>
+            <LDevice inst="second" />
         </Server>
     </AccessPoint>
 </IED>
@@ -82,6 +96,7 @@ export const subscribedReport = `
                             fc="ST" />
                     </DataSet>
                     <ReportControl name="someReport" datSet="rptDataSet" confRev="10001"/>
+                    <ReportControl name="newReportControl_001" />
                 </LN0>
             </LDevice>
         </Server>

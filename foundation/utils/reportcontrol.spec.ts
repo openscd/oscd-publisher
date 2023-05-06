@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from '@open-wc/testing';
 
@@ -10,11 +11,16 @@ import {
 } from '@openscd/open-scd-core';
 
 import {
+  completeReport,
+  defaultIntgPdReport,
+  defaultPeriodReport,
+  defaultReport,
   existingRptControl,
   missingRptControl,
   subscribedReport,
 } from './reportcontrol.testfiles';
 import {
+  addReportControl,
   updateMaxClients,
   updateOptFields,
   updateReportControl,
@@ -149,6 +155,155 @@ describe('ReportControl related functions', () => {
           srcCBName: 'someNewName',
         });
       });
+    });
+  });
+
+  describe('add ReportControl element', () => {
+    const ied = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('IED')!;
+
+    const ln = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('LN')!;
+
+    const ln0 = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('LN0')!;
+
+    const ln02 = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('IED[name="srcIED"] LN0')!;
+
+    const lDevice = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('IED[name="srcIED"] LDevice')!;
+
+    const invalidParent = new DOMParser()
+      .parseFromString(subscribedReport, 'application/xml')
+      .querySelector('LDevice[inst="second"]')!;
+
+    it('with parent IED adds ReportControl to first LDevices LLN0 ', () => {
+      const insert = addReportControl(ied);
+
+      expect(insert).to.exist;
+      expect((insert![0].parent as Element).tagName).to.equal('LN0');
+    });
+
+    it('with parent LDevice adds ReportControl to its LN0', () => {
+      const insert = addReportControl(lDevice);
+
+      expect(insert).to.exist;
+      expect((insert![0].parent as Element).tagName).to.equal('LN0');
+    });
+
+    it('with parent LN0 adds ReportControl to this LN0', () => {
+      const insert = addReportControl(ln0);
+
+      expect(insert).to.exist;
+      expect(insert![0].parent as Element).to.equal(ln0);
+    });
+
+    it('with parent LN adds ReportControl to this LN', () => {
+      const insert = addReportControl(ln);
+
+      expect(insert).to.exist;
+      expect(insert![0].parent as Element).to.equal(ln);
+    });
+
+    it('returns null with missing LN0 or LN', () => {
+      const insert = addReportControl(invalidParent);
+
+      expect(insert).to.not.exist;
+    });
+
+    it('adds required attributes when missing', () => {
+      const insert = addReportControl(ln02);
+      const expectedReport = findElement(defaultReport, 'ReportControl')!;
+
+      expect(insert).to.exist;
+      expect(insert?.length).to.equal(1);
+      expect(insert![0].node.isEqualNode(expectedReport)).to.be.true;
+    });
+
+    it('adds all handed attributes', () => {
+      const insert = addReportControl(ln02, {
+        rpt: {
+          name: 'someName',
+          desc: 'someDesc',
+          buffered: 'true',
+          rptID: 'someRptID',
+          indexed: 'true',
+          bufTime: '200',
+          intgPd: '40',
+        },
+        trgOps: {
+          dchg: 'true',
+          qchg: 'true',
+          dupd: 'true',
+          period: 'true',
+          gi: 'true',
+        },
+        optFields: {
+          seqNum: 'true',
+          timeStamp: 'true',
+          reasonCode: 'true',
+          dataRef: 'true',
+          entryID: 'true',
+          configRef: 'true',
+          bufOvfl: 'true',
+        },
+        confRev: '45',
+        maxClients: '8',
+      });
+      const expectedReport = findElement(completeReport, 'ReportControl')!;
+
+      expect(insert).to.exist;
+      expect(insert?.length).to.equal(1);
+      expect(insert![0].node.isEqualNode(expectedReport)).to.be.true;
+    });
+
+    it('defaults missing intgPd with TrgOps period active', () => {
+      const insert = addReportControl(ln02, {
+        rpt: {
+          name: 'someName',
+          desc: 'someDesc',
+          buffered: 'true',
+          rptID: 'someRptID',
+          indexed: 'true',
+          bufTime: '200',
+        },
+        trgOps: {
+          period: 'true',
+        },
+        optFields: {},
+      });
+      const expectedReport = findElement(defaultIntgPdReport, 'ReportControl')!;
+
+      expect(insert).to.exist;
+      expect(insert?.length).to.equal(1);
+      expect(insert![0].node.isEqualNode(expectedReport)).to.be.true;
+    });
+
+    it('defaults missing period with existing intgPd ', () => {
+      const insert = addReportControl(ln02, {
+        rpt: {
+          name: 'someName',
+          desc: 'someDesc',
+          buffered: 'true',
+          rptID: 'someRptID',
+          indexed: 'true',
+          bufTime: '200',
+          intgPd: '342',
+        },
+        trgOps: { period: 'false' },
+        optFields: {},
+      });
+      const expectedReport = findElement(defaultPeriodReport, 'ReportControl')!;
+
+      expect(insert).to.exist;
+      expect(insert?.length).to.equal(1);
+      expect(insert![0].node.isEqualNode(expectedReport)).to.be.true;
     });
   });
 });
