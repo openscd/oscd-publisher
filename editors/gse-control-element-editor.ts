@@ -41,6 +41,10 @@ export class GseControlElementEditor extends LitElement {
   @property({ attribute: false })
   element!: Element;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @property({ attribute: false })
   get gSE(): Element | null | undefined {
     const cbName = this.element.getAttribute('name');

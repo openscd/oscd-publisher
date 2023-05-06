@@ -16,6 +16,10 @@ export default class PublisherPlugin extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   private publisherType: 'Report' | 'GOOSE' | 'SampledValue' | 'DataSet' =
     'GOOSE';
@@ -60,24 +64,28 @@ export default class PublisherPlugin extends LitElement {
       </div>
       <report-control-editor
         .doc=${this.doc}
+        editCount="${this.editCount}"
         class="${classMap({
           hidden: this.publisherType !== 'Report',
         })}"
       ></report-control-editor
       ><gse-control-editor
         .doc=${this.doc}
+        editCount="${this.editCount}"
         class="${classMap({
           hidden: this.publisherType !== 'GOOSE',
         })}"
       ></gse-control-editor
       ><sampled-value-control-editor
         .doc=${this.doc}
+        editCount="${this.editCount}"
         class="${classMap({
           hidden: this.publisherType !== 'SampledValue',
         })}"
       ></sampled-value-control-editor
       ><data-set-editor
         .doc=${this.doc}
+        editCount="${this.editCount}"
         class="${classMap({
           hidden: this.publisherType !== 'DataSet',
         })}"

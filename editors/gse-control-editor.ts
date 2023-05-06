@@ -32,6 +32,10 @@ export class GseControlEditor extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   selectedGseControl?: Element;
 
@@ -138,6 +142,7 @@ export class GseControlEditor extends LitElement {
           <data-set-element-editor
             .element=${this.selectedDataSet!}
             .showHeader=${false}
+            editCount="${this.editCount}"
           >
             <mwc-icon-button
               slot="change"
@@ -151,6 +156,7 @@ export class GseControlEditor extends LitElement {
         <gse-control-element-editor
           .doc=${this.doc}
           .element=${this.selectedGseControl}
+          editCount="${this.editCount}"
         ></gse-control-element-editor>
       </div>`;
 

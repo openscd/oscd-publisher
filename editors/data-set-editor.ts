@@ -25,6 +25,10 @@ export class DataSetEditor extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   selectedDataSet?: Element;
 
@@ -62,6 +66,7 @@ export class DataSetEditor extends LitElement {
       return html`<div class="elementeditorcontainer">
         <data-set-element-editor
           .element=${this.selectedDataSet}
+          editCount="${this.editCount}"
         ></data-set-element-editor>
       </div>`;
 

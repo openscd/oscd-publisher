@@ -76,6 +76,10 @@ export class DataSetElementEditor extends LitElement {
   @property({ attribute: false })
   element!: Element | null;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   private get name(): string | null {
     return this.element ? this.element.getAttribute('name') : 'UNDEFINED';

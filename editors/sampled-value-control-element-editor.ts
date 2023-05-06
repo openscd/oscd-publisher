@@ -25,6 +25,10 @@ export class SampledValueControlElementEditor extends LitElement {
   @property({ attribute: false })
   element!: Element;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @property({ attribute: false })
   get sMV(): Element | null {
     const cbName = this.element.getAttribute('name');

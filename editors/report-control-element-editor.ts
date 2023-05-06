@@ -54,6 +54,10 @@ export class ReportControlElementEditor extends LitElement {
   @property({ attribute: false })
   element!: Element;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   private optFieldsDiff = false;
 

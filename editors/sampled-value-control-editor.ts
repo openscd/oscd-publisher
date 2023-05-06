@@ -31,6 +31,10 @@ export class SampledValueControlEditor extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   selectedSampledValueControl?: Element;
 
@@ -145,6 +149,7 @@ export class SampledValueControlEditor extends LitElement {
           <data-set-element-editor
             .element=${this.selectedDataSet!}
             .showHeader=${false}
+            editCount="${this.editCount}"
           >
             <mwc-icon-button
               slot="change"
@@ -159,6 +164,7 @@ export class SampledValueControlEditor extends LitElement {
         <sampled-value-control-element-editor
           .doc=${this.doc}
           .element=${this.selectedSampledValueControl}
+          editCount="${this.editCount}"
         ></sampled-value-control-element-editor>
       </div>`;
 

@@ -31,6 +31,10 @@ export class ReportControlEditor extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
+  /** SCL change indicator */
+  @property({ type: Number })
+  editCount = 0;
+
   @state()
   selectedReportControl?: Element;
 
@@ -143,6 +147,7 @@ export class ReportControlEditor extends LitElement {
           <data-set-element-editor
             .element=${this.selectedDataSet!}
             .showHeader=${false}
+            editCount="${this.editCount}"
           >
             <mwc-icon-button
               slot="change"
@@ -157,6 +162,7 @@ export class ReportControlEditor extends LitElement {
         <report-control-element-editor
           .doc=${this.doc}
           .element=${this.selectedReportControl}
+          editCount="${this.editCount}"
         ></report-control-element-editor>
       </div>`;
 
