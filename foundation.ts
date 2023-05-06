@@ -15,7 +15,7 @@ export function updateElementReference(
 }
 
 export const styles = css`
-  .content {
+  .section {
     display: flex;
     height: calc(100vh - 184px);
   }
@@ -23,7 +23,7 @@ export const styles = css`
   .selectionlist {
     flex: 35%;
     margin: 4px 4px 4px 8px;
-    background-color: var(--mdc-theme-surface);
+    background-color: var(--mdc-theme-surface, white);
     overflow-y: scroll;
   }
 
@@ -54,7 +54,7 @@ export const styles = css`
   }
 
   @media (max-width: 599px) {
-    .content {
+    .section {
       height: 100%;
     }
 

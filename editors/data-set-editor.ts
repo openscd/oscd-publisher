@@ -137,7 +137,7 @@ export class DataSetEditor extends LitElement {
 
   render(): TemplateResult {
     return html`${this.renderToggleButton()}
-      <div class="content">
+      <div class="section">
         ${this.renderSelectionList()}${this.renderElementEditorContainer()}
       </div>`;
   }
