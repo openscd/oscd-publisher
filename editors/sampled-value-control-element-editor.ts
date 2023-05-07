@@ -1,12 +1,23 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import {
+  customElement,
+  property,
+  query,
+  queryAll,
+  state,
+} from 'lit/decorators.js';
+import { newEditEvent } from '@openscd/open-scd-core';
 
-import '@material/mwc-formfield';
 import '@material/mwc-checkbox';
+import '@material/mwc-formfield';
+import type { Checkbox } from '@material/mwc-checkbox';
 
 import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
 import '../foundation/components/oscd-textfield.js';
+import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+
 import {
   maxLength,
   patterns,
@@ -14,6 +25,8 @@ import {
   typePattern,
 } from '../foundation/pattern.js';
 import { identity } from '../foundation/identities/identity.js';
+
+import { checkSMVDiff, updateSmvAddress } from '../foundation/utils/smv.js';
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
@@ -43,6 +56,50 @@ export class SampledValueControlElementEditor extends LitElement {
     );
   }
 
+  @state()
+  private sMVdiff = false;
+
+  private onSMVInputChange(): void {
+    if (
+      Array.from(this.sMVInputs ?? []).some(input => !input.checkValidity())
+    ) {
+      this.sMVdiff = false;
+      return;
+    }
+
+    const pTypes: Record<string, string | null> = {};
+    for (const input of this.sMVInputs ?? [])
+      pTypes[input.label] = input.maybeValue;
+
+    this.sMVdiff = checkSMVDiff(this.sMV!, {
+      pTypes,
+      instType: this.instType?.checked,
+    });
+  }
+
+  private saveSMVChanges(): void {
+    if (!this.sMV) return;
+
+    const pTypes: Record<string, string | null> = {};
+    for (const input of this.sMVInputs ?? [])
+      pTypes[input.label] = input.maybeValue;
+
+    this.dispatchEvent(
+      newEditEvent(
+        updateSmvAddress(this.sMV, {
+          pTypes,
+          instType: this.instType?.checked,
+        })
+      )
+    );
+
+    this.onSMVInputChange();
+  }
+
+  @queryAll('.content.smv > oscd-textfield') sMVInputs?: OscdTextfield[];
+
+  @query('#instType') instType?: Checkbox;
+
   private renderSmvContent(): TemplateResult {
     const { sMV } = this;
     if (!sMV)
@@ -65,12 +122,13 @@ export class SampledValueControlElementEditor extends LitElement {
             ?.textContent?.trim() ?? null;
     });
 
-    return html` <h3>'publisher.smv.commsetting'</h3>
-      <mwc-formfield label="'connectedap.wizard.addschemainsttype')}"
+    return html` <div class="content smv">
+      <h3>Communication Settings (SMV)</h3>
+      <mwc-formfield label="connectedap.wizard.addschemainsttype"
         ><mwc-checkbox
           id="instType"
           ?checked="${hasInstType}"
-          disabled
+          @change=${this.onSMVInputChange}
         ></mwc-checkbox></mwc-formfield
       >${Object.entries(attributes).map(
         ([key, value]) =>
@@ -80,9 +138,16 @@ export class SampledValueControlElementEditor extends LitElement {
             .maybeValue=${value}
             pattern="${typePattern[key]!}"
             required
-            disabled
+            @input=${this.onSMVInputChange}
           ></oscd-textfield>`
-      )}`;
+      )}<mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.sMVdiff}
+        @click=${() => this.saveSMVChanges()}
+      ></mwc-button>
+    </div>`;
   }
 
   private renderSmvOptsContent(): TemplateResult {
