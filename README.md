@@ -2,19 +2,18 @@
 
 ## What is this?
 
-This is an editor plugin for [open-scd-core](https://github.com/openscd/open-scd-core#readme), the new core editor engine for OpenSCD. With this plugin you can edit control block and related elements and its data sets. Start up a demo server with `npm start` and see for yourself!
+This is an editor plugin for [open-scd-core](https://github.com/openscd/open-scd-core#readme), the new core editor engine for OpenSCD. With this plugin you can edit control block and related elements and its data sets. Visit the [demo environment](https://shorturl.at/avzBL) and see for yourself.
 
 ## Missing features
 
-- create `ReportControl` elements
-- create `SampledValueControl` elements
 - edit `SampledValueControl` elements
+- create `SampledValueControl` elements
 - re-allocate control blocks in data model (new once are allocated the first logicals device `LLN0`)
 - re-arrange `FCDA` element in the `DataSet`
 
 ## Quick access tp the plugin
 
-https://shorturl.at/avzBL
+
 
 ## Linting and formatting
 
