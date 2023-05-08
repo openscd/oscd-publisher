@@ -17,6 +17,7 @@ import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
 import '../foundation/components/oscd-textfield.js';
 import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
 
 import {
   maxLength,
@@ -27,6 +28,7 @@ import {
 import { identity } from '../foundation/identities/identity.js';
 
 import { checkSMVDiff, updateSmvAddress } from '../foundation/utils/smv.js';
+import { updateSmvOpts } from '../foundation/utils/sampledvaluecontrol.js';
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
@@ -58,6 +60,9 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @state()
   private sMVdiff = false;
+
+  @state()
+  private smvOptsDiff = false;
 
   private onSMVInputChange(): void {
     if (
@@ -96,7 +101,44 @@ export class SampledValueControlElementEditor extends LitElement {
     this.onSMVInputChange();
   }
 
+  private onSmvOptsInputChange(): void {
+    const smvOpts = this.element.querySelector(':scope > SmvOpts');
+
+    if (
+      Array.from(this.smvOptsInputs ?? []).some(input => !input.checkValidity())
+    ) {
+      this.smvOptsDiff = false;
+      return;
+    }
+
+    const smvOptsAttrs: Record<string, string | null> = {};
+    for (const input of this.smvOptsInputs ?? [])
+      smvOptsAttrs[input.label] = input.maybeValue;
+
+    this.smvOptsDiff = Array.from(this.smvOptsInputs ?? []).some(
+      input => smvOpts?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveSmvOptsChanges(): void {
+    const smvOpts = this.element.querySelector(':scope > SmvOpts');
+
+    if (!smvOpts) return;
+
+    const smvOptsAttrs: Record<string, string | null> = {};
+    for (const input of this.smvOptsInputs ?? [])
+      if (smvOpts.getAttribute(input.label) !== input.maybeValue)
+        smvOptsAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(newEditEvent(updateSmvOpts(smvOpts, smvOptsAttrs)));
+
+    this.onSmvOptsInputChange();
+  }
+
   @queryAll('.content.smv > oscd-textfield') sMVInputs?: OscdTextfield[];
+
+  @queryAll('.content.smvopts > oscd-checkbox')
+  smvOptsInputs?: OscdCheckbox[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -151,22 +193,35 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   private renderSmvOptsContent(): TemplateResult {
-    const [refreshTime, sampleRate, dataSet, security, synchSourceId] = [
+    const [
+      refreshTime,
+      sampleSynchronized,
+      sampleRate,
+      dataSet,
+      security,
+      timestamp,
+      synchSourceId,
+    ] = [
       'refreshTime',
+      'sampleSynchronized',
       'sampleRate',
       'dataSet',
       'security',
+      'timestamp',
       'synchSourceId',
     ].map(
       attr => this.element.querySelector('SmvOpts')?.getAttribute(attr) ?? null
     );
 
-    return html`<h3>'publisher.smv.smvopts'</h3>
+    return html`<div class="content smvopts">
+      <h3>'Sampled Value Options'</h3>
       ${Object.entries({
         refreshTime,
+        sampleSynchronized,
         sampleRate,
         dataSet,
         security,
+        timestamp,
         synchSourceId,
       }).map(
         ([key, value]) =>
@@ -175,9 +230,16 @@ export class SampledValueControlElementEditor extends LitElement {
             .maybeValue=${value}
             nullable
             helper="scl.key"
-            disabled
+            @input=${this.onSmvOptsInputChange}
           ></oscd-checkbox>`
-      )}`;
+      )}<mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.smvOptsDiff}
+        @click=${() => this.saveSmvOptsChanges()}
+      ></mwc-button>
+    </div>`;
   }
 
   private renderOtherElements(): TemplateResult {
