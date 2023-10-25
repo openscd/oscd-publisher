@@ -14,22 +14,21 @@ import '@material/mwc-dialog';
 import type { Dialog } from '@material/mwc-dialog';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import '@openscd/oscd-tree-grid';
+import type { TreeGrid } from '@openscd/oscd-tree-grid';
+import { removeFCDA } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/oscd-textfield.js';
 import '../../foundation/components/oscd-finder-list.js';
 import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
-import type { OscdFinderList } from '../../foundation/components/oscd-finder-list.js';
 
 import { identity } from '../../foundation/identities/identity.js';
-import { updateDateSetName } from '../../foundation/utils/dataSet.js';
-import { addFCDAs, addFCDOs, removeFCDA } from '../../foundation/utils/fcda.js';
-import {
-  getDataAttributeChildren,
-  getDataObjectChildren,
-  getDisplayString,
-  getReader,
-} from '../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
+import { updateDateSetName } from '../../foundation/utils/dataSet.js';
+
+import { addFCDAs, addFCDOs } from './foundation.js';
+import { dataAttributeTree } from './dataAttributePicker.js';
+import { dataObjectTree } from './dataObjectPicker.js';
 
 function dataAttributePaths(doc: XMLDocument, paths: string[][]): Element[][] {
   const daPaths: Element[][] = [];
@@ -116,7 +115,7 @@ export class DataSetElementEditor extends LitElement {
 
   private saveDataObjects(): void {
     const finder =
-      this.dataObjectPicker?.querySelector<OscdFinderList>('oscd-finder-list');
+      this.dataObjectPicker?.querySelector<TreeGrid>('oscd-tree-grid');
     const paths = finder?.paths ?? [];
 
     const actions = addFCDOs(
@@ -130,9 +129,7 @@ export class DataSetElementEditor extends LitElement {
 
   private saveDataAttributes(): void {
     const finder =
-      this.dataAttributePicker?.querySelector<OscdFinderList>(
-        'oscd-finder-list'
-      );
+      this.dataAttributePicker?.querySelector<TreeGrid>('oscd-tree-grid');
     const paths = finder?.paths ?? [];
 
     const actions = addFCDAs(
@@ -171,14 +168,8 @@ export class DataSetElementEditor extends LitElement {
         icon="playlist_add"
         @click=${() => this.dataObjectPicker?.show()}
       ></mwc-button
-      ><mwc-dialog id="dopicker" heading="Add Data Attributes"
-        ><oscd-finder-list
-          multi
-          .paths=${[[`Server: ${identity(server)}`]]}
-          .read=${getReader(server.ownerDocument, getDataObjectChildren)}
-          .getDisplayString=${getDisplayString}
-          .getTitle=${(path: string[]) => path[path.length - 1]}
-        ></oscd-finder-list>
+      ><mwc-dialog id="dopicker" heading="Add Data Attributes">
+        <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
         <mwc-button
           slot="secondaryAction"
           label="close"
@@ -202,13 +193,7 @@ export class DataSetElementEditor extends LitElement {
         @click=${() => this.dataAttributePicker?.show()}
       ></mwc-button
       ><mwc-dialog id="dapicker" heading="Add Data Attributes"
-        ><oscd-finder-list
-          multi
-          .paths=${[[`Server: ${identity(server)}`]]}
-          .read=${getReader(server.ownerDocument, getDataAttributeChildren)}
-          .getDisplayString=${getDisplayString}
-          .getTitle=${(path: string[]) => path[path.length - 1]}
-        ></oscd-finder-list>
+        ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
         <mwc-button
           slot="secondaryAction"
           label="close"
@@ -275,7 +260,7 @@ export class DataSetElementEditor extends LitElement {
             ></span>
             <span slot="meta"><mwc-icon-button icon="delete" @click=${() =>
               this.dispatchEvent(
-                newEditEvent(removeFCDA(fcda))
+                newEditEvent(removeFCDA({ node: fcda }))
               )}></mwc-icon-button>
             </span>
           </mwc-list-item>`;
