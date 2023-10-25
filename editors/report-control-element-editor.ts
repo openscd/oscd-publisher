@@ -9,6 +9,7 @@ import {
 } from 'lit/decorators.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { updateReportControl } from '@openenergytools/scl-lib';
 
 import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
@@ -22,7 +23,6 @@ import { identity } from '../foundation/identities/identity.js';
 import {
   updateMaxClients,
   updateOptFields,
-  updateReportControl,
 } from '../foundation/utils/reportcontrol.js';
 
 function checkRptEnabledValidity(
@@ -173,10 +173,10 @@ export class ReportControlElementEditor extends LitElement {
       if (reportControl.getAttribute(input.label) !== input.maybeValue)
         reportControlAttrs[input.label] = input.maybeValue;
 
-    const reportControlActions = updateReportControl(
-      reportControl,
-      reportControlAttrs
-    );
+    const reportControlActions = updateReportControl({
+      element: reportControl,
+      attributes: reportControlAttrs,
+    });
 
     const max = this.rptEnabledInput.maybeValue;
     const rptEnabledAction = updateMaxClients(reportControl, max);

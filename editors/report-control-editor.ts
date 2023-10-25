@@ -10,6 +10,7 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { createReportControl } from '@openenergytools/scl-lib';
 
 import './data-set-element-editor.js';
 import './report-control-element-editor.js';
@@ -23,7 +24,6 @@ import {
   findCtrlBlockSubscription,
   removeControlBlock,
 } from '../foundation/utils/controlBlocks.js';
-import { addReportControl } from '../foundation/utils/reportcontrol.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {
@@ -193,7 +193,7 @@ export class ReportControlEditor extends LitElement {
               slot="meta"
               icon="playlist_add"
               @click=${() => {
-                const insert = addReportControl(ied);
+                const insert = createReportControl(ied);
                 if (insert) this.dispatchEvent(newEditEvent(insert));
 
                 this.requestUpdate();
