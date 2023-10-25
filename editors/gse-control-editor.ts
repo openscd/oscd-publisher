@@ -11,6 +11,7 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { createGSEControl } from '@openenergytools/scl-lib';
 
 import './data-set-element-editor.js';
 import './gse-control-element-editor.js';
@@ -24,7 +25,6 @@ import {
   findCtrlBlockSubscription,
   removeControlBlock,
 } from '../foundation/utils/controlBlocks.js';
-import { addGSEControl } from '../foundation/utils/gsecontrol.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {
@@ -187,7 +187,7 @@ export class GseControlEditor extends LitElement {
               slot="meta"
               icon="playlist_add"
               @click=${() => {
-                const insert = addGSEControl(ied);
+                const insert = createGSEControl(ied);
                 if (insert) this.dispatchEvent(newEditEvent(insert));
 
                 this.requestUpdate();

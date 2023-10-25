@@ -13,6 +13,7 @@ import '@material/mwc-checkbox';
 import type { Checkbox } from '@material/mwc-checkbox';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { updateGSEControl } from '@openenergytools/scl-lib';
 
 import '../foundation/components/oscd-checkbox.js';
 import '../foundation/components/oscd-select.js';
@@ -29,7 +30,6 @@ import {
 } from '../foundation/pattern.js';
 import { identity } from '../foundation/identities/identity.js';
 import { checkGSEDiff, updateGSE } from '../foundation/utils/gse.js';
-import { updateGseControl } from '../foundation/utils/gsecontrol.js';
 
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
@@ -93,7 +93,12 @@ export class GseControlElementEditor extends LitElement {
         gSEControlAttrs[input.label] = input.maybeValue;
 
     this.dispatchEvent(
-      newEditEvent(updateGseControl(this.element, gSEControlAttrs))
+      newEditEvent(
+        updateGSEControl({
+          element: this.element,
+          attributes: gSEControlAttrs,
+        })
+      )
     );
 
     this.onGSEControlInputChange();
