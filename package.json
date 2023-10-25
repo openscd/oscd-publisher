@@ -33,6 +33,7 @@
     "@material/mwc-select": "^0.27.0",
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
+    "@openenergytools/scl-lib": "0.6.13",
     "lit": "^2.4.0"
   },
   "devDependencies": {
