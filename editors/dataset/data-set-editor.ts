@@ -11,13 +11,13 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { newEditEvent } from '@openscd/open-scd-core';
 
 import './data-set-element-editor.js';
-import '../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';
+import '../../foundation/components/oscd-filtered-list.js';
+import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
 
-import { styles, updateElementReference } from '../foundation.js';
-import { selector } from '../foundation/identities/selector.js';
-import { identity } from '../foundation/identities/identity.js';
-import { addDataSet, removeDataSet } from '../foundation/utils/dataSet.js';
+import { styles, updateElementReference } from '../../foundation.js';
+import { selector } from '../../foundation/identities/selector.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { addDataSet, removeDataSet } from '../../foundation/utils/dataSet.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {

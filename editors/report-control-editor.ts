@@ -12,7 +12,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import { createReportControl } from '@openenergytools/scl-lib';
 
-import './data-set-element-editor.js';
+import './dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
 import '../foundation/components/oscd-filtered-list.js';
 import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';

@@ -15,21 +15,21 @@ import type { Dialog } from '@material/mwc-dialog';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
-import '../foundation/components/oscd-textfield.js';
-import '../foundation/components/oscd-finder-list.js';
-import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
-import type { OscdFinderList } from '../foundation/components/oscd-finder-list.js';
+import '../../foundation/components/oscd-textfield.js';
+import '../../foundation/components/oscd-finder-list.js';
+import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import type { OscdFinderList } from '../../foundation/components/oscd-finder-list.js';
 
-import { identity } from '../foundation/identities/identity.js';
-import { updateDateSetName } from '../foundation/utils/dataSet.js';
-import { addFCDAs, addFCDOs, removeFCDA } from '../foundation/utils/fcda.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { updateDateSetName } from '../../foundation/utils/dataSet.js';
+import { addFCDAs, addFCDOs, removeFCDA } from '../../foundation/utils/fcda.js';
 import {
   getDataAttributeChildren,
   getDataObjectChildren,
   getDisplayString,
   getReader,
-} from './foundation.js';
-import { selector } from '../foundation/identities/selector.js';
+} from '../foundation.js';
+import { selector } from '../../foundation/identities/selector.js';
 
 function dataAttributePaths(doc: XMLDocument, paths: string[][]): Element[][] {
   const daPaths: Element[][] = [];

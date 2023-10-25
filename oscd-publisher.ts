@@ -7,7 +7,7 @@ import '@material/mwc-formfield';
 
 import './editors/report-control-editor.js';
 import './editors/gse-control-editor.js';
-import './editors/data-set-editor.js';
+import './editors/dataset/data-set-editor.js';
 import './editors/sampled-value-control-editor.js';
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
