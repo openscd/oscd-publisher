@@ -131,8 +131,9 @@ export class DataSetEditor extends LitElement {
 
   private renderToggleButton(): TemplateResult {
     return html`<mwc-button
+      class="change scl element"
       outlined
-      label="publisher.selectbutton.DataSet"
+      label="Select DataSet"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectDataSetButton.classList.add('hidden');

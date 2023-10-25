@@ -229,7 +229,7 @@ export class DataSetElementEditor extends LitElement {
         tag="${this.element?.tagName ?? ''}"
         label="name"
         .maybeValue=${this.name}
-        helper="scl.name"
+        helper="DataSet name"
         required
         @input=${() => this.onInputChange()}
       >
@@ -238,7 +238,7 @@ export class DataSetElementEditor extends LitElement {
         id="${identity(this.element)}"
         label="desc"
         .maybeValue=${this.desc}
-        helper="scl.desc"
+        helper="DateSet Description"
         nullable
         @input=${() => this.onInputChange()}
       >
