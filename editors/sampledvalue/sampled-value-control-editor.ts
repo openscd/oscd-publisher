@@ -11,19 +11,19 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
-import './dataset/data-set-element-editor.js';
-import '../foundation/components/oscd-filtered-list.js';
+import '../dataset/data-set-element-editor.js';
+import '../../foundation/components/oscd-filtered-list.js';
 import './sampled-value-control-element-editor.js';
-import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';
+import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
 
-import { styles, updateElementReference } from '../foundation.js';
-import { selector } from '../foundation/identities/selector.js';
-import { identity } from '../foundation/identities/identity.js';
-import { smvIcon } from '../foundation/icons.js';
+import { styles, updateElementReference } from '../../foundation.js';
+import { selector } from '../../foundation/identities/selector.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { smvIcon } from '../../foundation/icons.js';
 import {
   findCtrlBlockSubscription,
   removeControlBlock,
-} from '../foundation/utils/controlBlocks.js';
+} from '../../foundation/utils/controlBlocks.js';
 
 @customElement('sampled-value-control-editor')
 export class SampledValueControlEditor extends LitElement {

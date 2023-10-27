@@ -13,22 +13,22 @@ import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
 import type { Checkbox } from '@material/mwc-checkbox';
 
-import '../foundation/components/oscd-checkbox.js';
-import '../foundation/components/oscd-select.js';
-import '../foundation/components/oscd-textfield.js';
-import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
-import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/oscd-textfield.js';
+import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
 
 import {
   maxLength,
   patterns,
   typeNullable,
   typePattern,
-} from '../foundation/pattern.js';
-import { identity } from '../foundation/identities/identity.js';
+} from '../../foundation/pattern.js';
+import { identity } from '../../foundation/identities/identity.js';
 
-import { checkSMVDiff, updateSmvAddress } from '../foundation/utils/smv.js';
-import { updateSmvOpts } from '../foundation/utils/sampledvaluecontrol.js';
+import { checkSMVDiff, updateSmvAddress } from '../../foundation/utils/smv.js';
+import { updateSmvOpts } from '../../foundation/utils/sampledvaluecontrol.js';
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
