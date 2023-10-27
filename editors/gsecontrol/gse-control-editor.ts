@@ -13,18 +13,18 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import { createGSEControl } from '@openenergytools/scl-lib';
 
-import './dataset/data-set-element-editor.js';
+import '../dataset/data-set-element-editor.js';
 import './gse-control-element-editor.js';
-import '../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';
-import { styles, updateElementReference } from '../foundation.js';
-import { selector } from '../foundation/identities/selector.js';
-import { identity } from '../foundation/identities/identity.js';
-import { gooseIcon } from '../foundation/icons.js';
+import '../../foundation/components/oscd-filtered-list.js';
+import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import { styles, updateElementReference } from '../../foundation.js';
+import { selector } from '../../foundation/identities/selector.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { gooseIcon } from '../../foundation/icons.js';
 import {
   findCtrlBlockSubscription,
   removeControlBlock,
-} from '../foundation/utils/controlBlocks.js';
+} from '../../foundation/utils/controlBlocks.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {

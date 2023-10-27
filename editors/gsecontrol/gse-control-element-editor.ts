@@ -15,21 +15,21 @@ import type { Checkbox } from '@material/mwc-checkbox';
 import { newEditEvent } from '@openscd/open-scd-core';
 import { updateGSEControl } from '@openenergytools/scl-lib';
 
-import '../foundation/components/oscd-checkbox.js';
-import '../foundation/components/oscd-select.js';
-import '../foundation/components/oscd-textfield.js';
-import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
-import type { OscdSelect } from '../foundation/components/oscd-select.js';
-import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 
 import {
   maxLength,
   patterns,
   typeNullable,
   typePattern,
-} from '../foundation/pattern.js';
-import { identity } from '../foundation/identities/identity.js';
-import { checkGSEDiff, updateGSE } from '../foundation/utils/gse.js';
+} from '../../foundation/pattern.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { checkGSEDiff, updateGSE } from '../../foundation/utils/gse.js';
 
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
