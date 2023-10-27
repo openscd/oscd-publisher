@@ -12,18 +12,18 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import { createReportControl } from '@openenergytools/scl-lib';
 
-import './dataset/data-set-element-editor.js';
+import '../dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
-import '../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../foundation/components/oscd-filtered-list.js';
-import { styles, updateElementReference } from '../foundation.js';
-import { selector } from '../foundation/identities/selector.js';
-import { identity } from '../foundation/identities/identity.js';
-import { reportIcon } from '../foundation/icons.js';
+import '../../foundation/components/oscd-filtered-list.js';
+import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import { styles, updateElementReference } from '../../foundation.js';
+import { selector } from '../../foundation/identities/selector.js';
+import { identity } from '../../foundation/identities/identity.js';
+import { reportIcon } from '../../foundation/icons.js';
 import {
   findCtrlBlockSubscription,
   removeControlBlock,
-} from '../foundation/utils/controlBlocks.js';
+} from '../../foundation/utils/controlBlocks.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {

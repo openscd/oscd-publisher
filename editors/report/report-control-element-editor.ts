@@ -11,19 +11,19 @@ import {
 import { newEditEvent } from '@openscd/open-scd-core';
 import { updateReportControl } from '@openenergytools/scl-lib';
 
-import '../foundation/components/oscd-checkbox.js';
-import '../foundation/components/oscd-select.js';
-import '../foundation/components/oscd-textfield.js';
-import type { OscdCheckbox } from '../foundation/components/oscd-checkbox.js';
-import type { OscdSelect } from '../foundation/components/oscd-select.js';
-import type { OscdTextfield } from '../foundation/components/oscd-textfield.js';
+import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/oscd-textfield.js';
+import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 
-import { maxLength, patterns } from '../foundation/pattern.js';
-import { identity } from '../foundation/identities/identity.js';
+import { maxLength, patterns } from '../../foundation/pattern.js';
+import { identity } from '../../foundation/identities/identity.js';
 import {
   updateMaxClients,
   updateOptFields,
-} from '../foundation/utils/reportcontrol.js';
+} from '../../foundation/utils/reportcontrol.js';
 
 function checkRptEnabledValidity(
   rptEnabled: Element | null,

@@ -5,7 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import '@material/mwc-radio';
 import '@material/mwc-formfield';
 
-import './editors/report-control-editor.js';
+import './editors/report/report-control-editor.js';
 import './editors/gsecontrol/gse-control-editor.js';
 import './editors/dataset/data-set-editor.js';
 import './editors/sampled-value-control-editor.js';
