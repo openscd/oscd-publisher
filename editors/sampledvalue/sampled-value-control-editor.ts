@@ -10,6 +10,7 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { removeControlBlock } from '@openenergytools/scl-lib';
 
 import '../dataset/data-set-element-editor.js';
 import '../../foundation/components/oscd-filtered-list.js';
@@ -20,10 +21,7 @@ import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
 import { smvIcon } from '../../foundation/icons.js';
-import {
-  findCtrlBlockSubscription,
-  removeControlBlock,
-} from '../../foundation/utils/controlBlocks.js';
+import { findCtrlBlockSubscription } from '../../foundation/utils/controlBlocks.js';
 
 @customElement('sampled-value-control-editor')
 export class SampledValueControlEditor extends LitElement {
@@ -209,7 +207,7 @@ export class SampledValueControlEditor extends LitElement {
                   icon="delete"
                   @click=${() => {
                     this.dispatchEvent(
-                      newEditEvent(removeControlBlock(smvControl))
+                      newEditEvent(removeControlBlock({ node: smvControl }))
                     );
                     this.requestUpdate();
                   }}

@@ -1,14 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from '@open-wc/testing';
 
-import { Remove, Update } from '@openscd/open-scd-core';
-
-import { addDataSet, removeDataSet, updateDateSetName } from './dataSet.js';
-import {
-  orphanDataSet,
-  validDataSet,
-  withSubscriptionSupervision,
-} from './dataSet.testfiles.js';
+import { addDataSet, updateDateSetName } from './dataSet.js';
+import { orphanDataSet, validDataSet } from './dataSet.testfiles.js';
 
 function findElement(str: string, selector: string): Element {
   return new DOMParser()
@@ -80,78 +74,6 @@ describe('DataSet related util functions', () => {
           confRev: '10000',
         });
       }
-    });
-  });
-
-  describe('removeDataSet', () => {
-    const dataSet = findElement(withSubscriptionSupervision, 'DataSet');
-    const actions = removeDataSet(dataSet);
-    const fCDAs = Array.from(dataSet.querySelectorAll(':scope > FCDA'));
-    const extRefs = Array.from(
-      dataSet.ownerDocument.querySelectorAll(
-        'ExtRef[srcCBName="someGse"], ExtRef[srcCBName="someGse2"], ExtRef[srcCBName="someGse3"]'
-      )
-    );
-    const doi = extRefs[0].ownerDocument.querySelector(
-      'LN[lnClass="LGOS"][inst="1"] > DOI'
-    );
-    const ln = extRefs[0].ownerDocument.querySelector(
-      'LN[lnClass="LGOS"][inst="2"]'
-    );
-
-    it('removes DataSet also removes/updates dependant data', () =>
-      expect(actions.length).to.equal(26));
-
-    it('including the DataSet itself', () =>
-      expect((actions[0] as Remove).node).to.equal(dataSet));
-
-    it('including control Block updates', () => {
-      expect((actions[1] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-      expect((actions[2] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-      expect((actions[3] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-    });
-
-    it('including external references', () => {
-      expect((actions[1] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-      expect((actions[2] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-      expect((actions[3] as Update).attributes).to.deep.equal({
-        datSet: null,
-        confRev: '10000',
-      });
-    });
-
-    it('including the data itself', () => {
-      expect((actions[4] as Remove).node).to.equal(fCDAs[0]);
-      expect((actions[5] as Remove).node).to.equal(fCDAs[1]);
-      expect((actions[6] as Remove).node).to.equal(fCDAs[2]);
-      expect((actions[7] as Remove).node).to.equal(fCDAs[3]);
-    });
-
-    it('including the external references itself', () => {
-      expect((actions[8] as Remove).node).to.equal(extRefs[0]);
-      expect((actions[9] as Remove).node).to.equal(extRefs[1]);
-      expect((actions[10] as Update).element).to.equal(extRefs[2]);
-      expect((actions[11] as Remove).node).to.equal(extRefs[3]);
-    });
-
-    it('including the subscriber supervision', () => {
-      expect((actions[12] as Remove).node).to.equal(doi);
-      expect((actions[13] as Remove).node).to.equal(ln);
     });
   });
 

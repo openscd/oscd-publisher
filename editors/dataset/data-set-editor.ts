@@ -9,6 +9,7 @@ import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
 
 import { newEditEvent } from '@openscd/open-scd-core';
+import { removeDataSet } from '@openenergytools/scl-lib';
 
 import './data-set-element-editor.js';
 import '../../foundation/components/oscd-filtered-list.js';
@@ -17,7 +18,7 @@ import type { OscdFilteredList } from '../../foundation/components/oscd-filtered
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
-import { addDataSet, removeDataSet } from '../../foundation/utils/dataSet.js';
+import { addDataSet } from '../../foundation/utils/dataSet.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {
@@ -116,7 +117,9 @@ export class DataSetEditor extends LitElement {
                 ><mwc-icon-button
                   icon="delete"
                   @click=${() => {
-                    this.dispatchEvent(newEditEvent(removeDataSet(dataSet)));
+                    this.dispatchEvent(
+                      newEditEvent(removeDataSet({ node: dataSet }))
+                    );
                     this.requestUpdate();
                   }}
                 ></mwc-icon-button>

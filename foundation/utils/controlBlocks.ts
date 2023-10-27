@@ -1,8 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Remove, Update } from '@openscd/open-scd-core';
-
-import { removeDataSet } from './dataSet.js';
-import { matchExtRefCtrlBlockAttr, unsubscribe } from './extRef.js';
+import { matchExtRefCtrlBlockAttr } from './extRef.js';
 
 /** @returns Updated confRev attribute for control block */
 export function updatedConfRev(ctrlBlock: Element): string {
@@ -78,22 +75,4 @@ export function controlBlocks(fcdaOrDataSet: Element): Element[] {
              :scope > SampledValueControl[datSet="${datSet}"]`
     ) ?? []
   );
-}
-
-/** @returns Action array removing control block and its referenced data */
-export function removeControlBlock(ctrlBlock: Element): (Remove | Update)[] {
-  const ctrlBlockRemoveAction: (Remove | Update)[] = [{ node: ctrlBlock }];
-
-  const dataSet = ctrlBlock.parentElement?.querySelector(
-    `DataSet[name="${ctrlBlock.getAttribute('datSet')}"]`
-  );
-  if (!dataSet) return ctrlBlockRemoveAction;
-
-  const multiUseDataSet = controlBlocks(dataSet).length > 1;
-  if (multiUseDataSet)
-    return ctrlBlockRemoveAction.concat(
-      unsubscribe(findCtrlBlockSubscription(ctrlBlock))
-    );
-
-  return ctrlBlockRemoveAction.concat(removeDataSet(dataSet));
 }

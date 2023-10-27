@@ -1,8 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Insert, Remove, Update } from '@openscd/open-scd-core';
+import { Insert, Update } from '@openscd/open-scd-core';
 
 import { controlBlocks, updatedConfRev } from './controlBlocks.js';
-import { removeFCDAs } from './fcda.js';
 import { getReference } from './scldata.js';
 
 function createElement(
@@ -16,22 +15,6 @@ function createElement(
     .filter(([_, value]) => value !== null)
     .forEach(([name, value]) => element.setAttribute(name, value!));
   return element;
-}
-
-export function removeDataSet(dataSet: Element): (Remove | Update)[] {
-  const dataSetRemove: (Remove | Update)[] = [{ node: dataSet }];
-
-  const ctrlBlockUpdates: (Remove | Update)[] = controlBlocks(dataSet).map(
-    ctrlBlock => ({
-      element: ctrlBlock,
-      attributes: { datSet: null, confRev: updatedConfRev(ctrlBlock) },
-    })
-  );
-  const removeFCDAsActions: (Remove | Update)[] = removeFCDAs(
-    Array.from(dataSet.querySelectorAll(':scope > FCDA'))
-  );
-
-  return dataSetRemove.concat(ctrlBlockUpdates, removeFCDAsActions);
 }
 
 /** @returns Update actions for `DataSet`s attributes and its `datSet` references */

@@ -10,7 +10,10 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { createReportControl } from '@openenergytools/scl-lib';
+import {
+  createReportControl,
+  removeControlBlock,
+} from '@openenergytools/scl-lib';
 
 import '../dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
@@ -20,10 +23,7 @@ import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
 import { reportIcon } from '../../foundation/icons.js';
-import {
-  findCtrlBlockSubscription,
-  removeControlBlock,
-} from '../../foundation/utils/controlBlocks.js';
+import { findCtrlBlockSubscription } from '../../foundation/utils/controlBlocks.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {
@@ -216,7 +216,7 @@ export class ReportControlEditor extends LitElement {
                   icon="delete"
                   @click=${() => {
                     this.dispatchEvent(
-                      newEditEvent(removeControlBlock(reportCb))
+                      newEditEvent(removeControlBlock({ node: reportCb }))
                     );
                     this.requestUpdate();
                   }}

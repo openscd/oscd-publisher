@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from '@open-wc/testing';
 
-import { Remove } from '@openscd/open-scd-core';
-
 import {
   connectedData,
   ed2Subscription,
@@ -16,7 +14,6 @@ import {
   controlBlock,
   controlBlockObjectReference,
   controlBlocks,
-  removeControlBlock,
   updatedConfRev,
 } from './controlBlocks.js';
 
@@ -125,66 +122,6 @@ describe('Control block related util functions', () => {
       expect(controlBlocks(findElement(connectedData, 'FCDA')).length).to.equal(
         3
       ));
-  });
-
-  describe('removeControlBlok', () => {
-    const ctrlBlock4 = findElement(
-      ed2Subscription,
-      'GSEControl[name="someGse4"]'
-    )!;
-    const ctrlBlock3 = findElement(
-      ed2Subscription,
-      'GSEControl[name="someGse3"]'
-    )!;
-    const ctrlBlock2 = findElement(
-      ed2Subscription,
-      'GSEControl[name="someGse2"]'
-    )!;
-    const ctrlBlock1 = findElement(
-      ed2Subscription,
-      'SampledValueControl[name="someSmv"]'
-    )!;
-    const orphanCtrlBlock = findElement(orphanControlBlock, 'GSEControl')!;
-
-    it('return empty array on orphan inputs', () => {
-      const actions = removeControlBlock(orphanCtrlBlock);
-      expect((actions[0] as Remove).node).equals(orphanCtrlBlock);
-    });
-
-    it('it only remove the control block without referenced DataSet', () => {
-      const actions = removeControlBlock(ctrlBlock4);
-      expect(actions.length).equals(1);
-      expect((actions[0] as Remove).node).equal(ctrlBlock4);
-    });
-
-    it('it only remove the control with multi used DataSet', () => {
-      const actions = removeControlBlock(ctrlBlock3);
-      expect(actions.length).equals(1);
-      expect((actions[0] as Remove).node).equal(ctrlBlock3);
-    });
-
-    it('it removes subscribed data in case of multi use DataSet', () => {
-      const actions = removeControlBlock(ctrlBlock2);
-      const extRef = ctrlBlock2.ownerDocument.querySelector(
-        'ExtRef[srcCBName="someGse2"]'
-      );
-      expect(actions.length).equals(3);
-      expect((actions[1] as Remove).node).equal(extRef);
-    });
-
-    it('it removes subscribed data form single use DataSet', () => {
-      const actions = removeControlBlock(ctrlBlock1);
-      const dataSet = ctrlBlock1.ownerDocument.querySelector(
-        'DataSet[name="smvDataSet"]'
-      );
-      expect(actions.length).equals(10);
-      expect((actions[1] as Remove).node).equal(dataSet);
-      expect(((actions[3] as Remove).node as Element).tagName).equal('FCDA');
-      expect(((actions[4] as Remove).node as Element).tagName).equal('FCDA');
-      expect(((actions[5] as Remove).node as Element).tagName).equal('ExtRef');
-      expect(((actions[6] as Remove).node as Element).tagName).equal('ExtRef');
-      expect(((actions[7] as Remove).node as Element).tagName).equal('Inputs');
-    });
   });
 
   describe('updatedConfRev', () => {
