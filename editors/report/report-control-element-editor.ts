@@ -20,10 +20,7 @@ import type { OscdTextfield } from '../../foundation/components/oscd-textfield.j
 
 import { maxLength, patterns } from '../../foundation/pattern.js';
 import { identity } from '../../foundation/identities/identity.js';
-import {
-  updateMaxClients,
-  updateOptFields,
-} from '../../foundation/utils/reportcontrol.js';
+import { updateMaxClients } from './foundation.js';
 
 function checkRptEnabledValidity(
   rptEnabled: Element | null,
@@ -98,7 +95,8 @@ export class ReportControlElementEditor extends LitElement {
       if (optFields.getAttribute(input.label) !== input.maybeValue)
         optFieldAttrs[input.label] = input.maybeValue;
 
-    this.dispatchEvent(newEditEvent(updateOptFields(optFields, optFieldAttrs)));
+    const updateEdit = { element: optFields, attributes: optFieldAttrs };
+    this.dispatchEvent(newEditEvent(updateEdit));
 
     this.onOptFieldsInputChange();
   }
@@ -132,7 +130,8 @@ export class ReportControlElementEditor extends LitElement {
       if (trgOps.getAttribute(input.label) !== input.maybeValue)
         trgOpsAttrs[input.label] = input.maybeValue;
 
-    this.dispatchEvent(newEditEvent(updateOptFields(trgOps, trgOpsAttrs)));
+    const updateEdit = { element: trgOps, attributes: trgOpsAttrs };
+    this.dispatchEvent(newEditEvent(updateEdit));
 
     this.onTrgOpsInputChange();
   }

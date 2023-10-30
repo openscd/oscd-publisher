@@ -19,7 +19,6 @@ import type { TreeGrid } from '@openscd/oscd-tree-grid';
 import { removeFCDA } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/oscd-textfield.js';
-import '../../foundation/components/oscd-finder-list.js';
 import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 
 import { identity } from '../../foundation/identities/identity.js';

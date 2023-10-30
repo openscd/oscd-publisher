@@ -1,26 +1,7 @@
-/* eslint-disable no-param-reassign */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Insert, Remove, Update } from '@openscd/open-scd-core';
 
-import { getReference } from './scldata.js';
-
-type TrgOpsAttributes = {
-  dchg?: string | null;
-  qchg?: string | null;
-  dupd?: string | null;
-  period?: string | null;
-  gi?: string | null;
-};
-
-type OptFieldsAttributes = {
-  seqNum?: string | null;
-  timeStamp?: string | null;
-  reasonCode?: string | null;
-  dataRef?: string | null;
-  entryID?: string | null;
-  configRef?: string | null;
-  bufOvfl?: string | null;
-};
+import { getReference } from '@openenergytools/scl-lib';
 
 function createElement(
   doc: XMLDocument,
@@ -33,22 +14,6 @@ function createElement(
     .filter(([_, value]) => value !== null)
     .forEach(([name, value]) => element.setAttribute(name, value!));
   return element;
-}
-
-/** @returns action array to update all `OptFields` attributes */
-export function updateOptFields(
-  optFields: Element,
-  attributes: OptFieldsAttributes
-): Update {
-  return { element: optFields, attributes };
-}
-
-/** @returns action array to update all `TrgOps` attributes */
-export function updateTrgOps(
-  trgOps: Element,
-  attributes: TrgOpsAttributes
-): Update {
-  return { element: trgOps, attributes };
 }
 
 /** @returns action to update max clients in ReportControl element */

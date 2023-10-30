@@ -28,7 +28,6 @@ import {
 import { identity } from '../../foundation/identities/identity.js';
 
 import { checkSMVDiff, updateSmvAddress } from '../../foundation/utils/smv.js';
-import { updateSmvOpts } from '../../foundation/utils/sampledvaluecontrol.js';
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
@@ -130,7 +129,8 @@ export class SampledValueControlElementEditor extends LitElement {
       if (smvOpts.getAttribute(input.label) !== input.maybeValue)
         smvOptsAttrs[input.label] = input.maybeValue;
 
-    this.dispatchEvent(newEditEvent(updateSmvOpts(smvOpts, smvOptsAttrs)));
+    const updateEdit = { element: smvOpts, attributes: smvOptsAttrs };
+    this.dispatchEvent(newEditEvent(updateEdit));
 
     this.onSmvOptsInputChange();
   }
