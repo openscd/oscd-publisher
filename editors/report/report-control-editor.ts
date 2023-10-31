@@ -12,6 +12,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createReportControl,
+  findControlBlockSubscription,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
 
@@ -23,7 +24,6 @@ import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
 import { reportIcon } from '../../foundation/icons.js';
-import { findCtrlBlockSubscription } from '../../foundation/utils/controlBlocks.js';
 
 @customElement('report-control-editor')
 export class ReportControlEditor extends LitElement {
@@ -152,7 +152,7 @@ export class ReportControlEditor extends LitElement {
             <mwc-icon-button
               slot="change"
               icon="swap_vert"
-              ?disabled=${!!findCtrlBlockSubscription(
+              ?disabled=${!!findControlBlockSubscription(
                 this.selectedReportControl
               ).length}
               @click=${() => this.selectDataSetDialog.show()}

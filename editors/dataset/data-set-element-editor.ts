@@ -16,14 +16,13 @@ import type { Dialog } from '@material/mwc-dialog';
 import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
-import { removeFCDA } from '@openenergytools/scl-lib';
+import { removeFCDA, updateDataSet } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/oscd-textfield.js';
 import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 
 import { identity } from '../../foundation/identities/identity.js';
 import { selector } from '../../foundation/identities/selector.js';
-import { updateDateSetName } from '../../foundation/utils/dataSet.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -106,7 +105,7 @@ export class DataSetElementEditor extends LitElement {
         attributes[input.label] = input.maybeValue;
 
     this.dispatchEvent(
-      newEditEvent(updateDateSetName(this.element, attributes))
+      newEditEvent(updateDataSet({ element: this.element, attributes }))
     );
 
     this.onInputChange();

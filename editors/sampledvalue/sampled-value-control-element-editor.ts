@@ -8,6 +8,10 @@ import {
   state,
 } from 'lit/decorators.js';
 import { newEditEvent } from '@openscd/open-scd-core';
+import {
+  ChangeGseOrSmvAddressOptions,
+  changeSMVContent,
+} from '@openenergytools/scl-lib';
 
 import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
@@ -27,7 +31,7 @@ import {
 } from '../../foundation/pattern.js';
 import { identity } from '../../foundation/identities/identity.js';
 
-import { checkSMVDiff, updateSmvAddress } from '../../foundation/utils/smv.js';
+import { checkSMVDiff } from '../../foundation/utils/smv.js';
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
@@ -84,18 +88,22 @@ export class SampledValueControlElementEditor extends LitElement {
   private saveSMVChanges(): void {
     if (!this.sMV) return;
 
-    const pTypes: Record<string, string | null> = {};
-    for (const input of this.sMVInputs ?? [])
-      pTypes[input.label] = input.maybeValue;
+    const options: ChangeGseOrSmvAddressOptions = {};
+    for (const input of this.sMVInputs ?? []) {
+      if (input.label === 'MAC-Address' && input.maybeValue)
+        options.mac = input.maybeValue;
+      if (input.label === 'APPID' && input.maybeValue)
+        options.appId = input.maybeValue;
+      if (input.label === 'VLAN-ID' && input.maybeValue)
+        options.vlanId = input.maybeValue;
+      if (input.label === 'VLAN-PRIORITY' && input.maybeValue)
+        options.vlanPriority = input.maybeValue;
+    }
 
-    this.dispatchEvent(
-      newEditEvent(
-        updateSmvAddress(this.sMV, {
-          pTypes,
-          instType: this.instType?.checked,
-        })
-      )
-    );
+    if (this.instType?.checked === true) options.instType = true;
+    else if (this.instType?.checked === false) options.instType = false;
+
+    this.dispatchEvent(newEditEvent(changeSMVContent(this.sMV, options)));
 
     this.onSMVInputChange();
   }

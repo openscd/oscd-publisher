@@ -11,7 +11,11 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { createGSEControl, removeControlBlock } from '@openenergytools/scl-lib';
+import {
+  createGSEControl,
+  findControlBlockSubscription,
+  removeControlBlock,
+} from '@openenergytools/scl-lib';
 
 import '../dataset/data-set-element-editor.js';
 import './gse-control-element-editor.js';
@@ -21,7 +25,6 @@ import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
 import { gooseIcon } from '../../foundation/icons.js';
-import { findCtrlBlockSubscription } from '../../foundation/utils/controlBlocks.js';
 
 @customElement('gse-control-editor')
 export class GseControlEditor extends LitElement {
@@ -144,8 +147,9 @@ export class GseControlEditor extends LitElement {
             <mwc-icon-button
               slot="change"
               icon="swap_vert"
-              ?disabled=${!!findCtrlBlockSubscription(this.selectedGseControl)
-                .length}
+              ?disabled=${!!findControlBlockSubscription(
+                this.selectedGseControl
+              ).length}
               @click=${() => this.selectDataSetDialog.show()}
             ></mwc-icon-button
           ></data-set-element-editor>

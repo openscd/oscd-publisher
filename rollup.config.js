@@ -1,5 +1,7 @@
 import nodeResolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {importMetaAssets}  from '@web/rollup-plugin-import-meta-assets';
 
 export default {
   input: './oscd-publisher.ts',
@@ -15,5 +17,6 @@ export default {
     /** Resolve bare module imports */
     nodeResolve(),
     typescript(),
+    importMetaAssets()
    ],
 };

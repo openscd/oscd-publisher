@@ -13,7 +13,11 @@ import '@material/mwc-checkbox';
 import type { Checkbox } from '@material/mwc-checkbox';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { updateGSEControl } from '@openenergytools/scl-lib';
+import {
+  changeGSEContent,
+  ChangeGSEContentOptions,
+  updateGSEControl,
+} from '@openenergytools/scl-lib';
 
 import '../../foundation/components/oscd-checkbox.js';
 import '../../foundation/components/oscd-select.js';
@@ -29,7 +33,7 @@ import {
   typePattern,
 } from '../../foundation/pattern.js';
 import { identity } from '../../foundation/identities/identity.js';
-import { checkGSEDiff, updateGSE } from '../../foundation/utils/gse.js';
+import { checkGSEDiff } from '../../foundation/utils/gse.js';
 
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
@@ -122,13 +126,27 @@ export class GseControlElementEditor extends LitElement {
   private saveGSEChanges(): void {
     if (!this.gSE) return;
 
-    const gSEAttrs: Record<string, string | null> = {};
-    for (const input of this.gSEInputs ?? [])
-      gSEAttrs[input.label] = input.maybeValue;
+    const options: ChangeGSEContentOptions = { address: {}, timing: {} };
+    for (const input of this.gSEInputs ?? []) {
+      if (input.label === 'MAC-Address' && input.maybeValue)
+        options.address!.mac = input.maybeValue;
+      if (input.label === 'APPID' && input.maybeValue)
+        options.address!.appId = input.maybeValue;
+      if (input.label === 'VLAN-ID' && input.maybeValue)
+        options.address!.vlanId = input.maybeValue;
+      if (input.label === 'VLAN-PRIORITY' && input.maybeValue)
+        options.address!.vlanPriority = input.maybeValue;
+      if (input.label === 'MinTime' && input.maybeValue)
+        options.timing!.MinTime = input.maybeValue;
+      if (input.label === 'MaxTime' && input.maybeValue)
+        options.timing!.MaxTime = input.maybeValue;
+    }
 
-    this.dispatchEvent(
-      newEditEvent(updateGSE(this.gSE, gSEAttrs, this.instType?.checked))
-    );
+    if (this.instType?.checked === true) options.address!.instType = true;
+    else if (this.instType?.checked === false)
+      options.address!.instType = false;
+
+    this.dispatchEvent(newEditEvent(changeGSEContent(this.gSE, options)));
 
     this.onGSEInputChange();
   }

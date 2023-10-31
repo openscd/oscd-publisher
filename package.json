@@ -34,7 +34,7 @@
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
-    "@openenergytools/scl-lib": "0.6.13",
+    "@openenergytools/scl-lib": "0.8.15",
     "lit": "^2.4.0"
   },
   "devDependencies": {
@@ -49,6 +49,7 @@
     "@typescript-eslint/parser": "^5.41.0",
     "@web/dev-server": "^0.1.35",
     "@web/test-runner": "^0.15.0",
+    "@web/rollup-plugin-import-meta-assets": "^2.0.2",
     "concurrently": "^7.5.0",
     "deepmerge": "^4.2.2",
     "eslint": "^8.26.0",
