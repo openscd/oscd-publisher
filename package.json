@@ -34,7 +34,7 @@
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
-    "@openenergytools/scl-lib": "0.8.15",
+    "@openenergytools/scl-lib": "0.8.16",
     "lit": "^2.4.0"
   },
   "devDependencies": {

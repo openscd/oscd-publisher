@@ -228,7 +228,7 @@ export class SampledValueControlEditor extends LitElement {
     return html`<mwc-button
       class="change scl element"
       outlined
-      label="'publisher.selectbutton', { type: 'SMV' })}"
+      label="Select Sampled Value Control"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectSampledValueControlButton.classList.add('hidden');

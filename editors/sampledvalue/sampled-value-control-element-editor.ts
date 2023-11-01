@@ -11,6 +11,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   ChangeGseOrSmvAddressOptions,
   changeSMVContent,
+  updateSampledValueControl,
 } from '@openenergytools/scl-lib';
 
 import '@material/mwc-checkbox';
@@ -20,8 +21,9 @@ import type { Checkbox } from '@material/mwc-checkbox';
 import '../../foundation/components/oscd-checkbox.js';
 import '../../foundation/components/oscd-select.js';
 import '../../foundation/components/oscd-textfield.js';
-import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
 
 import {
   maxLength,
@@ -32,6 +34,31 @@ import {
 import { identity } from '../../foundation/identities/identity.js';
 
 import { checkSMVDiff } from '../../foundation/utils/smv.js';
+
+function pElementContent(smv: Element, type: string): string | null {
+  return (
+    Array.from(smv.querySelectorAll(':scope > Address > P'))
+      .find(p => p.getAttribute('type') === type)
+      ?.textContent?.trim() ?? null
+  );
+}
+
+const smvOptsHelpers: Record<string, string> = {
+  refreshTime: 'SMV stream includes refresh time',
+  sampleSynchronized: 'SMV stream includes synchronized information',
+  sampleRate: 'SMV streams includes sampled rate information',
+  dataSet: 'SMV streams includes data set reference',
+  security: 'SMV streams includes security setting',
+  timestamp: 'SMV streams includes time stamp information',
+  synchSourceId: 'SMV streams includes synchronization source',
+};
+
+const smvHelpers: Record<string, string> = {
+  'MAC-Address': 'MAC address (01-0C-CD-04-xx-xx)',
+  APPID: 'APP ID (4xxx in hex)',
+  'VLAN-ID': 'VLAN ID (XXX in hex)',
+  'VLAN-PRIORITY': 'VLAN Priority (0-7)',
+};
 
 @customElement('sampled-value-control-element-editor')
 export class SampledValueControlElementEditor extends LitElement {
@@ -45,7 +72,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
   /** SCL change indicator */
   @property({ type: Number })
-  editCount = 0;
+  editCount = -1;
 
   @property({ attribute: false })
   get sMV(): Element | null {
@@ -55,9 +82,9 @@ export class SampledValueControlElementEditor extends LitElement {
     const ldInst = this.element.closest('LDevice')?.getAttribute('inst');
 
     return this.element.ownerDocument.querySelector(
-      `:root > Communication > SubNetwork > ` +
-        `ConnectedAP[iedName="${iedName}"][apName="${apName}"] > ` +
-        `SMV[ldInst="${ldInst}"][cbName="${cbName}"]`
+      `:root > Communication > SubNetwork 
+      > ConnectedAP[iedName="${iedName}"][apName="${apName}"] 
+      > SMV[ldInst="${ldInst}"][cbName="${cbName}"]`
     );
   }
 
@@ -66,6 +93,50 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @state()
   private smvOptsDiff = false;
+
+  @state()
+  private sampledValueControlDiff = false;
+
+  private onSampledValueControlInputChange(): void {
+    if (
+      Array.from(this.sampledValueControlInputs ?? []).some(
+        input => !input.checkValidity()
+      )
+    ) {
+      this.sampledValueControlDiff = false;
+      return;
+    }
+
+    const sampledValueControlAttrs: Record<string, string | null> = {};
+    for (const input of this.sampledValueControlInputs ?? [])
+      sampledValueControlAttrs[input.label] = input.maybeValue;
+
+    this.sampledValueControlDiff = Array.from(
+      this.sampledValueControlInputs ?? []
+    ).some(
+      input => this.element?.getAttribute(input.label) !== input.maybeValue
+    );
+  }
+
+  private saveSampledValueControlChanges(): void {
+    if (!this.element) return;
+
+    const sampledValueControlAttrs: Record<string, string | null> = {};
+    for (const input of this.sampledValueControlInputs ?? [])
+      if (this.element?.getAttribute(input.label) !== input.maybeValue)
+        sampledValueControlAttrs[input.label] = input.maybeValue;
+
+    this.dispatchEvent(
+      newEditEvent(
+        updateSampledValueControl({
+          element: this.element,
+          attributes: sampledValueControlAttrs,
+        })
+      )
+    );
+
+    this.onSampledValueControlInputChange();
+  }
 
   private onSMVInputChange(): void {
     if (
@@ -143,6 +214,11 @@ export class SampledValueControlElementEditor extends LitElement {
     this.onSmvOptsInputChange();
   }
 
+  @queryAll(
+    '.content.smvcontrol > oscd-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > oscd-checkbox'
+  )
+  sampledValueControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
+
   @queryAll('.content.smv > oscd-textfield') sMVInputs?: OscdTextfield[];
 
   @queryAll('.content.smvopts > oscd-checkbox')
@@ -154,50 +230,48 @@ export class SampledValueControlElementEditor extends LitElement {
     const { sMV } = this;
     if (!sMV)
       return html` <h3>
-        <div>'publisher.smv.commsetting</div>
-        <div class="headersubtitle">publisher.smv.noconnectionap'</div>
+        <div>'Communication Settings (SMV)</div>
+        <div class="headersubtitle">No connection available</div>
       </h3>`;
 
-    const hasInstType = Array.from(sMV.querySelectorAll('Address > P')).some(
-      pType => pType.getAttribute('xsi:type')
-    );
+    const hasInstType = Array.from(
+      sMV.querySelectorAll(':scope > Address > P')
+    ).some(pType => pType.getAttribute('xsi:type'));
 
     const attributes: Record<string, string | null> = {};
 
     ['MAC-Address', 'APPID', 'VLAN-ID', 'VLAN-PRIORITY'].forEach(key => {
-      if (!attributes[key])
-        attributes[key] =
-          sMV
-            .querySelector(`Address > P[type="${key}"]`)
-            ?.textContent?.trim() ?? null;
+      if (!attributes[key]) attributes[key] = pElementContent(sMV, key);
     });
 
     return html` <div class="content smv">
-      <h3>Communication Settings (SMV)</h3>
-      <mwc-formfield label="connectedap.wizard.addschemainsttype"
-        ><mwc-checkbox
-          id="instType"
-          ?checked="${hasInstType}"
-          @change=${this.onSMVInputChange}
-        ></mwc-checkbox></mwc-formfield
-      >${Object.entries(attributes).map(
-        ([key, value]) =>
-          html`<oscd-textfield
-            label="${key}"
-            ?nullable=${typeNullable[key]}
-            .maybeValue=${value}
-            pattern="${typePattern[key]!}"
-            required
-            @input=${this.onSMVInputChange}
-          ></oscd-textfield>`
-      )}<mwc-button
+        <h3>Communication Settings (SMV)</h3>
+        <mwc-formfield label="Add XMLSchema-instance type"
+          ><mwc-checkbox
+            id="instType"
+            ?checked="${hasInstType}"
+            @change=${this.onSMVInputChange}
+          ></mwc-checkbox></mwc-formfield
+        >${Object.entries(attributes).map(
+          ([key, value]) =>
+            html`<oscd-textfield
+              label="${key}"
+              ?nullable=${typeNullable[key]}
+              .maybeValue=${value}
+              pattern="${typePattern[key]!}"
+              required
+              helper="${smvHelpers[key]}"
+              @input=${this.onSMVInputChange}
+            ></oscd-textfield>`
+        )}
+      </div>
+      <mwc-button
         class="save"
         label="save"
         icon="save"
         ?disabled=${!this.sMVdiff}
         @click=${() => this.saveSMVChanges()}
-      ></mwc-button>
-    </div>`;
+      ></mwc-button>`;
   }
 
   private renderSmvOptsContent(): TemplateResult {
@@ -222,32 +296,33 @@ export class SampledValueControlElementEditor extends LitElement {
     );
 
     return html`<div class="content smvopts">
-      <h3>'Sampled Value Options'</h3>
-      ${Object.entries({
-        refreshTime,
-        sampleSynchronized,
-        sampleRate,
-        dataSet,
-        security,
-        timestamp,
-        synchSourceId,
-      }).map(
-        ([key, value]) =>
-          html`<oscd-checkbox
-            label="${key}"
-            .maybeValue=${value}
-            nullable
-            helper="scl.key"
-            @input=${this.onSmvOptsInputChange}
-          ></oscd-checkbox>`
-      )}<mwc-button
+        <h3>Sampled Value Options</h3>
+        ${Object.entries({
+          refreshTime,
+          sampleSynchronized,
+          sampleRate,
+          dataSet,
+          security,
+          timestamp,
+          synchSourceId,
+        }).map(
+          ([key, value]) =>
+            html`<oscd-checkbox
+              label="${key}"
+              .maybeValue=${value}
+              nullable
+              helper="${smvOptsHelpers[key]}"
+              @input=${this.onSmvOptsInputChange}
+            ></oscd-checkbox>`
+        )}
+      </div>
+      <mwc-button
         class="save"
         label="save"
         icon="save"
         ?disabled=${!this.smvOptsDiff}
         @click=${() => this.saveSmvOptsChanges()}
-      ></mwc-button>
-    </div>`;
+      ></mwc-button>`;
   }
 
   private renderOtherElements(): TemplateResult {
@@ -277,48 +352,46 @@ export class SampledValueControlElementEditor extends LitElement {
       'securityEnabled',
     ].map(attr => this.element?.getAttribute(attr));
 
-    return html`<div class="content">
+    return html`<div class="content smvcontrol">
       <oscd-textfield
         label="name"
         .maybeValue=${name}
-        helper="scl.name"
+        helper="Sampled Value Name"
         required
-        validationMessage="textfield.required')}"
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
-        disabled
+        @input="${this.onSampledValueControlInputChange}"
       ></oscd-textfield>
       <oscd-textfield
         label="desc"
         .maybeValue=${desc}
         nullable
-        helper="scl.desc')}"
-        disabled
+        helper="Sampled Value Description"
+        @input="${this.onSampledValueControlInputChange}"
       ></oscd-textfield>
-      ${multicast === 'true'
+      ${multicast === null || multicast === 'true'
         ? html``
         : html`<oscd-checkbox
             label="multicast"
             .maybeValue=${multicast}
-            helper="scl.multicast')}"
-            disabled
+            helper="Whether Sample Value Stream is multicast"
+            @input="${this.onSampledValueControlInputChange}"
           ></oscd-checkbox>`}
       <oscd-textfield
         label="smvID"
         .maybeValue=${smvID}
-        helper="scl.id')}"
+        helper="Sampled Value ID"
         required
-        voscd-textfield="textfield.nonempty')}"
-        disabled
+        @input="${this.onSampledValueControlInputChange}"
       ></oscd-textfield>
       <oscd-select
         label="smpMod"
         .maybeValue=${smpMod}
         nullable
         required
-        helper="scl.smpMod')}"
-        disabled
+        helper="Sample mode (Samples per Second, Sampled per Period, Seconds per Sample)"
+        @selected="${this.onSampledValueControlInputChange}"
         >${['SmpPerPeriod', 'SmpPerSec', 'SecPerSmp'].map(
           option =>
             html`<mwc-list-item value="${option}">${option}</mwc-list-item>`
@@ -327,32 +400,39 @@ export class SampledValueControlElementEditor extends LitElement {
       <oscd-textfield
         label="smpRate"
         .maybeValue=${smpRate}
-        helper="scl.smpRate')}"
+        helper="Sample Rate (Based on Sample Mode)"
         required
         type="number"
         moscd-textfield
         oscd-textfield
+        @input="${this.onSampledValueControlInputChange}"
       ></oscd-textfield>
       <oscd-textfield
         label="nofASDU"
         .maybeValue=${nofASDU}
-        helper="scl.nofASDU')}"
+        helper="Number of Samples per Ethernet packet"
         required
         type="number"
         min="0"
-        disabled
+        @input="${this.onSampledValueControlInputChange}"
       ></oscd-textfield>
       <oscd-select
         label="securityEnabled"
         .maybeValue=${securityEnabled}
         nullable
         required
-        helper="scl.securityEnable')}"
-        disabled
+        helper="Sampled Value Security Setting"
+        @selected="${this.onSampledValueControlInputChange}"
         >${['None', 'Signature', 'SignatureAndEncryption'].map(
           type => html`<mwc-list-item value="${type}">${type}</mwc-list-item>`
         )}</oscd-select
-      >
+      ><mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.sampledValueControlDiff}
+        @click="${this.saveSampledValueControlChanges}"
+      ></mwc-button>
     </div>`;
   }
 
@@ -377,7 +457,13 @@ export class SampledValueControlElementEditor extends LitElement {
     }
 
     .content {
+      display: flex;
+      flex-direction: column;
       border-left: thick solid var(--mdc-theme-on-primary);
+    }
+
+    .save {
+      align-self: flex-end;
     }
 
     .content > * {
