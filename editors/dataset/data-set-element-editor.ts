@@ -16,12 +16,15 @@ import type { Dialog } from '@material/mwc-dialog';
 import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
-import { identity, removeFCDA, updateDataSet } from '@openenergytools/scl-lib';
+import {
+  find,
+  identity,
+  removeFCDA,
+  updateDataSet,
+} from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-textfield.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
-
-import { selector } from '../../foundation/identities/selector.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -33,7 +36,7 @@ function dataAttributePaths(doc: XMLDocument, paths: string[][]): Element[][] {
     const daPath: Element[] = [];
     for (const section of path) {
       const [tag, id] = section.split(': ');
-      const ancestor = doc.querySelector(selector(tag, id));
+      const ancestor = find(doc, tag, id);
       if (ancestor) daPath.push(ancestor);
     }
     daPaths.push(daPath);
@@ -53,7 +56,7 @@ function functionaContraintPaths(
     for (const section of path) {
       const [tag, id] = section.split(': ');
       if (tag === 'FC') fc = id;
-      const ancestor = doc.querySelector(selector(tag, id));
+      const ancestor = find(doc, tag, id);
       if (ancestor) doPath.push(ancestor);
     }
     fcPaths.push({ path: doPath, fc });

@@ -11,6 +11,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
+  find,
   findControlBlockSubscription,
   identity,
   removeControlBlock,
@@ -22,7 +23,6 @@ import './sampled-value-control-element-editor.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
-import { selector } from '../../foundation/identities/selector.js';
 import { smvIcon } from '../../foundation/icons.js';
 
 @customElement('sampled-value-control-editor')
@@ -99,9 +99,7 @@ export class SampledValueControlEditor extends LitElement {
 
   private selectSMVControl(evt: Event): void {
     const id = ((evt.target as SclFilteredList).selected as ListItem).value;
-    const smvControl = this.doc.querySelector(
-      selector('SampledValueControl', id)
-    );
+    const smvControl = find(this.doc, 'SampledValueControl', id);
     if (!smvControl) return;
 
     this.selectedSampledValueControl = smvControl;

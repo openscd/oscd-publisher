@@ -13,6 +13,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createGSEControl,
+  find,
   findControlBlockSubscription,
   identity,
   removeControlBlock,
@@ -23,7 +24,6 @@ import './gse-control-element-editor.js';
 import '../../foundation/components/scl-filtered-list.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
-import { selector } from '../../foundation/identities/selector.js';
 import { gooseIcon } from '../../foundation/icons.js';
 
 @customElement('gse-control-editor')
@@ -95,7 +95,7 @@ export class GseControlEditor extends LitElement {
 
   private selectGSEControl(evt: Event): void {
     const id = ((evt.target as SclFilteredList).selected as ListItem).value;
-    const gseControl = this.doc.querySelector(selector('GSEControl', id));
+    const gseControl = find(this.doc, 'GSEControl', id);
     if (!gseControl) return;
 
     this.selectedGseControl = gseControl;

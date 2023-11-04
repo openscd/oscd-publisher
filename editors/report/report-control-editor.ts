@@ -12,6 +12,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createReportControl,
+  find,
   findControlBlockSubscription,
   identity,
   removeControlBlock,
@@ -22,7 +23,6 @@ import './report-control-element-editor.js';
 import '../../foundation/components/scl-filtered-list.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
-import { selector } from '../../foundation/identities/selector.js';
 import { reportIcon } from '../../foundation/icons.js';
 
 @customElement('report-control-editor')
@@ -99,7 +99,7 @@ export class ReportControlEditor extends LitElement {
 
   private selectReportControl(evt: Event): void {
     const id = ((evt.target as SclFilteredList).selected as ListItem).value;
-    const reportControl = this.doc.querySelector(selector('ReportControl', id));
+    const reportControl = find(this.doc, 'ReportControl', id);
     if (!reportControl) return;
 
     this.selectedReportControl = reportControl;

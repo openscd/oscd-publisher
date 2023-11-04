@@ -11,6 +11,7 @@ import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createDataSet,
+  find,
   identity,
   removeDataSet,
 } from '@openenergytools/scl-lib';
@@ -20,7 +21,6 @@ import '../../foundation/components/scl-filtered-list.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
-import { selector } from '../../foundation/identities/selector.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {
@@ -55,7 +55,7 @@ export class DataSetEditor extends LitElement {
 
   private selectDataSet(evt: Event): void {
     const id = ((evt.target as SclFilteredList).selected as ListItem).value;
-    const dataSet = this.doc.querySelector(selector('DataSet', id));
+    const dataSet = find(this.doc, 'DataSet', id);
 
     if (dataSet) {
       this.selectedDataSet = dataSet;
