@@ -19,10 +19,10 @@ import {
   updateGSEControl,
 } from '@openenergytools/scl-lib';
 
-import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/scl-checkbox.js';
 import '../../foundation/components/oscd-select.js';
 import '../../foundation/components/scl-textfield.js';
-import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
@@ -154,9 +154,9 @@ export class GseControlElementEditor extends LitElement {
   @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
 
   @queryAll(
-    '.content.gsecontrol > scl-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > oscd-checkbox'
+    '.content.gsecontrol > scl-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > scl-checkbox'
   )
-  gSEControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
+  gSEControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -290,13 +290,13 @@ export class GseControlElementEditor extends LitElement {
         validationMessage="textfield.nonempty"
         @input=${this.onGSEControlInputChange}
       ></scl-textfield>
-      <oscd-checkbox
+      <scl-checkbox
         label="fixedOffs"
         .maybeValue=${fixedOffs}
         nullable
         helper="scl.fixedOffs"
         @input=${this.onGSEControlInputChange}
-      ></oscd-checkbox>
+      ></scl-checkbox>
       <oscd-select
         label="securityEnabled"
         .maybeValue=${securityEnabled}

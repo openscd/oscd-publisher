@@ -18,10 +18,10 @@ import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
 import type { Checkbox } from '@material/mwc-checkbox';
 
-import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/scl-checkbox.js';
 import '../../foundation/components/oscd-select.js';
 import '../../foundation/components/scl-textfield.js';
-import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
@@ -215,14 +215,14 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   @queryAll(
-    '.content.smvcontrol > scl-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > oscd-checkbox'
+    '.content.smvcontrol > scl-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > scl-checkbox'
   )
-  sampledValueControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
+  sampledValueControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
 
   @queryAll('.content.smv > scl-textfield') sMVInputs?: SclTextfield[];
 
-  @queryAll('.content.smvopts > oscd-checkbox')
-  smvOptsInputs?: OscdCheckbox[];
+  @queryAll('.content.smvopts > scl-checkbox')
+  smvOptsInputs?: SclCheckbox[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -307,13 +307,13 @@ export class SampledValueControlElementEditor extends LitElement {
           synchSourceId,
         }).map(
           ([key, value]) =>
-            html`<oscd-checkbox
+            html`<scl-checkbox
               label="${key}"
               .maybeValue=${value}
               nullable
               helper="${smvOptsHelpers[key]}"
               @input=${this.onSmvOptsInputChange}
-            ></oscd-checkbox>`
+            ></scl-checkbox>`
         )}
       </div>
       <mwc-button
@@ -372,12 +372,12 @@ export class SampledValueControlElementEditor extends LitElement {
       ></scl-textfield>
       ${multicast === null || multicast === 'true'
         ? html``
-        : html`<oscd-checkbox
+        : html`<scl-checkbox
             label="multicast"
             .maybeValue=${multicast}
             helper="Whether Sample Value Stream is multicast"
             @input="${this.onSampledValueControlInputChange}"
-          ></oscd-checkbox>`}
+          ></scl-checkbox>`}
       <scl-textfield
         label="smvID"
         .maybeValue=${smvID}

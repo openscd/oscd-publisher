@@ -8,8 +8,8 @@ import type { Switch } from '@material/mwc-switch';
 import { html, LitElement } from 'lit';
 
 /** A potentially `nullable` labelled checkbox. */
-@customElement('oscd-checkbox')
-export class OscdCheckbox extends LitElement {
+@customElement('scl-checkbox')
+export class SclCheckbox extends LitElement {
   @property({ type: String })
   label = '';
 

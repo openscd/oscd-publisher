@@ -11,10 +11,10 @@ import {
 import { newEditEvent } from '@openscd/open-scd-core';
 import { updateReportControl } from '@openenergytools/scl-lib';
 
-import '../../foundation/components/oscd-checkbox.js';
+import '../../foundation/components/scl-checkbox.js';
 import '../../foundation/components/oscd-select.js';
 import '../../foundation/components/scl-textfield.js';
-import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
+import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
@@ -190,14 +190,14 @@ export class ReportControlElementEditor extends LitElement {
     this.onReportControlInputChange();
   }
 
-  @queryAll('.content.optfields > oscd-checkbox')
-  optFieldsInputs?: OscdCheckbox[];
+  @queryAll('.content.optfields > scl-checkbox')
+  optFieldsInputs?: SclCheckbox[];
 
-  @queryAll('.content.trgops > oscd-checkbox')
-  trgOpsInputs?: OscdCheckbox[];
+  @queryAll('.content.trgops > scl-checkbox')
+  trgOpsInputs?: SclCheckbox[];
 
   @queryAll('.report.attributes')
-  reportControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
+  reportControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
 
   @query('.rptenabled.attributes')
   rptEnabledInput!: SclTextfield;
@@ -239,13 +239,13 @@ export class ReportControlElementEditor extends LitElement {
           bufOvfl,
         }).map(
           ([key, value]) =>
-            html`<oscd-checkbox
+            html`<scl-checkbox
               label="${key}"
               .maybeValue=${value}
               nullable
               helper="scl.key"
               @input=${this.onOptFieldsInputChange}
-            ></oscd-checkbox>`
+            ></scl-checkbox>`
         )}
       </div>
       <mwc-button
@@ -272,13 +272,13 @@ export class ReportControlElementEditor extends LitElement {
         <h3>Trigger Options</h3>
         ${Object.entries({ dchg, qchg, dupd, period, gi }).map(
           ([key, value]) =>
-            html`<oscd-checkbox
+            html`<scl-checkbox
               label="${key}"
               .maybeValue=${value}
               nullable
               helper="scl.key"
               @input=${this.onTrgOpsInputChange}
-            ></oscd-checkbox>`
+            ></scl-checkbox>`
         )}
       </div>
       <mwc-button
@@ -330,13 +330,13 @@ export class ReportControlElementEditor extends LitElement {
         helper="scl.desc"
         @input=${this.onReportControlInputChange}
       ></scl-textfield
-      ><oscd-checkbox
+      ><scl-checkbox
         class="report attributes"
         label="buffered"
         .maybeValue=${buffered}
         helper="scl.buffered"
         @input=${this.onReportControlInputChange}
-      ></oscd-checkbox
+      ></scl-checkbox
       ><scl-textfield
         class="report attributes"
         label="rptID"
@@ -345,14 +345,14 @@ export class ReportControlElementEditor extends LitElement {
         helper="report.rptID"
         @input=${this.onReportControlInputChange}
       ></scl-textfield
-      ><oscd-checkbox
+      ><scl-checkbox
         class="report attributes"
         label="indexed"
         .maybeValue=${indexed}
         nullable
         helper="scl.indexed"
         @input=${this.onReportControlInputChange}
-      ></oscd-checkbox
+      ></scl-checkbox
       ><scl-textfield
         class="rptenabled attributes"
         label="max Clients"
