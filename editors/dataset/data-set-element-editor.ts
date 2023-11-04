@@ -18,8 +18,8 @@ import '@openscd/oscd-tree-grid';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
 import { removeFCDA, updateDataSet } from '@openenergytools/scl-lib';
 
-import '../../foundation/components/oscd-textfield.js';
-import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import '../../foundation/components/scl-textfield.js';
+import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import { identity } from '../../foundation/identities/identity.js';
 import { selector } from '../../foundation/identities/selector.js';
@@ -139,7 +139,7 @@ export class DataSetElementEditor extends LitElement {
     this.dataAttributePicker?.close();
   }
 
-  @queryAll('oscd-textfield') inputs?: OscdTextfield[];
+  @queryAll('scl-textfield') inputs?: SclTextfield[];
 
   @query('#dapicker') dataAttributePicker?: Dialog;
 
@@ -207,7 +207,7 @@ export class DataSetElementEditor extends LitElement {
   }
 
   private renderContent(): TemplateResult {
-    return html`<oscd-textfield
+    return html`<scl-textfield
         id="${identity(this.element)}"
         tag="${this.element?.tagName ?? ''}"
         label="name"
@@ -216,8 +216,8 @@ export class DataSetElementEditor extends LitElement {
         required
         @input=${() => this.onInputChange()}
       >
-      </oscd-textfield>
-      <oscd-textfield
+      </scl-textfield>
+      <scl-textfield
         id="${identity(this.element)}"
         label="desc"
         .maybeValue=${this.desc}
@@ -225,7 +225,7 @@ export class DataSetElementEditor extends LitElement {
         nullable
         @input=${() => this.onInputChange()}
       >
-      </oscd-textfield>
+      </scl-textfield>
       <mwc-button
         class="save"
         label="save"

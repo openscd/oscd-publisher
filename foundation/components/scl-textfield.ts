@@ -15,8 +15,8 @@ import { html } from 'lit';
  * `multiplier` if an SI `unit` is given.
  *
  * NB: Use `maybeValue: string | null` instead of `value` if `nullable`! */
-@customElement('oscd-textfield')
-export class OscdTextfield extends TextField {
+@customElement('scl-textfield')
+export class SclTextfield extends TextField {
   /** Whether [[`maybeValue`]] may be `null` */
   @property({ type: Boolean })
   nullable = false;

@@ -13,10 +13,10 @@ import { updateReportControl } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/oscd-checkbox.js';
 import '../../foundation/components/oscd-select.js';
-import '../../foundation/components/oscd-textfield.js';
+import '../../foundation/components/scl-textfield.js';
 import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
-import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import { maxLength, patterns } from '../../foundation/pattern.js';
 import { identity } from '../../foundation/identities/identity.js';
@@ -24,7 +24,7 @@ import { updateMaxClients } from './foundation.js';
 
 function checkRptEnabledValidity(
   rptEnabled: Element | null,
-  input: OscdTextfield
+  input: SclTextfield
 ): boolean {
   if (!input.checkValidity()) return false;
 
@@ -197,10 +197,10 @@ export class ReportControlElementEditor extends LitElement {
   trgOpsInputs?: OscdCheckbox[];
 
   @queryAll('.report.attributes')
-  reportControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
+  reportControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
 
   @query('.rptenabled.attributes')
-  rptEnabledInput!: OscdTextfield;
+  rptEnabledInput!: SclTextfield;
 
   private renderOptFieldsContent(): TemplateResult {
     const [
@@ -310,7 +310,7 @@ export class ReportControlElementEditor extends LitElement {
       this.element.querySelector('RptEnabled')?.getAttribute('max') ?? null;
 
     return html`<div class="content reportcontrol">
-      <oscd-textfield
+      <scl-textfield
         class="report attributes"
         label="name"
         .maybeValue=${name}
@@ -321,15 +321,15 @@ export class ReportControlElementEditor extends LitElement {
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield
-      ><oscd-textfield
+      ></scl-textfield
+      ><scl-textfield
         class="report attributes"
         label="desc"
         .maybeValue=${desc}
         nullable
         helper="scl.desc"
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield
+      ></scl-textfield
       ><oscd-checkbox
         class="report attributes"
         label="buffered"
@@ -337,14 +337,14 @@ export class ReportControlElementEditor extends LitElement {
         helper="scl.buffered"
         @input=${this.onReportControlInputChange}
       ></oscd-checkbox
-      ><oscd-textfield
+      ><scl-textfield
         class="report attributes"
         label="rptID"
         .maybeValue=${rptID}
         nullable
         helper="report.rptID"
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield
+      ></scl-textfield
       ><oscd-checkbox
         class="report attributes"
         label="indexed"
@@ -353,7 +353,7 @@ export class ReportControlElementEditor extends LitElement {
         helper="scl.indexed"
         @input=${this.onReportControlInputChange}
       ></oscd-checkbox
-      ><oscd-textfield
+      ><scl-textfield
         class="rptenabled attributes"
         label="max Clients"
         .maybeValue=${max}
@@ -363,8 +363,8 @@ export class ReportControlElementEditor extends LitElement {
         min="0"
         suffix="#"
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield
-      ><oscd-textfield
+      ></scl-textfield
+      ><scl-textfield
         class="report attributes"
         label="bufTime"
         .maybeValue=${bufTime}
@@ -375,8 +375,8 @@ export class ReportControlElementEditor extends LitElement {
         min="0"
         suffix="ms"
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield
-      ><oscd-textfield
+      ></scl-textfield
+      ><scl-textfield
         class="report attributes"
         label="intgPd"
         .maybeValue=${intgPd}
@@ -387,7 +387,7 @@ export class ReportControlElementEditor extends LitElement {
         min="0"
         suffix="ms"
         @input=${this.onReportControlInputChange}
-      ></oscd-textfield>
+      ></scl-textfield>
       <mwc-button
         class="save"
         label="save"

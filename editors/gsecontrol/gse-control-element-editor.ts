@@ -21,10 +21,10 @@ import {
 
 import '../../foundation/components/oscd-checkbox.js';
 import '../../foundation/components/oscd-select.js';
-import '../../foundation/components/oscd-textfield.js';
+import '../../foundation/components/scl-textfield.js';
 import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
-import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import {
   maxLength,
@@ -151,12 +151,12 @@ export class GseControlElementEditor extends LitElement {
     this.onGSEInputChange();
   }
 
-  @queryAll('.content.gse > oscd-textfield') gSEInputs?: OscdTextfield[];
+  @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
 
   @queryAll(
-    '.content.gsecontrol > oscd-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > oscd-checkbox'
+    '.content.gsecontrol > scl-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > oscd-checkbox'
   )
-  gSEControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
+  gSEControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -196,30 +196,30 @@ export class GseControlElementEditor extends LitElement {
         ></mwc-checkbox></mwc-formfield
       >${Object.entries(attributes).map(
         ([key, value]) =>
-          html`<oscd-textfield
+          html`<scl-textfield
             label="${key}"
             .maybeValue=${value}
             pattern="${typePattern[key]!}"
             required
             @input=${this.onGSEInputChange}
             ?nullable=${typeNullable[key]}
-          ></oscd-textfield>`
-      )}<oscd-textfield
+          ></scl-textfield>`
+      )}<scl-textfield
         label="MinTime"
         .maybeValue=${minTime}
         nullable
         suffix="ms"
         type="number"
         @input=${this.onGSEInputChange}
-      ></oscd-textfield
-      ><oscd-textfield
+      ></scl-textfield
+      ><scl-textfield
         label="MaxTime"
         .maybeValue=${maxTime}
         nullable
         suffix="ms"
         type="number"
         @input=${this.onGSEInputChange}
-      ></oscd-textfield>
+      ></scl-textfield>
       <mwc-button
         class="save"
         label="save"
@@ -249,7 +249,7 @@ export class GseControlElementEditor extends LitElement {
       );
 
     return html`<div class="content gsecontrol">
-      <oscd-textfield
+      <scl-textfield
         label="name"
         .maybeValue=${name}
         helper="scl.name"
@@ -260,14 +260,14 @@ export class GseControlElementEditor extends LitElement {
         .reservedValues=${reservedGseControlNames}
         dialogInitialFocus
         @input=${this.onGSEControlInputChange}
-      ></oscd-textfield>
-      <oscd-textfield
+      ></scl-textfield>
+      <scl-textfield
         label="desc"
         .maybeValue=${desc}
         nullable
         helper="scl.desc"
         @input=${this.onGSEControlInputChange}
-      ></oscd-textfield>
+      ></scl-textfield>
       <oscd-select
         label="type"
         .maybeValue=${type}
@@ -282,14 +282,14 @@ export class GseControlElementEditor extends LitElement {
             >`
         )}</oscd-select
       >
-      <oscd-textfield
+      <scl-textfield
         label="appID"
         .maybeValue=${appID}
         helper="scl.id"
         required
         validationMessage="textfield.nonempty"
         @input=${this.onGSEControlInputChange}
-      ></oscd-textfield>
+      ></scl-textfield>
       <oscd-checkbox
         label="fixedOffs"
         .maybeValue=${fixedOffs}

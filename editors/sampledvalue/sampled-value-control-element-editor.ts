@@ -20,10 +20,10 @@ import type { Checkbox } from '@material/mwc-checkbox';
 
 import '../../foundation/components/oscd-checkbox.js';
 import '../../foundation/components/oscd-select.js';
-import '../../foundation/components/oscd-textfield.js';
+import '../../foundation/components/scl-textfield.js';
 import type { OscdCheckbox } from '../../foundation/components/oscd-checkbox.js';
 import type { OscdSelect } from '../../foundation/components/oscd-select.js';
-import type { OscdTextfield } from '../../foundation/components/oscd-textfield.js';
+import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import {
   maxLength,
@@ -215,11 +215,11 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   @queryAll(
-    '.content.smvcontrol > oscd-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > oscd-checkbox'
+    '.content.smvcontrol > scl-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > oscd-checkbox'
   )
-  sampledValueControlInputs?: (OscdTextfield | OscdSelect | OscdCheckbox)[];
+  sampledValueControlInputs?: (SclTextfield | OscdSelect | OscdCheckbox)[];
 
-  @queryAll('.content.smv > oscd-textfield') sMVInputs?: OscdTextfield[];
+  @queryAll('.content.smv > scl-textfield') sMVInputs?: SclTextfield[];
 
   @queryAll('.content.smvopts > oscd-checkbox')
   smvOptsInputs?: OscdCheckbox[];
@@ -254,7 +254,7 @@ export class SampledValueControlElementEditor extends LitElement {
           ></mwc-checkbox></mwc-formfield
         >${Object.entries(attributes).map(
           ([key, value]) =>
-            html`<oscd-textfield
+            html`<scl-textfield
               label="${key}"
               ?nullable=${typeNullable[key]}
               .maybeValue=${value}
@@ -262,7 +262,7 @@ export class SampledValueControlElementEditor extends LitElement {
               required
               helper="${smvHelpers[key]}"
               @input=${this.onSMVInputChange}
-            ></oscd-textfield>`
+            ></scl-textfield>`
         )}
       </div>
       <mwc-button
@@ -353,7 +353,7 @@ export class SampledValueControlElementEditor extends LitElement {
     ].map(attr => this.element?.getAttribute(attr));
 
     return html`<div class="content smvcontrol">
-      <oscd-textfield
+      <scl-textfield
         label="name"
         .maybeValue=${name}
         helper="Sampled Value Name"
@@ -362,14 +362,14 @@ export class SampledValueControlElementEditor extends LitElement {
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
         @input="${this.onSampledValueControlInputChange}"
-      ></oscd-textfield>
-      <oscd-textfield
+      ></scl-textfield>
+      <scl-textfield
         label="desc"
         .maybeValue=${desc}
         nullable
         helper="Sampled Value Description"
         @input="${this.onSampledValueControlInputChange}"
-      ></oscd-textfield>
+      ></scl-textfield>
       ${multicast === null || multicast === 'true'
         ? html``
         : html`<oscd-checkbox
@@ -378,13 +378,13 @@ export class SampledValueControlElementEditor extends LitElement {
             helper="Whether Sample Value Stream is multicast"
             @input="${this.onSampledValueControlInputChange}"
           ></oscd-checkbox>`}
-      <oscd-textfield
+      <scl-textfield
         label="smvID"
         .maybeValue=${smvID}
         helper="Sampled Value ID"
         required
         @input="${this.onSampledValueControlInputChange}"
-      ></oscd-textfield>
+      ></scl-textfield>
       <oscd-select
         label="smpMod"
         .maybeValue=${smpMod}
@@ -397,17 +397,17 @@ export class SampledValueControlElementEditor extends LitElement {
             html`<mwc-list-item value="${option}">${option}</mwc-list-item>`
         )}</oscd-select
       >
-      <oscd-textfield
+      <scl-textfield
         label="smpRate"
         .maybeValue=${smpRate}
         helper="Sample Rate (Based on Sample Mode)"
         required
         type="number"
-        moscd-textfield
-        oscd-textfield
+        mscl-textfield
+        scl-textfield
         @input="${this.onSampledValueControlInputChange}"
-      ></oscd-textfield>
-      <oscd-textfield
+      ></scl-textfield>
+      <scl-textfield
         label="nofASDU"
         .maybeValue=${nofASDU}
         helper="Number of Samples per Ethernet packet"
@@ -415,7 +415,7 @@ export class SampledValueControlElementEditor extends LitElement {
         type="number"
         min="0"
         @input="${this.onSampledValueControlInputChange}"
-      ></oscd-textfield>
+      ></scl-textfield>
       <oscd-select
         label="securityEnabled"
         .maybeValue=${securityEnabled}
