@@ -13,6 +13,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createReportControl,
   findControlBlockSubscription,
+  identity,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
 
@@ -22,7 +23,6 @@ import '../../foundation/components/scl-filtered-list.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
-import { identity } from '../../foundation/identities/identity.js';
 import { reportIcon } from '../../foundation/icons.js';
 
 @customElement('report-control-editor')

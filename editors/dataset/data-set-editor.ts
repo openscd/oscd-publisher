@@ -9,7 +9,11 @@ import type { Button } from '@material/mwc-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { createDataSet, removeDataSet } from '@openenergytools/scl-lib';
+import {
+  createDataSet,
+  identity,
+  removeDataSet,
+} from '@openenergytools/scl-lib';
 
 import './data-set-element-editor.js';
 import '../../foundation/components/scl-filtered-list.js';
@@ -17,7 +21,6 @@ import type { SclFilteredList } from '../../foundation/components/scl-filtered-l
 
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
-import { identity } from '../../foundation/identities/identity.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {

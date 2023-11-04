@@ -14,6 +14,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createGSEControl,
   findControlBlockSubscription,
+  identity,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
 
@@ -23,7 +24,6 @@ import '../../foundation/components/scl-filtered-list.js';
 import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
-import { identity } from '../../foundation/identities/identity.js';
 import { gooseIcon } from '../../foundation/icons.js';
 
 @customElement('gse-control-editor')

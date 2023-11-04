@@ -1,5 +1,7 @@
 import { css } from 'lit';
-import { identity } from './foundation/identities/identity.js';
+
+import { identity } from '@openenergytools/scl-lib';
+
 import { selector } from './foundation/identities/selector.js';
 
 export function updateElementReference(

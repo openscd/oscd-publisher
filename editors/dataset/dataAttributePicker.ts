@@ -1,6 +1,5 @@
+import { identity } from '@openenergytools/scl-lib';
 import { Tree } from '@openscd/oscd-tree-grid';
-
-import { identity } from '../../foundation/identities/identity.js';
 
 function dataAttributeObject(da: Element): Tree {
   const tree: Tree = {};

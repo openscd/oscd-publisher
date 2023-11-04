@@ -9,7 +9,7 @@ import {
 } from 'lit/decorators.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { updateReportControl } from '@openenergytools/scl-lib';
+import { identity, updateReportControl } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-checkbox.js';
 import '../../foundation/components/scl-select.js';
@@ -19,7 +19,6 @@ import type { SclSelect } from '../../foundation/components/scl-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import { maxLength, patterns } from '../../foundation/pattern.js';
-import { identity } from '../../foundation/identities/identity.js';
 import { updateMaxClients } from './foundation.js';
 
 function checkRptEnabledValidity(

@@ -16,12 +16,11 @@ import type { Dialog } from '@material/mwc-dialog';
 import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
-import { removeFCDA, updateDataSet } from '@openenergytools/scl-lib';
+import { identity, removeFCDA, updateDataSet } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-textfield.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
-import { identity } from '../../foundation/identities/identity.js';
 import { selector } from '../../foundation/identities/selector.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';

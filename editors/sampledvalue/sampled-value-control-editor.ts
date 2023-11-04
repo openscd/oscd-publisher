@@ -12,6 +12,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   findControlBlockSubscription,
+  identity,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
 
@@ -22,7 +23,6 @@ import type { SclFilteredList } from '../../foundation/components/scl-filtered-l
 
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
-import { identity } from '../../foundation/identities/identity.js';
 import { smvIcon } from '../../foundation/icons.js';
 
 @customElement('sampled-value-control-editor')

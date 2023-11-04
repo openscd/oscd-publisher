@@ -16,6 +16,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   changeGSEContent,
   ChangeGSEContentOptions,
+  identity,
   updateGSEControl,
 } from '@openenergytools/scl-lib';
 
@@ -32,7 +33,6 @@ import {
   typeNullable,
   typePattern,
 } from '../../foundation/pattern.js';
-import { identity } from '../../foundation/identities/identity.js';
 import { checkGSEDiff } from '../../foundation/utils/gse.js';
 
 @customElement('gse-control-element-editor')

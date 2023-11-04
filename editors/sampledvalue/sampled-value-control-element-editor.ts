@@ -11,6 +11,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   ChangeGseOrSmvAddressOptions,
   changeSMVContent,
+  identity,
   updateSampledValueControl,
 } from '@openenergytools/scl-lib';
 
@@ -31,7 +32,6 @@ import {
   typeNullable,
   typePattern,
 } from '../../foundation/pattern.js';
-import { identity } from '../../foundation/identities/identity.js';
 
 import { checkSMVDiff } from '../../foundation/utils/smv.js';
 
