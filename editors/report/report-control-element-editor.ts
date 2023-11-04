@@ -21,6 +21,25 @@ import type { SclTextfield } from '../../foundation/components/scl-textfield.js'
 import { maxLength, patterns } from '../../foundation/pattern.js';
 import { updateMaxClients } from './foundation.js';
 
+const optFieldsHelpers: Record<string, string> = {
+  seqNum: 'Whether Report includes Sequence Number',
+  timeStamp: 'Whether Report includes Time Stamp',
+  dataSet: 'Whether Report includes DataSet reference',
+  reasonCode: 'Whether Report includes reason for trigger',
+  dataRef: 'Whether Report includes structure of DataSet',
+  entryID: 'Whether Report includes ID for Report',
+  configRef: 'Whether Report includes Configuration Revision',
+  bufOvfl: 'Whether Report includes indicator for buffer overflow',
+};
+
+const trgOpsHelpers: Record<string, string> = {
+  dchg: 'Trigger Report through data change',
+  qchg: 'Trigger Report through data quality change',
+  dupd: 'Trigger Report through data update',
+  period: 'Periodically send Report',
+  gi: 'Allow trigger Report manually',
+};
+
 function checkRptEnabledValidity(
   rptEnabled: Element | null,
   input: SclTextfield
@@ -242,7 +261,7 @@ export class ReportControlElementEditor extends LitElement {
               label="${key}"
               .maybeValue=${value}
               nullable
-              helper="scl.key"
+              helper="${optFieldsHelpers[key]}"
               @input=${this.onOptFieldsInputChange}
             ></scl-checkbox>`
         )}
@@ -275,7 +294,7 @@ export class ReportControlElementEditor extends LitElement {
               label="${key}"
               .maybeValue=${value}
               nullable
-              helper="scl.key"
+              helper="${trgOpsHelpers[key]}"
               @input=${this.onTrgOpsInputChange}
             ></scl-checkbox>`
         )}
@@ -313,9 +332,8 @@ export class ReportControlElementEditor extends LitElement {
         class="report attributes"
         label="name"
         .maybeValue=${name}
-        helper="scl.name"
+        helper="ReportControl Name"
         required
-        validationMessage="'textfield.required')}"
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
@@ -323,7 +341,7 @@ export class ReportControlElementEditor extends LitElement {
       ></scl-textfield
       ><scl-textfield
         class="report attributes"
-        label="desc"
+        label="ReportControl Description"
         .maybeValue=${desc}
         nullable
         helper="scl.desc"
@@ -333,7 +351,7 @@ export class ReportControlElementEditor extends LitElement {
         class="report attributes"
         label="buffered"
         .maybeValue=${buffered}
-        helper="scl.buffered"
+        helper="Whether ReportControl is Buffered"
         @input=${this.onReportControlInputChange}
       ></scl-checkbox
       ><scl-textfield
@@ -341,7 +359,7 @@ export class ReportControlElementEditor extends LitElement {
         label="rptID"
         .maybeValue=${rptID}
         nullable
-        helper="report.rptID"
+        helper="ReportControl ID"
         @input=${this.onReportControlInputChange}
       ></scl-textfield
       ><scl-checkbox
@@ -349,14 +367,14 @@ export class ReportControlElementEditor extends LitElement {
         label="indexed"
         .maybeValue=${indexed}
         nullable
-        helper="scl.indexed"
+        helper="Allow multiple Instances of this ReportControl"
         @input=${this.onReportControlInputChange}
       ></scl-checkbox
       ><scl-textfield
         class="rptenabled attributes"
         label="max Clients"
         .maybeValue=${max}
-        helper="scl.maxReport"
+        helper="Number of ReportControl Instances"
         nullable
         type="number"
         min="0"
@@ -367,7 +385,7 @@ export class ReportControlElementEditor extends LitElement {
         class="report attributes"
         label="bufTime"
         .maybeValue=${bufTime}
-        helper="scl.bufTime"
+        helper="Minimum time between two ReportControl"
         nullable
         required
         type="number"
@@ -379,7 +397,7 @@ export class ReportControlElementEditor extends LitElement {
         class="report attributes"
         label="intgPd"
         .maybeValue=${intgPd}
-        helper="scl.intgPd"
+        helper="Integrity Period"
         nullable
         required
         type="number"

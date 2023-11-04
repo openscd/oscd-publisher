@@ -156,6 +156,7 @@ export class DataSetElementEditor extends LitElement {
           <div class="headersubtitle">${subtitle}</div>
         </div>
         <slot name="change"></slot>
+        <slot name="new"></slot>
       </div>
     </h2>`;
   }
@@ -275,7 +276,7 @@ export class DataSetElementEditor extends LitElement {
       </div>`;
 
     return html`<div class="content">
-      ${this.renderHeader('publisher.nocontent')}
+      ${this.renderHeader('No DataSet connected')}
     </div>`;
   }
 
@@ -320,6 +321,10 @@ export class DataSetElementEditor extends LitElement {
 
     *[iconTrailing='search'] {
       --mdc-shape-small: 28px;
+    }
+
+    ::slotted(mwc-icon-button[disabled]) {
+      display: none;
     }
   `;
 }

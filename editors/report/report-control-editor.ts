@@ -11,6 +11,7 @@ import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
+  createDataSet,
   createReportControl,
   find,
   findControlBlockSubscription,
@@ -69,6 +70,21 @@ export class ReportControlEditor extends LitElement {
       )
         (this.selectionList.selected as ListItem).selected = false;
     }
+  }
+
+  private addNewDataSet(control: Element): void {
+    const parent = control.parentElement;
+    if (!parent) return;
+
+    const insert = createDataSet(parent);
+    if (!insert) return;
+
+    const newName = (insert.node as Element).getAttribute('name');
+    if (!newName) return;
+
+    const update = { element: control, attributes: { datSet: newName } };
+
+    this.dispatchEvent(newEditEvent([insert, update]));
   }
 
   private selectDataSet(): void {
@@ -156,6 +172,14 @@ export class ReportControlEditor extends LitElement {
                 this.selectedReportControl
               ).length}
               @click=${() => this.selectDataSetDialog.show()}
+            ></mwc-icon-button>
+            <mwc-icon-button
+              slot="new"
+              icon="playlist_add"
+              ?disabled=${!!this.selectedReportControl.getAttribute('datSet')}
+              @click="${() => {
+                this.addNewDataSet(this.selectedReportControl!);
+              }}"
             ></mwc-icon-button
           ></data-set-element-editor>
         </div>
@@ -235,7 +259,7 @@ export class ReportControlEditor extends LitElement {
     return html`<mwc-button
       class="change scl element"
       outlined
-      label="publisher.selectbutton Report"
+      label="Select Report"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectReportControlButton.classList.add('hidden');
