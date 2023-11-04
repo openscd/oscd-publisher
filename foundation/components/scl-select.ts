@@ -8,8 +8,8 @@ import { html } from 'lit';
 /** A potentially `nullable` `Select`.
  *
  * NB: Use `maybeValue: string | null` instead of `value` if `nullable`! */
-@customElement('oscd-select')
-export class OscdSelect extends Select {
+@customElement('scl-select')
+export class SclSelect extends Select {
   /** Whether [[`maybeValue`]] may be `null` */
   @property({ type: Boolean })
   nullable = false;

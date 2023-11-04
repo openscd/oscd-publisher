@@ -19,10 +19,10 @@ import '@material/mwc-formfield';
 import type { Checkbox } from '@material/mwc-checkbox';
 
 import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/scl-select.js';
 import '../../foundation/components/scl-textfield.js';
 import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { SclSelect } from '../../foundation/components/scl-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import {
@@ -215,9 +215,9 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   @queryAll(
-    '.content.smvcontrol > scl-textfield, .content.smvcontrol > oscd-select, .content.smvcontrol > scl-checkbox'
+    '.content.smvcontrol > scl-textfield, .content.smvcontrol > scl-select, .content.smvcontrol > scl-checkbox'
   )
-  sampledValueControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
+  sampledValueControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
 
   @queryAll('.content.smv > scl-textfield') sMVInputs?: SclTextfield[];
 
@@ -385,7 +385,7 @@ export class SampledValueControlElementEditor extends LitElement {
         required
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
-      <oscd-select
+      <scl-select
         label="smpMod"
         .maybeValue=${smpMod}
         nullable
@@ -395,7 +395,7 @@ export class SampledValueControlElementEditor extends LitElement {
         >${['SmpPerPeriod', 'SmpPerSec', 'SecPerSmp'].map(
           option =>
             html`<mwc-list-item value="${option}">${option}</mwc-list-item>`
-        )}</oscd-select
+        )}</scl-select
       >
       <scl-textfield
         label="smpRate"
@@ -416,7 +416,7 @@ export class SampledValueControlElementEditor extends LitElement {
         min="0"
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
-      <oscd-select
+      <scl-select
         label="securityEnabled"
         .maybeValue=${securityEnabled}
         nullable
@@ -425,7 +425,7 @@ export class SampledValueControlElementEditor extends LitElement {
         @selected="${this.onSampledValueControlInputChange}"
         >${['None', 'Signature', 'SignatureAndEncryption'].map(
           type => html`<mwc-list-item value="${type}">${type}</mwc-list-item>`
-        )}</oscd-select
+        )}</scl-select
       ><mwc-button
         class="save"
         label="save"

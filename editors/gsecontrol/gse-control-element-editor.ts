@@ -20,10 +20,10 @@ import {
 } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/scl-select.js';
 import '../../foundation/components/scl-textfield.js';
 import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { SclSelect } from '../../foundation/components/scl-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import {
@@ -154,9 +154,9 @@ export class GseControlElementEditor extends LitElement {
   @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
 
   @queryAll(
-    '.content.gsecontrol > scl-textfield, .content.gsecontrol > oscd-select, .content.gsecontrol > scl-checkbox'
+    '.content.gsecontrol > scl-textfield, .content.gsecontrol > scl-select, .content.gsecontrol > scl-checkbox'
   )
-  gSEControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
+  gSEControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -268,7 +268,7 @@ export class GseControlElementEditor extends LitElement {
         helper="scl.desc"
         @input=${this.onGSEControlInputChange}
       ></scl-textfield>
-      <oscd-select
+      <scl-select
         label="type"
         .maybeValue=${type}
         helper="scl.type"
@@ -280,7 +280,7 @@ export class GseControlElementEditor extends LitElement {
             html`<mwc-list-item value="${gseControlType}"
               >${gseControlType}</mwc-list-item
             >`
-        )}</oscd-select
+        )}</scl-select
       >
       <scl-textfield
         label="appID"
@@ -297,7 +297,7 @@ export class GseControlElementEditor extends LitElement {
         helper="scl.fixedOffs"
         @input=${this.onGSEControlInputChange}
       ></scl-checkbox>
-      <oscd-select
+      <scl-select
         label="securityEnabled"
         .maybeValue=${securityEnabled}
         nullable
@@ -309,7 +309,7 @@ export class GseControlElementEditor extends LitElement {
             html`<mwc-list-item value="${securityType}"
               >${securityType}</mwc-list-item
             >`
-        )}</oscd-select
+        )}</scl-select
       >
       <mwc-button
         class="save"

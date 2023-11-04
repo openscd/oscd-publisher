@@ -12,10 +12,10 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import { updateReportControl } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/oscd-select.js';
+import '../../foundation/components/scl-select.js';
 import '../../foundation/components/scl-textfield.js';
 import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { OscdSelect } from '../../foundation/components/oscd-select.js';
+import type { SclSelect } from '../../foundation/components/scl-select.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import { maxLength, patterns } from '../../foundation/pattern.js';
@@ -197,7 +197,7 @@ export class ReportControlElementEditor extends LitElement {
   trgOpsInputs?: SclCheckbox[];
 
   @queryAll('.report.attributes')
-  reportControlInputs?: (SclTextfield | OscdSelect | SclCheckbox)[];
+  reportControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
 
   @query('.rptenabled.attributes')
   rptEnabledInput!: SclTextfield;
