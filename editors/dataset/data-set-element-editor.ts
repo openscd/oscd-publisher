@@ -237,7 +237,7 @@ export class DataSetElementEditor extends LitElement {
       <div style="display: flex; flex-direction:row;align-self: center;">
         ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
       </div>
-      <oscd-filtered-list
+      <scl-filtered-list
         >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
           const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
             'ldInst',
@@ -262,7 +262,7 @@ export class DataSetElementEditor extends LitElement {
               )}></mwc-icon-button>
             </span>
           </mwc-list-item>`;
-        })}</oscd-filtered-list
+        })}</scl-filtered-list
       >`;
   }
 

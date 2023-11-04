@@ -18,8 +18,8 @@ import {
 
 import '../dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
-import '../../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import '../../foundation/components/scl-filtered-list.js';
+import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
@@ -41,7 +41,7 @@ export class ReportControlEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('.selectionlist') selectionList!: OscdFilteredList;
+  @query('.selectionlist') selectionList!: SclFilteredList;
 
   @query('mwc-button') selectReportControlButton!: Button;
 
@@ -74,8 +74,8 @@ export class ReportControlEditor extends LitElement {
   private selectDataSet(): void {
     const dataSetElement = (
       this.selectDataSetDialog.querySelector(
-        'oscd-filtered-list'
-      ) as OscdFilteredList
+        'scl-filtered-list'
+      ) as SclFilteredList
     ).selected;
     if (!dataSetElement) return;
 
@@ -98,7 +98,7 @@ export class ReportControlEditor extends LitElement {
   }
 
   private selectReportControl(evt: Event): void {
-    const id = ((evt.target as OscdFilteredList).selected as ListItem).value;
+    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
     const reportControl = this.doc.querySelector(selector('ReportControl', id));
     if (!reportControl) return;
 
@@ -109,7 +109,7 @@ export class ReportControlEditor extends LitElement {
         this.selectedReportControl.parentElement?.querySelector(
           `DataSet[name="${this.selectedReportControl.getAttribute('datSet')}"]`
         );
-      (evt.target as OscdFilteredList).classList.add('hidden');
+      (evt.target as SclFilteredList).classList.add('hidden');
       this.selectReportControlButton.classList.remove('hidden');
     }
   }
@@ -117,7 +117,7 @@ export class ReportControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <oscd-filtered-list activatable @selected=${() => this.selectDataSet()}
+        <scl-filtered-list activatable @selected=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedReportControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -134,7 +134,7 @@ export class ReportControlEditor extends LitElement {
                 <span slot="secondary">${identity(dataSet)}</span>
               </mwc-list-item>`
           )}
-        </oscd-filtered-list>
+        </scl-filtered-list>
       </mwc-dialog>
     `;
   }
@@ -170,7 +170,7 @@ export class ReportControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<oscd-filtered-list
+    return html`<scl-filtered-list
       activatable
       class="selectionlist"
       @action=${this.selectReportControl}
@@ -227,7 +227,7 @@ export class ReportControlEditor extends LitElement {
         );
 
         return [ieditem, ...reports];
-      })}</oscd-filtered-list
+      })}</scl-filtered-list
     >`;
   }
 

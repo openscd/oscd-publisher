@@ -19,8 +19,8 @@ import {
 
 import '../dataset/data-set-element-editor.js';
 import './gse-control-element-editor.js';
-import '../../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import '../../foundation/components/scl-filtered-list.js';
+import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
 import { identity } from '../../foundation/identities/identity.js';
@@ -42,7 +42,7 @@ export class GseControlEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('.selectionlist') selectionList!: OscdFilteredList;
+  @query('.selectionlist') selectionList!: SclFilteredList;
 
   @query('mwc-button') selectGSEControlButton!: Button;
 
@@ -71,8 +71,8 @@ export class GseControlEditor extends LitElement {
   private selectDataSet(): void {
     const dataSetElement = (
       this.selectDataSetDialog.querySelector(
-        'oscd-filtered-list'
-      ) as OscdFilteredList
+        'scl-filtered-list'
+      ) as SclFilteredList
     ).selected;
     if (!dataSetElement) return;
 
@@ -94,7 +94,7 @@ export class GseControlEditor extends LitElement {
   }
 
   private selectGSEControl(evt: Event): void {
-    const id = ((evt.target as OscdFilteredList).selected as ListItem).value;
+    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
     const gseControl = this.doc.querySelector(selector('GSEControl', id));
     if (!gseControl) return;
 
@@ -104,7 +104,7 @@ export class GseControlEditor extends LitElement {
       this.selectedDataSet = gseControl.parentElement?.querySelector(
         `DataSet[name="${gseControl.getAttribute('datSet')}"]`
       );
-      (evt.target as OscdFilteredList).classList.add('hidden');
+      (evt.target as SclFilteredList).classList.add('hidden');
       this.selectGSEControlButton.classList.remove('hidden');
     }
   }
@@ -112,7 +112,7 @@ export class GseControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <oscd-filtered-list activatable @action=${() => this.selectDataSet()}
+        <scl-filtered-list activatable @action=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedGseControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -129,7 +129,7 @@ export class GseControlEditor extends LitElement {
                 <span slot="secondary">${identity(dataSet)}</span>
               </mwc-list-item>`
           )}
-        </oscd-filtered-list>
+        </scl-filtered-list>
       </mwc-dialog>
     `;
   }
@@ -165,7 +165,7 @@ export class GseControlEditor extends LitElement {
   }
 
   renderSelectionList(): TemplateResult {
-    return html`<oscd-filtered-list
+    return html`<scl-filtered-list
       activatable
       @action=${this.selectGSEControl}
       class="selectionlist"
@@ -222,7 +222,7 @@ export class GseControlEditor extends LitElement {
         );
 
         return [ieditem, ...gseControls];
-      })}</oscd-filtered-list
+      })}</scl-filtered-list
     >`;
   }
 

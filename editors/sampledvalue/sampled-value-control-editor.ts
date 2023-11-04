@@ -16,9 +16,9 @@ import {
 } from '@openenergytools/scl-lib';
 
 import '../dataset/data-set-element-editor.js';
-import '../../foundation/components/oscd-filtered-list.js';
+import '../../foundation/components/scl-filtered-list.js';
 import './sampled-value-control-element-editor.js';
-import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
@@ -41,7 +41,7 @@ export class SampledValueControlEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('.selectionlist') selectionList!: OscdFilteredList;
+  @query('.selectionlist') selectionList!: SclFilteredList;
 
   @query('mwc-button') selectSampledValueControlButton!: Button;
 
@@ -74,8 +74,8 @@ export class SampledValueControlEditor extends LitElement {
   private selectDataSet(): void {
     const dataSetElement = (
       this.selectDataSetDialog.querySelector(
-        'oscd-filtered-list'
-      ) as OscdFilteredList
+        'scl-filtered-list'
+      ) as SclFilteredList
     ).selected;
     if (!dataSetElement) return;
 
@@ -98,7 +98,7 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   private selectSMVControl(evt: Event): void {
-    const id = ((evt.target as OscdFilteredList).selected as ListItem).value;
+    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
     const smvControl = this.doc.querySelector(
       selector('SampledValueControl', id)
     );
@@ -111,7 +111,7 @@ export class SampledValueControlEditor extends LitElement {
         smvControl.parentElement?.querySelector(
           `DataSet[name="${smvControl.getAttribute('datSet')}"]`
         ) ?? null;
-      (evt.target as OscdFilteredList).classList.add('hidden');
+      (evt.target as SclFilteredList).classList.add('hidden');
       this.selectSampledValueControlButton.classList.remove('hidden');
     }
   }
@@ -119,7 +119,7 @@ export class SampledValueControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <oscd-filtered-list activatable @selected=${() => this.selectDataSet()}
+        <scl-filtered-list activatable @selected=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedSampledValueControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -136,7 +136,7 @@ export class SampledValueControlEditor extends LitElement {
                 <span slot="secondary">${identity(dataSet)}</span>
               </mwc-list-item>`
           )}
-        </oscd-filtered-list>
+        </scl-filtered-list>
       </mwc-dialog>
     `;
   }
@@ -172,7 +172,7 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<oscd-filtered-list
+    return html`<scl-filtered-list
       activatable
       @action=${this.selectSMVControl}
       class="selectionlist"
@@ -220,7 +220,7 @@ export class SampledValueControlEditor extends LitElement {
         );
 
         return [ieditem, ...sampledValueControls];
-      })}</oscd-filtered-list
+      })}</scl-filtered-list
     >`;
   }
 

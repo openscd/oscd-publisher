@@ -12,8 +12,8 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import { createDataSet, removeDataSet } from '@openenergytools/scl-lib';
 
 import './data-set-element-editor.js';
-import '../../foundation/components/oscd-filtered-list.js';
-import type { OscdFilteredList } from '../../foundation/components/oscd-filtered-list.js';
+import '../../foundation/components/scl-filtered-list.js';
+import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
 import { selector } from '../../foundation/identities/selector.js';
@@ -32,7 +32,7 @@ export class DataSetEditor extends LitElement {
   @state()
   selectedDataSet?: Element;
 
-  @query('.selectionlist') selectionList!: OscdFilteredList;
+  @query('.selectionlist') selectionList!: SclFilteredList;
 
   @query('mwc-button') selectDataSetButton!: Button;
 
@@ -51,12 +51,12 @@ export class DataSetEditor extends LitElement {
   }
 
   private selectDataSet(evt: Event): void {
-    const id = ((evt.target as OscdFilteredList).selected as ListItem).value;
+    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
     const dataSet = this.doc.querySelector(selector('DataSet', id));
 
     if (dataSet) {
       this.selectedDataSet = dataSet;
-      (evt.target as OscdFilteredList).classList.add('hidden');
+      (evt.target as SclFilteredList).classList.add('hidden');
       this.selectDataSetButton.classList.remove('hidden');
     }
   }
@@ -74,7 +74,7 @@ export class DataSetEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<oscd-filtered-list
+    return html`<scl-filtered-list
       activatable
       @action=${this.selectDataSet}
       class="selectionlist"
@@ -127,7 +127,7 @@ export class DataSetEditor extends LitElement {
         );
 
         return [ieditem, ...dataSets];
-      })}</oscd-filtered-list
+      })}</scl-filtered-list
     >`;
   }
 

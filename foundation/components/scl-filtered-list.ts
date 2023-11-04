@@ -12,8 +12,8 @@ import type { TextField } from '@material/mwc-textfield';
 import { css, html, unsafeCSS } from 'lit';
 
 function slotItem(item: Element): Element {
-  if (!item.closest('oscd-filtered-list') || !item.parentElement) return item;
-  if (item.parentElement instanceof OscdFilteredList) return item;
+  if (!item.closest('scl-filtered-list') || !item.parentElement) return item;
+  if (item.parentElement instanceof SclFilteredList) return item;
   return slotItem(item.parentElement);
 }
 
@@ -53,8 +53,8 @@ function hideFiltered(item: ListItemBase, searchText: string): void {
 /**
  * A mwc-list with mwc-textfield that filters the list items for given or separated terms
  */
-@customElement('oscd-filtered-list')
-export class OscdFilteredList extends ListBase {
+@customElement('scl-filtered-list')
+export class SclFilteredList extends ListBase {
   /** search mwc-textfield label property */
   @property({ type: String })
   searchFieldLabel?: string;
