@@ -12,6 +12,7 @@ import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-dialog';
 import type { Dialog } from '@material/mwc-dialog';
+import type { Menu } from '@material/mwc-menu';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
@@ -24,6 +25,7 @@ import {
 } from '@openenergytools/scl-lib';
 
 import '../../foundation/components/scl-textfield.js';
+import '../../foundation/components/action-filtered-list.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
@@ -45,7 +47,7 @@ function dataAttributePaths(doc: XMLDocument, paths: string[][]): Element[][] {
   return daPaths;
 }
 
-function functionaContraintPaths(
+function functionalConstraintPaths(
   doc: XMLDocument,
   paths: string[][]
 ): { path: Element[]; fc: string }[] {
@@ -71,13 +73,13 @@ export class DataSetElementEditor extends LitElement {
   @property({ attribute: false })
   doc!: XMLDocument;
 
-  /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
+  /** The element being edited */
   @property({ attribute: false })
   element!: Element | null;
 
   /** SCL change indicator */
   @property({ type: Number })
-  editCount = 0;
+  editCount = -1;
 
   @state()
   private get name(): string | null {
@@ -90,10 +92,10 @@ export class DataSetElementEditor extends LitElement {
   }
 
   @state()
-  private someInputDiff = false;
+  private someDiffOnInputs = false;
 
   private onInputChange(): void {
-    this.someInputDiff = Array.from(this.inputs ?? []).some(
+    this.someDiffOnInputs = Array.from(this.inputs ?? []).some(
       input => this.element?.getAttribute(input.label) !== input.maybeValue
     );
   }
@@ -120,7 +122,7 @@ export class DataSetElementEditor extends LitElement {
 
     const actions = addFCDOs(
       this.element!,
-      functionaContraintPaths(this.element!.ownerDocument, paths)
+      functionalConstraintPaths(this.element!.ownerDocument, paths)
     );
 
     this.dispatchEvent(newEditEvent(actions));
@@ -141,11 +143,40 @@ export class DataSetElementEditor extends LitElement {
     this.dataAttributePicker?.close();
   }
 
+  private onMoveFCDAUp(fcda: Element): void {
+    const remove = { node: fcda };
+    const insert = {
+      parent: fcda.parentElement,
+      node: fcda,
+      reference: fcda.previousElementSibling,
+    };
+
+    this.dispatchEvent(newEditEvent([remove, insert]));
+  }
+
+  private onMoveFCDADown(fcda: Element): void {
+    const remove = { node: fcda };
+    const insert = {
+      parent: fcda.parentElement,
+      node: fcda,
+      reference: fcda.nextElementSibling?.nextElementSibling,
+    };
+
+    this.dispatchEvent(newEditEvent([remove, insert]));
+  }
+
   @queryAll('scl-textfield') inputs?: SclTextfield[];
 
   @query('#dapicker') dataAttributePicker?: Dialog;
 
   @query('#dopicker') dataObjectPicker?: Dialog;
+
+  updated(): void {
+    this.shadowRoot?.querySelectorAll('mwc-menu').forEach(menu => {
+      // eslint-disable-next-line no-param-reassign
+      (menu as Menu).anchor = menu.previousElementSibling as HTMLElement;
+    });
+  }
 
   // eslint-disable-next-line class-methods-use-this
   private renderHeader(subtitle: string | number): TemplateResult {
@@ -233,14 +264,14 @@ export class DataSetElementEditor extends LitElement {
         class="save"
         label="save"
         icon="save"
-        ?disabled=${!this.someInputDiff}
+        ?disabled=${!this.someDiffOnInputs}
         @click=${() => this.saveChanges()}
       ></mwc-button>
       <hr color="lightgrey" />
       <div style="display: flex; flex-direction:row;align-self: center;">
         ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
       </div>
-      <scl-filtered-list
+      <action-filtered-list style="position:relative"
         >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
           const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
             'ldInst',
@@ -252,20 +283,61 @@ export class DataSetElementEditor extends LitElement {
             'fc',
           ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
 
-          return html`<mwc-list-item hasMeta selected twoline value="${identity(
-            fcda
-          )}"
+          return html`<mwc-list-item selected twoline value="${identity(fcda)}"
             ><span>${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}</span
             ><span slot="secondary"
               >${`${ldInst}/${prefix}${lnClass}${lnInst}`}</span
             ></span>
-            <span slot="meta"><mwc-icon-button icon="delete" @click=${() =>
-              this.dispatchEvent(
-                newEditEvent(removeFCDA({ node: fcda }))
-              )}></mwc-icon-button>
-            </span>
-          </mwc-list-item>`;
-        })}</scl-filtered-list
+          </mwc-list-item>
+          <mwc-list-item 
+            style="height:72px;" 
+            slot="primaryAction" 
+            @request-selected="${(e: Event) => {
+              e.stopPropagation();
+              this.dispatchEvent(newEditEvent(removeFCDA({ node: fcda })));
+            }}">
+            <mwc-icon>delete</mwc-icon>
+          </mwc-list-item>
+          <div style="position:relative" slot="secondaryAction">
+          <mwc-list-item 
+            style="height:72px;" 
+            slot="secondaryAction"
+            @request-selected="${(e: Event) => {
+              e.stopPropagation();
+              ((e.target as Element).nextElementSibling as Menu).show();
+            }}"
+          >
+            <mwc-icon>more_vert</mwc-icon>
+          </mwc-list-item>
+          <mwc-menu corner="BOTTOM_LEFT" menuCorner="END">
+            <mwc-list-item
+              graphic="icon" 
+              ?disabled=${!fcda.previousElementSibling} 
+              @request-selected="${(evt: Event) => {
+                evt.stopPropagation();
+                this.onMoveFCDAUp(fcda);
+                ((evt.target as Element).parentElement as Menu).close();
+              }}"
+            >
+              <span>move up</span>
+              <mwc-icon slot="graphic">text_select_move_up</mwc-icon>
+            </mwc-list-item>
+            <mwc-list-item 
+              graphic="icon" 
+              ?disabled=${!fcda.nextElementSibling} 
+              @request-selected="${(evt: Event) => {
+                evt.stopPropagation();
+                this.onMoveFCDADown(fcda);
+                ((evt.target as Element).parentElement as Menu).close();
+              }}"
+            >
+              <span>move down</span>
+              <mwc-icon slot="graphic">text_select_move_down</mwc-icon>
+            </mwc-list-item>
+          </mwc-menu>
+          </div>
+          `;
+        })}</action-filtered-list
       >`;
   }
 
