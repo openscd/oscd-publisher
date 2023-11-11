@@ -5,15 +5,25 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
+// eslint-disable-next-line import/no-duplicates
 import '@material/mwc-list/mwc-list-item-base';
 import '@material/mwc-textfield';
 import { CheckListItem } from '@material/mwc-list/mwc-check-list-item';
 import { List } from '@material/mwc-list';
 import type { TextField } from '@material/mwc-textfield';
-import type { ListItemBase } from '@material/mwc-list/mwc-list-item-base';
+// eslint-disable-next-line import/no-duplicates
+import { ListItemBase } from '@material/mwc-list/mwc-list-item-base';
 
-function items(list: List): Element[] {
-  return list.querySelector('slot')?.assignedElements() ?? [];
+function infoItems(list: List): ListItemBase[] {
+  return (list.querySelector('slot')?.assignedElements() ?? []).filter(
+    item => item instanceof ListItemBase
+  ) as ListItemBase[];
+}
+
+function actionItems(actionList: List): Element[] {
+  return (actionList.querySelector('slot')?.assignedElements() ?? []).filter(
+    item => item.tagName !== 'LI'
+  );
 }
 
 function slotItem(item: Element): Element {
@@ -25,7 +35,7 @@ function slotItem(item: Element): Element {
 function hideFiltered(
   infoItem: ListItemBase,
   searchText: string,
-  actionItems: Element[]
+  siblingActionItems: Element[]
 ): void {
   const itemInnerText = `${infoItem.innerText}\n`;
   const childInnerText = Array.from(infoItem.children)
@@ -55,12 +65,12 @@ function hideFiltered(
   });
 
   if (isEmptyFilter || meetsFilter) {
-    actionItems.forEach(actionItem =>
+    siblingActionItems.forEach(actionItem =>
       slotItem(actionItem).classList.remove('hidden')
     );
     slotItem(infoItem).classList.remove('hidden');
   } else {
-    actionItems.forEach(actionItem =>
+    siblingActionItems.forEach(actionItem =>
       slotItem(actionItem).classList.add('hidden')
     );
     slotItem(infoItem).classList.add('hidden');
@@ -143,22 +153,20 @@ export class ActionFilteredList extends LitElement {
   }
 
   onFilterInput(): void {
-    this.infoList.items.forEach(item => {
-      const index = this.infoList.items.indexOf(item);
-      const actionItems: Element[] = [];
-      const primaryItem = items(this.listPrimary)[index] ?? undefined;
-      if (primaryItem) actionItems.push(primaryItem);
-      const secondaryItem = items(this.listSecondary)[index] ?? undefined;
-      if (secondaryItem) actionItems.push(secondaryItem);
+    infoItems(this.infoList).forEach(item => {
+      const index = infoItems(this.infoList).indexOf(item);
+      const siblingActionItems: Element[] = [];
+      const primaryItem = actionItems(this.listPrimary)[index] ?? undefined;
+      if (primaryItem) siblingActionItems.push(primaryItem);
+      const secondaryItem = actionItems(this.listSecondary)[index] ?? undefined;
+      if (secondaryItem) siblingActionItems.push(secondaryItem);
 
-      hideFiltered(item, this.searchField.value, actionItems);
+      hideFiltered(item, this.searchField.value, siblingActionItems);
     });
   }
 
   firstUpdated(): void {
-    this.items = this.shadowRoot
-      ?.querySelector('slot')
-      ?.assignedElements({ flatten: true }) as ListItemBase[];
+    this.items = this.infoList.items;
   }
 
   constructor() {
