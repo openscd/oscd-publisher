@@ -44,6 +44,11 @@ export class DataSetEditor extends LitElement {
   @state()
   selectedDataSet?: Element;
 
+  @state()
+  get childCount(): number {
+    return this.selectedDataSet?.querySelectorAll(':scope > FCDA').length ?? 0;
+  }
+
   @query('.selectionlist') selectionList!: ActionFilteredList;
 
   @query('mwc-button') selectDataSetButton!: Button;

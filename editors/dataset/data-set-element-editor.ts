@@ -18,8 +18,10 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
 import {
+  canAddFCDA,
   find,
   identity,
+  maxAttributes,
   removeFCDA,
   updateDataSet,
 } from '@openenergytools/scl-lib';
@@ -67,6 +69,18 @@ function functionalConstraintPaths(
   return fcPaths;
 }
 
+function loadIcon(percent: number): string {
+  if (percent < 0.1) return 'circle';
+  if (percent < 0.2) return 'clock_loader_10';
+  if (percent < 0.4) return 'clock_loader_20';
+  if (percent < 0.6) return 'clock_loader_40';
+  if (percent < 0.8) return 'clock_loader_60';
+  if (percent < 0.9) return 'clock_loader_80';
+  if (percent < 1) return 'clock_loader_90';
+
+  return 'stroke_full';
+}
+
 @customElement('data-set-element-editor')
 export class DataSetElementEditor extends LitElement {
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
@@ -89,6 +103,11 @@ export class DataSetElementEditor extends LitElement {
   @state()
   private get desc(): string | null {
     return this.element ? this.element.getAttribute('desc') : 'UNDEFINED';
+  }
+
+  @state()
+  private get fcdaCount(): number {
+    return this.element?.querySelectorAll('FCDA').length ?? 0;
   }
 
   @state()
@@ -178,112 +197,20 @@ export class DataSetElementEditor extends LitElement {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private renderHeader(subtitle: string | number): TemplateResult {
-    return html`<h2>
-      <div style="display:flex; flex-direction:row;">
-        <div style="flex:auto;">
-          <div>DataSet</div>
-          <div class="headersubtitle">${subtitle}</div>
-        </div>
-        <slot name="change"></slot>
-        <slot name="new"></slot>
-      </div>
-    </h2>`;
-  }
+  private renderFCDAList(): TemplateResult {
+    return html` <action-filtered-list style="position:relative"
+      >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
+        const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
+          'ldInst',
+          'prefix',
+          'lnClass',
+          'lnInst',
+          'doName',
+          'daName',
+          'fc',
+        ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
 
-  private renderDataObjectPicker(): TemplateResult {
-    const server = this.element?.closest('Server')!;
-
-    return html` <mwc-button
-        label="Add data object"
-        icon="playlist_add"
-        @click=${() => this.dataObjectPicker?.show()}
-      ></mwc-button
-      ><mwc-dialog id="dopicker" heading="Add Data Attributes">
-        <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
-        <mwc-button
-          slot="secondaryAction"
-          label="close"
-          @click=${() => this.dataObjectPicker?.close()}
-        ></mwc-button>
-        <mwc-button
-          slot="primaryAction"
-          label="save"
-          icon="save"
-          @click=${this.saveDataObjects}
-        ></mwc-button>
-      </mwc-dialog>`;
-  }
-
-  private renderDataAttributePicker(): TemplateResult {
-    const server = this.element?.closest('Server')!;
-
-    return html` <mwc-button
-        label="Add data attribute"
-        icon="playlist_add"
-        @click=${() => this.dataAttributePicker?.show()}
-      ></mwc-button
-      ><mwc-dialog id="dapicker" heading="Add Data Attributes"
-        ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
-        <mwc-button
-          slot="secondaryAction"
-          label="close"
-          @click=${() => this.dataAttributePicker?.close()}
-        ></mwc-button>
-        <mwc-button
-          slot="primaryAction"
-          label="save"
-          icon="save"
-          @click=${this.saveDataAttributes}
-        ></mwc-button>
-      </mwc-dialog>`;
-  }
-
-  private renderContent(): TemplateResult {
-    return html`<scl-textfield
-        id="${identity(this.element)}"
-        tag="${this.element?.tagName ?? ''}"
-        label="name"
-        .maybeValue=${this.name}
-        helper="DataSet name"
-        required
-        @input=${() => this.onInputChange()}
-      >
-      </scl-textfield>
-      <scl-textfield
-        id="${identity(this.element)}"
-        label="desc"
-        .maybeValue=${this.desc}
-        helper="DateSet Description"
-        nullable
-        @input=${() => this.onInputChange()}
-      >
-      </scl-textfield>
-      <mwc-button
-        class="save"
-        label="save"
-        icon="save"
-        ?disabled=${!this.someDiffOnInputs}
-        @click=${() => this.saveChanges()}
-      ></mwc-button>
-      <hr color="lightgrey" />
-      <div style="display: flex; flex-direction:row;align-self: center;">
-        ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
-      </div>
-      <action-filtered-list style="position:relative"
-        >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
-          const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
-            'ldInst',
-            'prefix',
-            'lnClass',
-            'lnInst',
-            'doName',
-            'daName',
-            'fc',
-          ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
-
-          return html`<mwc-list-item selected twoline value="${identity(fcda)}"
+        return html`<mwc-list-item selected twoline value="${identity(fcda)}"
             ><span>${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}</span
             ><span slot="secondary"
               >${`${ldInst}/${prefix}${lnClass}${lnInst}`}</span
@@ -337,19 +264,136 @@ export class DataSetElementEditor extends LitElement {
           </mwc-menu>
           </div>
           `;
-        })}</action-filtered-list
-      >`;
+      })}</action-filtered-list
+    >`;
+  }
+
+  private renderDataObjectPicker(): TemplateResult {
+    const server = this.element?.closest('Server')!;
+
+    return html` <mwc-button
+        label="Add data object"
+        icon="playlist_add"
+        ?disabled=${!canAddFCDA(this.element!)}
+        @click=${() => this.dataObjectPicker?.show()}
+      ></mwc-button
+      ><mwc-dialog id="dopicker" heading="Add Data Attributes">
+        <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
+        <mwc-button
+          slot="secondaryAction"
+          label="close"
+          @click=${() => this.dataObjectPicker?.close()}
+        ></mwc-button>
+        <mwc-button
+          slot="primaryAction"
+          label="save"
+          icon="save"
+          @click=${this.saveDataObjects}
+        ></mwc-button>
+      </mwc-dialog>`;
+  }
+
+  private renderDataAttributePicker(): TemplateResult {
+    const server = this.element?.closest('Server')!;
+
+    return html` <mwc-button
+        label="Add data attribute"
+        icon="playlist_add"
+        ?disabled=${!canAddFCDA(this.element!)}
+        @click=${() => this.dataAttributePicker?.show()}
+      ></mwc-button
+      ><mwc-dialog id="dapicker" heading="Add Data Attributes"
+        ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
+        <mwc-button
+          slot="secondaryAction"
+          label="close"
+          @click=${() => this.dataAttributePicker?.close()}
+        ></mwc-button>
+        <mwc-button
+          slot="primaryAction"
+          label="save"
+          icon="save"
+          @click=${this.saveDataAttributes}
+        ></mwc-button>
+      </mwc-dialog>`;
+  }
+
+  private renderDataPickers(): TemplateResult {
+    return html`
+      <div style="display: flex; flex-direction:row;align-self: center;">
+        ${this.renderDataAttributePicker()} ${this.renderDataObjectPicker()}
+      </div>
+    `;
+  }
+
+  private renderLimits(): TemplateResult {
+    if (!this.element) return html``;
+
+    const { max } = maxAttributes(this.element);
+    const is = this.fcdaCount;
+
+    return html`<h3
+      style="display: flex; flex-direction:row;align-self: center;"
+    >
+      Entries: <mwc-icon>${loadIcon(is / max)}</mwc-icon> ${is}/${max}
+    </h3>`;
+  }
+
+  private renderDataSetAttributes(): TemplateResult {
+    return html`<scl-textfield
+        id="${identity(this.element)}"
+        tag="${this.element?.tagName ?? ''}"
+        label="name"
+        .maybeValue=${this.name}
+        helper="DataSet name"
+        required
+        @input=${() => this.onInputChange()}
+      >
+      </scl-textfield>
+      <scl-textfield
+        id="${identity(this.element)}"
+        label="desc"
+        .maybeValue=${this.desc}
+        helper="DateSet Description"
+        nullable
+        @input=${() => this.onInputChange()}
+      >
+      </scl-textfield>
+      <mwc-button
+        class="save"
+        label="save"
+        icon="save"
+        ?disabled=${!this.someDiffOnInputs}
+        @click=${() => this.saveChanges()}
+      ></mwc-button>
+      <hr color="lightgrey" />`;
+  }
+
+  private renderHeader(): TemplateResult {
+    const subtitle = this.element
+      ? identity(this.element)
+      : 'No DataSet connected';
+
+    return html`<h2>
+      <div style="display:flex; flex-direction:row;">
+        <div style="flex:auto;">
+          <div>DataSet</div>
+          <div class="headersubtitle">${subtitle}</div>
+        </div>
+        <slot name="change"></slot>
+        <slot name="new"></slot>
+      </div>
+    </h2>`;
   }
 
   render(): TemplateResult {
     if (this.element)
       return html`<div class="content">
-        ${this.renderHeader(identity(this.element))}${this.renderContent()}
+        ${this.renderHeader()}${this.renderDataSetAttributes()}
+        ${this.renderLimits()}${this.renderDataPickers()}${this.renderFCDAList()}
       </div>`;
 
-    return html`<div class="content">
-      ${this.renderHeader('No DataSet connected')}
-    </div>`;
+    return html`<div class="content">${this.renderHeader()}</div>`;
   }
 
   static styles = css`
@@ -369,7 +413,8 @@ export class DataSetElementEditor extends LitElement {
       align-self: flex-end;
     }
 
-    h2 {
+    h2,
+    h3 {
       color: var(--mdc-theme-on-surface);
       font-family: 'Roboto', sans-serif;
       font-weight: 300;
