@@ -12,7 +12,7 @@ function dataAttributeObject(da: Element): Tree {
 
   Array.from(daType.querySelectorAll('BDA')).forEach(bda => {
     const bdaName = bda.getAttribute('name') ?? 'UNKNOWN_BDA';
-    const id = `BDA:${identity(bda)}`;
+    const id = `BDA: ${identity(bda)}`;
     if (bda.getAttribute('bType') === 'Struct') {
       children[id] = dataAttributeObject(bda);
       children[id]!.text = bdaName;
