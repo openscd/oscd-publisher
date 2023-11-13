@@ -167,6 +167,8 @@ export class DataSetEditor extends LitElement {
   }
 
   render(): TemplateResult {
+    if (!this.doc) return html`<div>No SCL loaded</div>`;
+
     return html`${this.renderToggleButton()}
       <div class="section">
         ${this.renderSelectionList()}${this.renderElementEditorContainer()}

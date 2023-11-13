@@ -98,6 +98,61 @@ export const dataSetDoc = `
             </Server>
         </AccessPoint>
     </IED>
+    <IED name="IED2" >
+        <Services>
+            <ConfDataSet max="10" maxAttributes="10" />
+        </Services>
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="ldInst1">
+                    <LN0 lnClass="LLN0" inst="" lnType="LLN0">
+                        <DataSet name="datSet">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="cVal.mag.f" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="q" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="t" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsB" fc="MX" />
+                        </DataSet>
+                    </LN0>
+                    <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
+                </LDevice>
+                <LDevice inst="ldInst2">
+                    <LN0 lnClass="LLN0" inst="">
+                        <DataSet name="datSet">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="cVal.mag.f" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="q" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="t" fc="MX" />
+                        </DataSet>
+                    </LN0>
+                </LDevice>
+                <LDevice inst="ldInst3">
+                    <LN0 lnClass="LLN0" inst="">
+                        <DataSet name="datSet">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="cVal.mag.f" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="PhV.phsA" daName="q" fc="MX" />
+                        </DataSet>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
     <DataTypeTemplates>
         <LNodeType lnClass="LLN0" id="LLN0">
             <DO name="Beh" type="ENS"/>
