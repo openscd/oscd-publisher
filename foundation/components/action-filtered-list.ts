@@ -169,6 +169,10 @@ export class ActionFilteredList extends LitElement {
     this.items = this.infoList.items;
   }
 
+  updated(): void {
+    this.items = this.infoList.items;
+  }
+
   constructor() {
     super();
 
