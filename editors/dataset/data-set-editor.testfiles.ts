@@ -115,6 +115,10 @@ export const dataSetDoc = `
             <SDO name="phsA" type="CMV" />
             <SDO name="phsB" type="CMV" />
             <SDO name="phsC" type="CMV" />
+            <SDO name="phRes" type="CustomWYE" />
+        </DOType>
+        <DOType cdc="WYE" id="CustomWYE" >
+            <SDO name="phsA" type="CMV" />
         </DOType>
         <DOType cdc="CMV" id="CMV">
             <DA name="cVal" bType="Struct" type="Vector" fc="MX"/>

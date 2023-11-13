@@ -34,8 +34,8 @@
     "@material/mwc-select": "^0.27.0",
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
-    "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
     "@openenergytools/scl-lib": "0.9.20",
+    "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
     "lit": "^2.4.0"
   },
   "devDependencies": {
@@ -50,11 +50,11 @@
     "@typescript-eslint/parser": "^5.41.0",
     "@web/dev-server": "^0.1.35",
     "@web/dev-server-esbuild": "^1.0.0",
+    "@web/rollup-plugin-import-meta-assets": "^2.0.2",
     "@web/test-runner": "^0.15.0",
     "@web/test-runner-commands": "0.09",
     "@web/test-runner-playwright": "^0.11.0",
     "@web/test-runner-visual-regression": "^0.9.0",
-    "@web/rollup-plugin-import-meta-assets": "^2.0.2",
     "concurrently": "^7.5.0",
     "deepmerge": "^4.2.2",
     "eslint": "^8.26.0",
@@ -65,6 +65,7 @@
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.79.1",
+    "sinon": "^17.0.1",
     "tslib": "^2.4.1",
     "typescript": "^4.8.4"
   },

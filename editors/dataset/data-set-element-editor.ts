@@ -31,6 +31,7 @@ import {
 import '../../foundation/components/scl-textfield.js';
 import '../../foundation/components/action-filtered-list.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
+import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -115,7 +116,11 @@ export class DataSetElementEditor extends LitElement {
   @state()
   private someDiffOnInputs = false;
 
-  @queryAll('scl-textfield') inputs?: SclTextfield[];
+  @queryAll('scl-textfield') inputs!: SclTextfield[];
+
+  @query('mwc-button.save') saveButton!: Button;
+
+  @query('.list.fcda') fcdaList!: ActionFilteredList;
 
   @query('#dapickerbutton') daPickerButton!: Button;
 
@@ -204,7 +209,9 @@ export class DataSetElementEditor extends LitElement {
   }
 
   private renderFCDAList(): TemplateResult {
-    return html` <action-filtered-list style="position:relative"
+    return html` <action-filtered-list
+      class="list fcda"
+      style="position:relative"
       >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
         const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
           'ldInst',

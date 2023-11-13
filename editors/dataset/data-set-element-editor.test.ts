@@ -380,7 +380,11 @@ describe('DataSet element editor component', () => {
     });
 
     it('the first menu looks like the latest snapshot', async () => {
-      editor.shadowRoot?.querySelector('mwc-menu')?.show();
+      (
+        editor.shadowRoot?.querySelector(
+          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
+        ) as HTMLElement
+      ).click();
 
       await editor.updateComplete;
       await timeout(200);
@@ -391,7 +395,11 @@ describe('DataSet element editor component', () => {
     });
 
     it('a middle menu looks like the latest snapshot', async () => {
-      editor.shadowRoot?.querySelectorAll('mwc-menu')[1]?.show();
+      (
+        editor.shadowRoot?.querySelectorAll(
+          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
+        )[1] as HTMLElement
+      )?.click();
 
       await editor.updateComplete;
       await timeout(100);
@@ -402,7 +410,11 @@ describe('DataSet element editor component', () => {
     });
 
     it('the last menu looks like the latest snapshot', async () => {
-      editor.shadowRoot?.querySelectorAll('mwc-menu')[9]?.show();
+      (
+        editor.shadowRoot?.querySelectorAll(
+          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
+        )[9] as HTMLElement
+      )?.click();
 
       await editor.updateComplete;
       await timeout(200);
