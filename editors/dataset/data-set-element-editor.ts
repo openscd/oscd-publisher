@@ -8,14 +8,16 @@ import {
   state,
 } from 'lit/decorators.js';
 
+import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-dialog';
+import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
 import type { Menu } from '@material/mwc-menu';
 
-import { newEditEvent } from '@openscd/open-scd-core';
 import '@openscd/oscd-tree-grid';
+import { newEditEvent } from '@openscd/open-scd-core';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
 import {
   canAddFCDA,
@@ -89,7 +91,7 @@ export class DataSetElementEditor extends LitElement {
 
   /** The element being edited */
   @property({ attribute: false })
-  element!: Element | null;
+  element: Element | null = null;
 
   /** SCL change indicator */
   @property({ type: Number })
@@ -97,21 +99,35 @@ export class DataSetElementEditor extends LitElement {
 
   @state()
   private get name(): string | null {
-    return this.element ? this.element.getAttribute('name') : 'UNDEFINED';
+    return this.element!.getAttribute('name');
   }
 
   @state()
   private get desc(): string | null {
-    return this.element ? this.element.getAttribute('desc') : 'UNDEFINED';
+    return this.element!.getAttribute('desc');
   }
 
   @state()
   private get fcdaCount(): number {
-    return this.element?.querySelectorAll('FCDA').length ?? 0;
+    return this.element!.querySelectorAll('FCDA').length;
   }
 
   @state()
   private someDiffOnInputs = false;
+
+  @queryAll('scl-textfield') inputs?: SclTextfield[];
+
+  @query('#dapickerbutton') daPickerButton!: Button;
+
+  @query('#dapicker') daPickerDialog!: Dialog;
+
+  @query('#dapicker > oscd-tree-grid') daPicker!: TreeGrid;
+
+  @query('#dopickerbutton') doPickerButton!: Button;
+
+  @query('#dopicker') doPickerDialog!: Dialog;
+
+  @query('#dopicker > oscd-tree-grid') doPicker!: TreeGrid;
 
   private onInputChange(): void {
     this.someDiffOnInputs = Array.from(this.inputs ?? []).some(
@@ -135,9 +151,7 @@ export class DataSetElementEditor extends LitElement {
   }
 
   private saveDataObjects(): void {
-    const finder =
-      this.dataObjectPicker?.querySelector<TreeGrid>('oscd-tree-grid');
-    const paths = finder?.paths ?? [];
+    const { paths } = this.doPicker;
 
     const actions = addFCDOs(
       this.element!,
@@ -145,13 +159,11 @@ export class DataSetElementEditor extends LitElement {
     );
 
     this.dispatchEvent(newEditEvent(actions));
-    this.dataObjectPicker?.close();
+    this.doPickerDialog.close();
   }
 
   private saveDataAttributes(): void {
-    const finder =
-      this.dataAttributePicker?.querySelector<TreeGrid>('oscd-tree-grid');
-    const paths = finder?.paths ?? [];
+    const { paths } = this.daPicker;
 
     const actions = addFCDAs(
       this.element!,
@@ -159,7 +171,7 @@ export class DataSetElementEditor extends LitElement {
     );
 
     this.dispatchEvent(newEditEvent(actions));
-    this.dataAttributePicker?.close();
+    this.daPickerDialog.close();
   }
 
   private onMoveFCDAUp(fcda: Element): void {
@@ -183,12 +195,6 @@ export class DataSetElementEditor extends LitElement {
 
     this.dispatchEvent(newEditEvent([remove, insert]));
   }
-
-  @queryAll('scl-textfield') inputs?: SclTextfield[];
-
-  @query('#dapicker') dataAttributePicker?: Dialog;
-
-  @query('#dopicker') dataObjectPicker?: Dialog;
 
   updated(): void {
     this.shadowRoot?.querySelectorAll('mwc-menu').forEach(menu => {
@@ -272,17 +278,18 @@ export class DataSetElementEditor extends LitElement {
     const server = this.element?.closest('Server')!;
 
     return html` <mwc-button
+        id="doPickerButton"
         label="Add data object"
         icon="playlist_add"
         ?disabled=${!canAddFCDA(this.element!)}
-        @click=${() => this.dataObjectPicker?.show()}
+        @click=${() => this.doPickerDialog?.show()}
       ></mwc-button
       ><mwc-dialog id="dopicker" heading="Add Data Attributes">
         <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
         <mwc-button
           slot="secondaryAction"
           label="close"
-          @click=${() => this.dataObjectPicker?.close()}
+          @click=${() => this.doPickerDialog?.close()}
         ></mwc-button>
         <mwc-button
           slot="primaryAction"
@@ -297,17 +304,18 @@ export class DataSetElementEditor extends LitElement {
     const server = this.element?.closest('Server')!;
 
     return html` <mwc-button
+        id="daPickerButton"
         label="Add data attribute"
         icon="playlist_add"
         ?disabled=${!canAddFCDA(this.element!)}
-        @click=${() => this.dataAttributePicker?.show()}
+        @click=${() => this.daPickerDialog.show()}
       ></mwc-button
       ><mwc-dialog id="dapicker" heading="Add Data Attributes"
         ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
         <mwc-button
           slot="secondaryAction"
           label="close"
-          @click=${() => this.dataAttributePicker?.close()}
+          @click=${() => this.daPickerDialog?.close()}
         ></mwc-button>
         <mwc-button
           slot="primaryAction"
@@ -430,6 +438,10 @@ export class DataSetElementEditor extends LitElement {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    mwc-dialog {
+      --mdc-dialog-max-width: 92vw;
     }
 
     mwc-list-item {

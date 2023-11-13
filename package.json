@@ -17,7 +17,8 @@
     "prepublish": "tsc && npm run analyze -- --exclude dist",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
-    "test": "tsc && wtr --coverage",
+    "test": "playwright install && wtr --coverage",
+    "test:update": "tsc && wtr --update-visual-baseline",
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\""
   },
   "dependencies": {
@@ -34,7 +35,7 @@
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
-    "@openenergytools/scl-lib": "0.9.19",
+    "@openenergytools/scl-lib": "0.9.20",
     "lit": "^2.4.0"
   },
   "devDependencies": {
@@ -48,7 +49,11 @@
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "@web/dev-server": "^0.1.35",
+    "@web/dev-server-esbuild": "^1.0.0",
     "@web/test-runner": "^0.15.0",
+    "@web/test-runner-commands": "0.09",
+    "@web/test-runner-playwright": "^0.11.0",
+    "@web/test-runner-visual-regression": "^0.9.0",
     "@web/rollup-plugin-import-meta-assets": "^2.0.2",
     "concurrently": "^7.5.0",
     "deepmerge": "^4.2.2",
