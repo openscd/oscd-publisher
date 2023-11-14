@@ -48,7 +48,7 @@ export class DataSetEditor extends LitElement {
 
   @query('mwc-button') selectDataSetButton!: Button;
 
-  /** Resets selected GOOSE, if not existing in new doc */
+  /** Resets selected DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
     if (props.has('doc') && this.selectedDataSet) {
       const newDataSet = updateElementReference(this.doc, this.selectedDataSet);
