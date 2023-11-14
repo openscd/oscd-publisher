@@ -5,7 +5,7 @@ import { setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { dataSetDoc } from './data-set-editor.testfiles.js';
+import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
 import './data-set-editor.js';
 import type { DataSetEditor } from './data-set-editor.js';
@@ -134,6 +134,23 @@ describe('DataSet editor component', () => {
         await visualDiff(
           editor,
           `dataset/data-set-editor/#7 Selection List 599x1100`
+        );
+      });
+
+      it('dynamically loaded new doc looks like the latest snapshot', async () => {
+        await setViewport({ width: 599, height: 1100 });
+
+        editor.selectDataSetButton.click();
+        editor.doc = new DOMParser().parseFromString(
+          otherDataSetDoc,
+          'application/xml'
+        );
+
+        await editor.updateComplete;
+        await timeout(200);
+        await visualDiff(
+          editor,
+          `dataset/data-set-editor/#8 New Doc with selected DataSet 599x1100`
         );
       });
     });
