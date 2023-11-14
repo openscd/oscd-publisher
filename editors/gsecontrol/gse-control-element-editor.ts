@@ -8,6 +8,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
+import '@material/mwc-button';
 import '@material/mwc-formfield';
 import '@material/mwc-checkbox';
 import type { Checkbox } from '@material/mwc-checkbox';
@@ -35,39 +36,48 @@ import {
 } from '../../foundation/pattern.js';
 import { checkGSEDiff } from '../../foundation/utils/gse.js';
 
+function pElementContent(gse: Element, type: string): string | null {
+  return (
+    Array.from(gse.querySelectorAll(':scope > Address > P'))
+      .find(p => p.getAttribute('type') === type)
+      ?.textContent?.trim() ?? null
+  );
+}
+
+const gseHelpers: Record<string, string> = {
+  'MAC-Address': 'MAC address (01-0C-CD-04-xx-xx)',
+  APPID: 'APP ID (4xxx in hex)',
+  'VLAN-ID': 'VLAN ID (XXX in hex)',
+  'VLAN-PRIORITY': 'VLAN Priority (0-7)',
+};
+
 @customElement('gse-control-element-editor')
 export class GseControlElementEditor extends LitElement {
-  /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
-  @property({ attribute: false })
-  doc!: XMLDocument;
-
   /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
-  element!: Element;
+  element: Element | null = null;
 
   /** SCL change indicator */
   @property({ type: Number })
-  editCount = 0;
+  editCount = -1;
 
   @property({ attribute: false })
   get gSE(): Element | null | undefined {
-    const cbName = this.element.getAttribute('name');
-    const iedName = this.element.closest('IED')?.getAttribute('name');
-    const apName = this.element.closest('AccessPoint')?.getAttribute('name');
-    const ldInst = this.element.closest('LDevice')?.getAttribute('inst');
+    const cbName = this.element!.getAttribute('name');
+    const iedName = this.element!.closest('IED')?.getAttribute('name');
+    const apName = this.element!.closest('AccessPoint')?.getAttribute('name');
+    const ldInst = this.element!.closest('LDevice')?.getAttribute('inst');
 
-    return this.element.ownerDocument.querySelector(
+    return this.element!.ownerDocument.querySelector(
       `:root > Communication > SubNetwork > ` +
         `ConnectedAP[iedName="${iedName}"][apName="${apName}"] > ` +
         `GSE[ldInst="${ldInst}"][cbName="${cbName}"]`
     );
   }
 
-  @state()
-  private gSEdiff = false;
+  @state() private gSEdiff = false;
 
-  @state()
-  private gSEControlDiff = false;
+  @state() private gSEControlDiff = false;
 
   private onGSEControlInputChange(): void {
     if (
@@ -153,10 +163,11 @@ export class GseControlElementEditor extends LitElement {
 
   @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
 
-  @queryAll(
-    '.content.gsecontrol > scl-textfield, .content.gsecontrol > scl-select, .content.gsecontrol > scl-checkbox'
-  )
-  gSEControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
+  @queryAll('.input.gsecontrol') gSEControlInputs?: (
+    | SclTextfield
+    | SclSelect
+    | SclCheckbox
+  )[];
 
   @query('#instType') instType?: Checkbox;
 
@@ -178,17 +189,13 @@ export class GseControlElementEditor extends LitElement {
     );
 
     const attributes: Record<string, string | null> = {};
-
     ['MAC-Address', 'APPID', 'VLAN-ID', 'VLAN-PRIORITY'].forEach(key => {
-      if (!attributes[key])
-        attributes[key] =
-          gSE.querySelector(`Address > P[type="${key}"]`)?.innerHTML.trim() ??
-          null;
+      if (!attributes[key]) attributes[key] = pElementContent(gSE, key);
     });
 
     return html`<div class="content gse">
       <h3>Communication Settings (GSE)</h3>
-      <mwc-formfield label="connectedap.wizard.addschemainsttype"
+      <mwc-formfield label="Add XMLSchema-instance type"
         ><mwc-checkbox
           id="instType"
           ?checked="${hasInstType}"
@@ -198,16 +205,18 @@ export class GseControlElementEditor extends LitElement {
         ([key, value]) =>
           html`<scl-textfield
             label="${key}"
+            ?nullable=${typeNullable[key]}
             .maybeValue=${value}
             pattern="${typePattern[key]!}"
             required
+            helper="${gseHelpers[key]}"
             @input=${this.onGSEInputChange}
-            ?nullable=${typeNullable[key]}
           ></scl-textfield>`
       )}<scl-textfield
         label="MinTime"
         .maybeValue=${minTime}
         nullable
+        helper="Min repetition interval"
         suffix="ms"
         type="number"
         @input=${this.onGSEInputChange}
@@ -216,6 +225,7 @@ export class GseControlElementEditor extends LitElement {
         label="MaxTime"
         .maybeValue=${maxTime}
         nullable
+        helper="Max repetition interval"
         suffix="ms"
         type="number"
         @input=${this.onGSEInputChange}
@@ -238,21 +248,22 @@ export class GseControlElementEditor extends LitElement {
       'appID',
       'fixedOffs',
       'securityEnabled',
-    ].map(attr => this.element?.getAttribute(attr));
+    ].map(attr => this.element!.getAttribute(attr));
 
     const reservedGseControlNames = Array.from(
-      this.element.parentElement?.querySelectorAll('GSEControl') ?? []
+      this.element!.parentElement?.querySelectorAll('GSEControl') ?? []
     )
       .map(gseControl => gseControl.getAttribute('name')!)
       .filter(
-        gseControlName => gseControlName !== this.element.getAttribute('name')
+        gseControlName => gseControlName !== this.element!.getAttribute('name')
       );
 
     return html`<div class="content gsecontrol">
       <scl-textfield
+        class="input gsecontrol"
         label="name"
         .maybeValue=${name}
-        helper="scl.name"
+        helper="GSEControl Name"
         required
         validationMessage="textfield.required"
         pattern="${patterns.asciName}"
@@ -262,16 +273,18 @@ export class GseControlElementEditor extends LitElement {
         @input=${this.onGSEControlInputChange}
       ></scl-textfield>
       <scl-textfield
+        class="input gsecontrol"
         label="desc"
         .maybeValue=${desc}
         nullable
-        helper="scl.desc"
+        helper="GSEControl Description"
         @input=${this.onGSEControlInputChange}
       ></scl-textfield>
       <scl-select
+        class="input gsecontrol"
         label="type"
         .maybeValue=${type}
-        helper="scl.type"
+        helper="GOOSE or GSSE"
         nullable
         required
         @selected=${this.onGSEControlInputChange}
@@ -283,26 +296,29 @@ export class GseControlElementEditor extends LitElement {
         )}</scl-select
       >
       <scl-textfield
+        class="input gsecontrol"
         label="appID"
         .maybeValue=${appID}
-        helper="scl.id"
+        helper="GSEControl ID"
         required
         validationMessage="textfield.nonempty"
         @input=${this.onGSEControlInputChange}
       ></scl-textfield>
       <scl-checkbox
+        class="input gsecontrol"
         label="fixedOffs"
         .maybeValue=${fixedOffs}
         nullable
-        helper="scl.fixedOffs"
+        helper="Whether ASN.1 coding is done with fixed offsets"
         @input=${this.onGSEControlInputChange}
       ></scl-checkbox>
       <scl-select
+        class="input gsecontrol"
         label="securityEnabled"
         .maybeValue=${securityEnabled}
         nullable
         required
-        helper="scl.securityEnable"
+        helper="GSEControl Security Settings"
         @selected=${this.onGSEControlInputChange}
         >${['None', 'Signature', 'SignatureAndEncryption'].map(
           securityType =>
@@ -322,6 +338,9 @@ export class GseControlElementEditor extends LitElement {
   }
 
   render(): TemplateResult {
+    if (!this.element)
+      return html`<h2 style="display: flex;">No GSEControl selected</h2>`;
+
     return html`<h2 style="display: flex;">
         <div style="flex:auto">
           <div>GSEControl</div>
