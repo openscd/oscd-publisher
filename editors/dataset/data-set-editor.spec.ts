@@ -52,7 +52,7 @@ describe('DataSet editor component', () => {
     (
       editor.selectionList.querySelectorAll(
         'mwc-list-item[slot="primaryAction"]'
-      )[4] as HTMLElement
+      )[2] as HTMLElement
     ).click();
 
     expect(editEvent).to.have.been.calledOnce;
