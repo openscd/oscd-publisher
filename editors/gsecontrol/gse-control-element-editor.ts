@@ -11,6 +11,7 @@ import {
 import '@material/mwc-button';
 import '@material/mwc-formfield';
 import '@material/mwc-checkbox';
+import type { Button } from '@material/mwc-button';
 import type { Checkbox } from '@material/mwc-checkbox';
 
 import { newEditEvent } from '@openscd/open-scd-core';
@@ -163,11 +164,15 @@ export class GseControlElementEditor extends LitElement {
 
   @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
 
+  @query('.content.gse > .save') gseSave!: Button;
+
   @queryAll('.input.gsecontrol') gSEControlInputs?: (
     | SclTextfield
     | SclSelect
     | SclCheckbox
   )[];
+
+  @query('.content.gsecontrol > .save') gseControlSave!: Button;
 
   @query('#instType') instType?: Checkbox;
 
