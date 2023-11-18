@@ -8,6 +8,8 @@ import {
   state,
 } from 'lit/decorators.js';
 
+import '@material/mwc-button';
+
 import { newEditEvent } from '@openscd/open-scd-core';
 import { identity, updateReportControl } from '@openenergytools/scl-lib';
 
@@ -81,6 +83,18 @@ export class ReportControlElementEditor extends LitElement {
 
   @state()
   private reportControlDiff = false;
+
+  @queryAll('.content.optfields > scl-checkbox')
+  optFieldsInputs?: SclCheckbox[];
+
+  @queryAll('.content.trgops > scl-checkbox')
+  trgOpsInputs?: SclCheckbox[];
+
+  @queryAll('.report.attributes')
+  reportControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
+
+  @query('.rptenabled.attributes')
+  rptEnabledInput!: SclTextfield;
 
   private onOptFieldsInputChange(): void {
     const optFields = this.element.querySelector(':scope > OptFields');
@@ -207,18 +221,6 @@ export class ReportControlElementEditor extends LitElement {
 
     this.onReportControlInputChange();
   }
-
-  @queryAll('.content.optfields > scl-checkbox')
-  optFieldsInputs?: SclCheckbox[];
-
-  @queryAll('.content.trgops > scl-checkbox')
-  trgOpsInputs?: SclCheckbox[];
-
-  @queryAll('.report.attributes')
-  reportControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
-
-  @query('.rptenabled.attributes')
-  rptEnabledInput!: SclTextfield;
 
   private renderOptFieldsContent(): TemplateResult {
     const [
@@ -428,7 +430,7 @@ export class ReportControlElementEditor extends LitElement {
         </div>`;
 
     return html`<div class="parentcontent">
-      <h2>'publisher.nodataset'</h2>
+      <h2>No ReportControl loaded</h2>
     </div>`;
   }
 
