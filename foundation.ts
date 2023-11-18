@@ -44,6 +44,10 @@ export const styles = css`
     display: none;
   }
 
+  mwc-list-item.hidden[slot] + li[divider] {
+    display: none;
+  }
+
   .change.scl.element {
     display: none;
   }

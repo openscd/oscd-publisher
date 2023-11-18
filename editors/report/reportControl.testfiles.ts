@@ -27,6 +27,12 @@ export const reportControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="cVal.mag.f" fc="MX" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="q" fc="MX" />
                         </DataSet>
+                        <DataSet name="datSet2">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                        </DataSet>
+                        <ReportControl name="rp3" />
                     </LN>
                 </LDevice>
             </Server>
@@ -42,10 +48,21 @@ export const reportControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <GSEControl name="pr1" rptID="" buffered="true" datSet="datSet" />
-                        <GSEControl name="pr2" rptID="" buffered="false" datSet="datSet" />
+                        <ReportControl name="rp1" buffered="true" rptID="" />
+                        <ReportControl name="rp2" buffered="true" datSet="datSet" intgPd="1000" bufTime="100" indexed="true" rptID="someID" desc="desc" confRev="53">
+                            <TrgOps dchg="true" qchg="true" dupd="true" period="true" gi="true"/>
+                            <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+                            <RptEnabled max="5" >
+                            </RptEnabled>
+                        </ReportControl>
                     </LN0>
-                    <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
+                    <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU">
+                        <DataSet name="datSet">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="cVal.mag.f" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="q" fc="MX" />
+                        </DataSet>
+                        <ReportControl name="rp3" datSet="datSet" />
+                    </LN>
                 </LDevice>
             </Server>
         </AccessPoint>
@@ -89,31 +106,13 @@ export const reportControlDoc = `
 </SCL>
 `;
 
-export const otherGseControlDoc = `
+export const otherReportControlDoc = `
 <SCL>
-    <Communication>
-        <SubNetwork name="subNet" >
-            <ConnectedAP iedName="IED" apName="AP1" >
-                <GSE ldInst="ldInst1" cbName="gse2" >
-                    <Address>
-                        <P type="MAC-Address">01-0C-CD-01-00-01</P>
-                        <P type="APPID">0001</P>
-                        <P type="VLAN-ID">001</P>
-                        <P type="VLAN-PRIORITY">3</P>
-                    </Address>
-                    <MinTime unit="s" multiplier="m">2</MinTime>
-                    <MaxTime unit="s" multiplier="m">200</MaxTime>
-                </GSE>
-                <GSE ldInst="ldInst1" cbName="gse3" >
-                    <Address>
-                        <P xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="tP_MAC" type="MAC-Address">01-0C-CD-01-00-02</P>
-                        <P type="APPID">0002</P>
-                    </Address>
-                </GSE>
-            </ConnectedAP>
-        </SubNetwork>
-    </Communication>
     <IED name="IED" >
+        <Services>
+            <ConfDataSet max="15" />
+            <GOOSE max="15" />
+        </Services>
         <AccessPoint name="AP1">
             <Server>
                 <LDevice inst="ldInst1">
@@ -123,10 +122,20 @@ export const otherGseControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <GSEControl name="gse1" type="GSSE" appID="" securityEnabled="Signature" fixedOffs="true" />
-                        <GSEControl name="gse3" type="GOOSE" appID="someAppID" desc="GOOSE with GSE" />
+                        <ReportControl name="rp1" buffered="true" rptID="" />
+                        <ReportControl name="rp3" buffered="true" datSet="datSet" intgPd="1000" bufTime="100" indexed="true" rptID="someID" desc="desc" confRev="53">
+                            <TrgOps dchg="true" qchg="true" dupd="true" period="true" gi="true"/>
+                            <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+                            <RptEnabled max="5" >
+                            </RptEnabled>
+                        </ReportControl>
                     </LN0>
-                    <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
+                    <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU">
+                        <DataSet name="datSet">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="cVal.mag.f" fc="MX" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="q" fc="MX" />
+                        </DataSet>
+                    </LN>
                 </LDevice>
             </Server>
         </AccessPoint>
@@ -141,8 +150,8 @@ export const otherGseControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <GSEControl name="gse1" type="GSSE" appID="" securityEnabled="Signature" fixedOffs="true" />
-                        <GSEControl name="gse3" type="GOOSE" appID="someAppID" desc="GOOSE with GSE" />
+                        <GSEControl name="pr1" rptID="" buffered="true" datSet="datSet" />
+                        <GSEControl name="pr2" rptID="" buffered="false" datSet="datSet" />
                     </LN0>
                     <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
                 </LDevice>

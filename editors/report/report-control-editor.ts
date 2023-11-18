@@ -3,9 +3,11 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
+import type { IconButton } from '@material/mwc-icon-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
@@ -21,8 +23,8 @@ import {
 
 import '../dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
-import '../../foundation/components/scl-filtered-list.js';
-import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
+import '../../foundation/components/action-filtered-list.js';
+import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 import { styles, updateElementReference } from '../../foundation.js';
 import { reportIcon } from '../../foundation/icons.js';
 
@@ -42,11 +44,15 @@ export class ReportControlEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('.selectionlist') selectionList!: SclFilteredList;
+  @query('.selectionlist') selectionList!: ActionFilteredList;
 
   @query('mwc-button') selectReportControlButton!: Button;
 
   @query('mwc-dialog') selectDataSetDialog!: Dialog;
+
+  @query('.new.dataset') newDataSet!: IconButton;
+
+  @query('.change.dataset') changeDataSet!: IconButton;
 
   /** Resets selected Report and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
@@ -90,8 +96,8 @@ export class ReportControlEditor extends LitElement {
   private selectDataSet(): void {
     const dataSetElement = (
       this.selectDataSetDialog.querySelector(
-        'scl-filtered-list'
-      ) as SclFilteredList
+        'action-filtered-list'
+      ) as ActionFilteredList
     ).selected;
     if (!dataSetElement) return;
 
@@ -114,7 +120,7 @@ export class ReportControlEditor extends LitElement {
   }
 
   private selectReportControl(evt: Event): void {
-    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
+    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
     const reportControl = find(this.doc, 'ReportControl', id);
     if (!reportControl) return;
 
@@ -125,7 +131,7 @@ export class ReportControlEditor extends LitElement {
         this.selectedReportControl.parentElement?.querySelector(
           `DataSet[name="${this.selectedReportControl.getAttribute('datSet')}"]`
         );
-      (evt.target as SclFilteredList).classList.add('hidden');
+      (evt.target as ActionFilteredList).classList.add('hidden');
       this.selectReportControlButton.classList.remove('hidden');
     }
   }
@@ -133,7 +139,9 @@ export class ReportControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <scl-filtered-list activatable @selected=${() => this.selectDataSet()}
+        <action-filtered-list
+          activatable
+          @selected=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedReportControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -150,7 +158,7 @@ export class ReportControlEditor extends LitElement {
                 <span slot="secondary">${identity(dataSet)}</span>
               </mwc-list-item>`
           )}
-        </scl-filtered-list>
+        </action-filtered-list>
       </mwc-dialog>
     `;
   }
@@ -166,6 +174,7 @@ export class ReportControlEditor extends LitElement {
             editCount="${this.editCount}"
           >
             <mwc-icon-button
+              class="change dataset"
               slot="change"
               icon="swap_vert"
               ?disabled=${!!findControlBlockSubscription(
@@ -174,6 +183,7 @@ export class ReportControlEditor extends LitElement {
               @click=${() => this.selectDataSetDialog.show()}
             ></mwc-icon-button>
             <mwc-icon-button
+              class="new dataset"
               slot="new"
               icon="playlist_add"
               ?disabled=${!!this.selectedReportControl.getAttribute('datSet')}
@@ -194,14 +204,13 @@ export class ReportControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<scl-filtered-list
+    return html`<action-filtered-list
       activatable
       class="selectionlist"
       @action=${this.selectReportControl}
       >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
         const ieditem = html`<mwc-list-item
             class="listitem header"
-            hasMeta
             noninteractive
             graphic="icon"
             value="${Array.from(ied.querySelectorAll('ReportControl'))
@@ -213,45 +222,59 @@ export class ReportControlEditor extends LitElement {
           >
             <span>${ied.getAttribute('name')}</span>
             <mwc-icon slot="graphic">developer_board</mwc-icon>
-            <mwc-icon-button
-              slot="meta"
-              icon="playlist_add"
-              @click=${() => {
-                const insert = createReportControl(ied);
-                if (insert) this.dispatchEvent(newEditEvent(insert));
-
-                this.requestUpdate();
-              }}
-            ></mwc-icon-button>
           </mwc-list-item>
-          <li divider role="separator"></li>`;
+          <li divider role="separator"></li>
+          <mwc-list-item
+            slot="primaryAction"
+            style="height:56px;"
+            @request-selected="${(evt: Event) => {
+              evt.stopPropagation();
+
+              const insertDataSet = createReportControl(ied);
+              if (insertDataSet)
+                this.dispatchEvent(newEditEvent(insertDataSet));
+            }}"
+            ><mwc-icon>playlist_add</mwc-icon></mwc-list-item
+          >
+          <li slot="primaryAction" divider role="separator"></li> `;
 
         const reports = Array.from(ied.querySelectorAll('ReportControl')).map(
           reportCb =>
             html`<mwc-list-item
-              hasMeta
-              twoline
-              value="${identity(reportCb)}"
-              graphic="icon"
-              ><span>${reportCb.getAttribute('name')}</span
-              ><span slot="secondary">${identity(reportCb)}</span>
-              <span slot="meta"
-                ><mwc-icon-button
-                  icon="delete"
-                  @click=${() => {
-                    this.dispatchEvent(
-                      newEditEvent(removeControlBlock({ node: reportCb }))
-                    );
-                    this.requestUpdate();
-                  }}
-                ></mwc-icon-button>
-              </span>
-              <mwc-icon slot="graphic">${reportIcon}</mwc-icon>
-            </mwc-list-item>`
+                twoline
+                value="${identity(reportCb)}"
+                graphic="icon"
+                ><span>${reportCb.getAttribute('name')}</span
+                ><span slot="secondary">${identity(reportCb)}</span>
+                <span slot="meta"
+                  ><mwc-icon-button
+                    icon="delete"
+                    @click=${() => {
+                      this.dispatchEvent(
+                        newEditEvent(removeControlBlock({ node: reportCb }))
+                      );
+                      this.requestUpdate();
+                    }}
+                  ></mwc-icon-button>
+                </span>
+                <mwc-icon slot="graphic">${reportIcon}</mwc-icon>
+              </mwc-list-item>
+              <mwc-list-item
+                style="height:72px;"
+                slot="primaryAction"
+                @request-selected="${(evt: Event) => {
+                  evt.stopPropagation();
+                  this.dispatchEvent(
+                    newEditEvent(removeControlBlock({ node: reportCb }))
+                  );
+                }}"
+              >
+                <mwc-icon>delete</mwc-icon>
+              </mwc-list-item>`
         );
 
         return [ieditem, ...reports];
-      })}</scl-filtered-list
+      })}</action-filtered-list
     >`;
   }
 
@@ -268,6 +291,8 @@ export class ReportControlEditor extends LitElement {
   }
 
   render(): TemplateResult {
+    if (!this.doc) return html`No SCL loaded`;
+
     return html`${this.renderToggleButton()}
       <div class="section">
         ${this.renderSelectionList()}${this.renderElementEditorContainer()}
