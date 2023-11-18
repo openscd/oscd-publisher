@@ -15,6 +15,7 @@ import {
   updateSampledValueControl,
 } from '@openenergytools/scl-lib';
 
+import '@material/mwc-button';
 import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
 import type { Checkbox } from '@material/mwc-checkbox';
@@ -96,6 +97,15 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @state()
   private sampledValueControlDiff = false;
+
+  @queryAll('.smvcontrol.attribute')
+  sampledValueControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
+
+  @queryAll('.smv.attribute') sMVInputs?: SclTextfield[];
+
+  @queryAll('.smvopts.attribute') smvOptsInputs?: SclCheckbox[];
+
+  @query('.smv.insttype') instType?: Checkbox;
 
   private onSampledValueControlInputChange(): void {
     if (
@@ -214,23 +224,11 @@ export class SampledValueControlElementEditor extends LitElement {
     this.onSmvOptsInputChange();
   }
 
-  @queryAll(
-    '.content.smvcontrol > scl-textfield, .content.smvcontrol > scl-select, .content.smvcontrol > scl-checkbox'
-  )
-  sampledValueControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
-
-  @queryAll('.content.smv > scl-textfield') sMVInputs?: SclTextfield[];
-
-  @queryAll('.content.smvopts > scl-checkbox')
-  smvOptsInputs?: SclCheckbox[];
-
-  @query('#instType') instType?: Checkbox;
-
   private renderSmvContent(): TemplateResult {
     const { sMV } = this;
     if (!sMV)
       return html` <h3>
-        <div>'Communication Settings (SMV)</div>
+        <div>Communication Settings (SMV)</div>
         <div class="headersubtitle">No connection available</div>
       </h3>`;
 
@@ -248,13 +246,14 @@ export class SampledValueControlElementEditor extends LitElement {
         <h3>Communication Settings (SMV)</h3>
         <mwc-formfield label="Add XMLSchema-instance type"
           ><mwc-checkbox
-            id="instType"
+            class="smv.insttype"
             ?checked="${hasInstType}"
             @change=${this.onSMVInputChange}
           ></mwc-checkbox></mwc-formfield
         >${Object.entries(attributes).map(
           ([key, value]) =>
             html`<scl-textfield
+              class="smv attribute"
               label="${key}"
               ?nullable=${typeNullable[key]}
               .maybeValue=${value}
@@ -308,6 +307,7 @@ export class SampledValueControlElementEditor extends LitElement {
         }).map(
           ([key, value]) =>
             html`<scl-checkbox
+              class="smvopts attribute"
               label="${key}"
               .maybeValue=${value}
               nullable
@@ -354,6 +354,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
     return html`<div class="content smvcontrol">
       <scl-textfield
+        class="smvcontrol attribute"
         label="name"
         .maybeValue=${name}
         helper="Sampled Value Name"
@@ -364,6 +365,7 @@ export class SampledValueControlElementEditor extends LitElement {
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
       <scl-textfield
+        class="smvcontrol attribute"
         label="desc"
         .maybeValue=${desc}
         nullable
@@ -373,12 +375,14 @@ export class SampledValueControlElementEditor extends LitElement {
       ${multicast === null || multicast === 'true'
         ? html``
         : html`<scl-checkbox
+            class="smvcontrol attribute"
             label="multicast"
             .maybeValue=${multicast}
             helper="Whether Sample Value Stream is multicast"
             @input="${this.onSampledValueControlInputChange}"
           ></scl-checkbox>`}
       <scl-textfield
+        class="smvcontrol attribute"
         label="smvID"
         .maybeValue=${smvID}
         helper="Sampled Value ID"
@@ -386,6 +390,7 @@ export class SampledValueControlElementEditor extends LitElement {
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
       <scl-select
+        class="smvcontrol attribute"
         label="smpMod"
         .maybeValue=${smpMod}
         nullable
@@ -398,6 +403,7 @@ export class SampledValueControlElementEditor extends LitElement {
         )}</scl-select
       >
       <scl-textfield
+        class="smvcontrol attribute"
         label="smpRate"
         .maybeValue=${smpRate}
         helper="Sample Rate (Based on Sample Mode)"
@@ -408,6 +414,7 @@ export class SampledValueControlElementEditor extends LitElement {
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
       <scl-textfield
+        class="smvcontrol attribute"
         label="nofASDU"
         .maybeValue=${nofASDU}
         helper="Number of Samples per Ethernet packet"
@@ -417,6 +424,7 @@ export class SampledValueControlElementEditor extends LitElement {
         @input="${this.onSampledValueControlInputChange}"
       ></scl-textfield>
       <scl-select
+        class="smvcontrol attribute"
         label="securityEnabled"
         .maybeValue=${securityEnabled}
         nullable
@@ -437,6 +445,11 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   render(): TemplateResult {
+    if (!this.element)
+      return html`<h2 style="display: flex;">
+        No SampledValueControl selected
+      </h2>`;
+
     return html`<h2 style="display: flex;">
         <div style="flex:auto">
           <div>SampledValueControl</div>
