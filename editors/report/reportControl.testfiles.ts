@@ -3,7 +3,7 @@ export const reportControlDoc = `
     <IED name="IED" >
         <Services>
             <ConfDataSet max="15" />
-            <GOOSE max="15" />
+            <ConfReportControl max="15" />
         </Services>
         <AccessPoint name="AP1">
             <Server>

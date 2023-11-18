@@ -246,17 +246,6 @@ export class ReportControlEditor extends LitElement {
                 graphic="icon"
                 ><span>${reportCb.getAttribute('name')}</span
                 ><span slot="secondary">${identity(reportCb)}</span>
-                <span slot="meta"
-                  ><mwc-icon-button
-                    icon="delete"
-                    @click=${() => {
-                      this.dispatchEvent(
-                        newEditEvent(removeControlBlock({ node: reportCb }))
-                      );
-                      this.requestUpdate();
-                    }}
-                  ></mwc-icon-button>
-                </span>
                 <mwc-icon slot="graphic">${reportIcon}</mwc-icon>
               </mwc-list-item>
               <mwc-list-item
