@@ -9,6 +9,7 @@ import {
 } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+import type { Button } from '@material/mwc-button';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 import { identity, updateReportControl } from '@openenergytools/scl-lib';
@@ -85,34 +86,30 @@ export class ReportControlElementEditor extends LitElement {
   private reportControlDiff = false;
 
   @queryAll('.content.optfields > scl-checkbox')
-  optFieldsInputs?: SclCheckbox[];
+  optFieldsInputs!: SclCheckbox[];
+
+  @query('.save.optfields') optFieldsSave!: Button;
 
   @queryAll('.content.trgops > scl-checkbox')
-  trgOpsInputs?: SclCheckbox[];
+  trgOpsInputs!: SclCheckbox[];
+
+  @query('.save.trgops') trgOpsSave!: Button;
 
   @queryAll('.report.attributes')
-  reportControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
+  reportControlInputs!: (SclTextfield | SclSelect | SclCheckbox)[];
 
-  @query('.rptenabled.attributes')
-  rptEnabledInput!: SclTextfield;
+  @query('.content.reportcontrol > .save') reportControlSave!: Button;
+
+  @query('.rptenabled.attributes') rptEnabledInput!: SclTextfield;
 
   private onOptFieldsInputChange(): void {
     const optFields = this.element.querySelector(':scope > OptFields');
 
-    if (
-      Array.from(this.optFieldsInputs ?? []).some(
-        input => !input.checkValidity()
-      )
-    ) {
-      this.optFieldsDiff = false;
-      return;
-    }
-
     const optFieldsAttrs: Record<string, string | null> = {};
-    for (const input of this.optFieldsInputs ?? [])
+    for (const input of this.optFieldsInputs)
       optFieldsAttrs[input.label] = input.maybeValue;
 
-    this.optFieldsDiff = Array.from(this.optFieldsInputs ?? []).some(
+    this.optFieldsDiff = Array.from(this.optFieldsInputs).some(
       input => optFields?.getAttribute(input.label) !== input.maybeValue
     );
   }
@@ -136,18 +133,11 @@ export class ReportControlElementEditor extends LitElement {
   private onTrgOpsInputChange(): void {
     const trgOps = this.element.querySelector(':scope > TrgOps');
 
-    if (
-      Array.from(this.trgOpsInputs ?? []).some(input => !input.checkValidity())
-    ) {
-      this.trgOpsDiff = false;
-      return;
-    }
-
     const trgOpsAttrs: Record<string, string | null> = {};
-    for (const input of this.trgOpsInputs ?? [])
+    for (const input of this.trgOpsInputs)
       trgOpsAttrs[input.label] = input.maybeValue;
 
-    this.trgOpsDiff = Array.from(this.trgOpsInputs ?? []).some(
+    this.trgOpsDiff = Array.from(this.trgOpsInputs).some(
       input => trgOps?.getAttribute(input.label) !== input.maybeValue
     );
   }
@@ -172,7 +162,7 @@ export class ReportControlElementEditor extends LitElement {
     const reportControl = this.element;
     const rptEnabled = reportControl.querySelector(':scope > RptEnabled');
 
-    const someInvalidAttrs = Array.from(this.reportControlInputs ?? []).some(
+    const someInvalidAttrs = Array.from(this.reportControlInputs).some(
       input => !input.checkValidity()
     );
     if (
@@ -184,10 +174,10 @@ export class ReportControlElementEditor extends LitElement {
     }
 
     const reportControlAttrs: Record<string, string | null> = {};
-    for (const input of this.reportControlInputs ?? [])
+    for (const input of this.reportControlInputs)
       reportControlAttrs[input.label] = input.maybeValue;
 
-    const someAttrDiff = Array.from(this.reportControlInputs ?? []).some(
+    const someAttrDiff = Array.from(this.reportControlInputs).some(
       input => reportControl?.getAttribute(input.label) !== input.maybeValue
     );
     const rptEnabledDiff =
@@ -269,7 +259,7 @@ export class ReportControlElementEditor extends LitElement {
         )}
       </div>
       <mwc-button
-        class="save"
+        class="save optfields"
         label="save"
         icon="save"
         ?disabled=${!this.optFieldsDiff}
@@ -302,7 +292,7 @@ export class ReportControlElementEditor extends LitElement {
         )}
       </div>
       <mwc-button
-        class="save"
+        class="save trgops"
         label="save"
         icon="save"
         ?disabled=${!this.trgOpsDiff}
@@ -343,10 +333,10 @@ export class ReportControlElementEditor extends LitElement {
       ></scl-textfield
       ><scl-textfield
         class="report attributes"
-        label="ReportControl Description"
+        label="desc"
         .maybeValue=${desc}
         nullable
-        helper="scl.desc"
+        helper="ReportControl Description"
         @input=${this.onReportControlInputChange}
       ></scl-textfield
       ><scl-checkbox

@@ -15,7 +15,7 @@ export const reportControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
                         <ReportControl name="rp1" buffered="true" rptID="" />
-                        <ReportControl name="rp2" buffered="true" datSet="datSet" intgPd="1000" bufTime="100" indexed="true" rptID="someID" desc="desc">
+                        <ReportControl name="rp2" buffered="true" datSet="datSet" intgPd="1000" bufTime="100" indexed="true" rptID="someID" desc="desc" confRev="53">
                             <TrgOps dchg="true" qchg="true" dupd="true" period="true" gi="true"/>
                             <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
                             <RptEnabled max="5" >
