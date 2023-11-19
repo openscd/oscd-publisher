@@ -3,9 +3,11 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-button';
+import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
+import type { IconButton } from '@material/mwc-icon-button';
 import type { ListItem } from '@material/mwc-list/mwc-list-item';
 import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
@@ -19,9 +21,9 @@ import {
 } from '@openenergytools/scl-lib';
 
 import '../dataset/data-set-element-editor.js';
-import '../../foundation/components/scl-filtered-list.js';
+import '../../foundation/components/action-filtered-list.js';
 import './sampled-value-control-element-editor.js';
-import type { SclFilteredList } from '../../foundation/components/scl-filtered-list.js';
+import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
 import { smvIcon } from '../../foundation/icons.js';
@@ -42,11 +44,15 @@ export class SampledValueControlEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('.selectionlist') selectionList!: SclFilteredList;
+  @query('.selectionlist') selectionList!: ActionFilteredList;
 
   @query('mwc-button') selectSampledValueControlButton!: Button;
 
   @query('mwc-dialog') selectDataSetDialog!: Dialog;
+
+  @query('.new.dataset') newDataSet!: IconButton;
+
+  @query('.change.dataset') changeDataSet!: IconButton;
 
   /** Resets selected SMV and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
@@ -90,8 +96,8 @@ export class SampledValueControlEditor extends LitElement {
   private selectDataSet(): void {
     const dataSetElement = (
       this.selectDataSetDialog.querySelector(
-        'scl-filtered-list'
-      ) as SclFilteredList
+        'action-filtered-list'
+      ) as ActionFilteredList
     ).selected;
     if (!dataSetElement) return;
 
@@ -114,7 +120,7 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   private selectSMVControl(evt: Event): void {
-    const id = ((evt.target as SclFilteredList).selected as ListItem).value;
+    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
     const smvControl = find(this.doc, 'SampledValueControl', id);
     if (!smvControl) return;
 
@@ -125,7 +131,7 @@ export class SampledValueControlEditor extends LitElement {
         smvControl.parentElement?.querySelector(
           `DataSet[name="${smvControl.getAttribute('datSet')}"]`
         ) ?? null;
-      (evt.target as SclFilteredList).classList.add('hidden');
+      (evt.target as ActionFilteredList).classList.add('hidden');
       this.selectSampledValueControlButton.classList.remove('hidden');
     }
   }
@@ -133,7 +139,9 @@ export class SampledValueControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <scl-filtered-list activatable @selected=${() => this.selectDataSet()}
+        <action-filtered-list
+          activatable
+          @selected=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedSampledValueControl?.parentElement?.querySelectorAll(
               'DataSet'
@@ -150,7 +158,7 @@ export class SampledValueControlEditor extends LitElement {
                 <span slot="secondary">${identity(dataSet)}</span>
               </mwc-list-item>`
           )}
-        </scl-filtered-list>
+        </action-filtered-list>
       </mwc-dialog>
     `;
   }
@@ -166,6 +174,7 @@ export class SampledValueControlEditor extends LitElement {
             editCount="${this.editCount}"
           >
             <mwc-icon-button
+              class="change dataset"
               slot="change"
               icon="swap_vert"
               ?disabled=${!!findControlBlockSubscription(
@@ -174,6 +183,7 @@ export class SampledValueControlEditor extends LitElement {
               @click=${() => this.selectDataSetDialog.show()}
             ></mwc-icon-button
             ><mwc-icon-button
+              class="new dataset"
               slot="new"
               icon="playlist_add"
               ?disabled=${!!this.selectedSampledValueControl.getAttribute(
@@ -196,7 +206,7 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<scl-filtered-list
+    return html`<action-filtered-list
       activatable
       @action=${this.selectSMVControl}
       class="selectionlist"
@@ -215,36 +225,43 @@ export class SampledValueControlEditor extends LitElement {
             <span>${ied.getAttribute('name')}</span>
             <mwc-icon slot="graphic">developer_board</mwc-icon>
           </mwc-list-item>
-          <li divider role="separator"></li>`;
+          <li divider role="separator"></li>
+          <mwc-list-item
+            noninteractive
+            style="height:56px;"
+            slot="primaryAction"
+          >
+          </mwc-list-item>
+          <li slot="primaryAction" divider role="separator"></li>`;
 
         const sampledValueControls = Array.from(
           ied.querySelectorAll('SampledValueControl')
         ).map(
           smvControl =>
             html`<mwc-list-item
-              hasMeta
-              twoline
-              value="${identity(smvControl)}"
-              graphic="icon"
-              ><span>${smvControl.getAttribute('name')}</span
-              ><span slot="secondary">${identity(smvControl)}</span>
-              <span slot="meta"
-                ><mwc-icon-button
-                  icon="delete"
-                  @click=${() => {
-                    this.dispatchEvent(
-                      newEditEvent(removeControlBlock({ node: smvControl }))
-                    );
-                    this.requestUpdate();
-                  }}
-                ></mwc-icon-button>
-              </span>
-              <mwc-icon slot="graphic">${smvIcon}</mwc-icon>
-            </mwc-list-item>`
+                twoline
+                value="${identity(smvControl)}"
+                graphic="icon"
+                ><span>${smvControl.getAttribute('name')}</span
+                ><span slot="secondary">${identity(smvControl)}</span>
+                <mwc-icon slot="graphic">${smvIcon}</mwc-icon>
+              </mwc-list-item>
+              <mwc-list-item
+                style="height:72px;"
+                slot="primaryAction"
+                @request-selected="${(evt: Event) => {
+                  evt.stopPropagation();
+                  this.dispatchEvent(
+                    newEditEvent(removeControlBlock({ node: smvControl }))
+                  );
+                }}"
+              >
+                <mwc-icon>delete</mwc-icon>
+              </mwc-list-item>`
         );
 
         return [ieditem, ...sampledValueControls];
-      })}</scl-filtered-list
+      })}</action-filtered-list
     >`;
   }
 
@@ -261,6 +278,8 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   render(): TemplateResult {
+    if (!this.doc) return html`No SCL loaded`;
+
     return html`${this.renderToggleButton()}
       <div class="section">
         ${this.renderSelectionList()}${this.renderElementEditorContainer()}

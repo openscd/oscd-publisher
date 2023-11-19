@@ -108,31 +108,33 @@ export const smvControlDoc = `
 </SCL>
 `;
 
-export const otherGseControlDoc = `
+export const otherSmvControlDoc = `
 <SCL>
     <Communication>
         <SubNetwork name="subNet" >
             <ConnectedAP iedName="IED" apName="AP1" >
-                <GSE ldInst="ldInst1" cbName="gse2" >
+                <SMV ldInst="ldInst1" cbName="smv2" >
                     <Address>
-                        <P type="MAC-Address">01-0C-CD-01-00-01</P>
-                        <P type="APPID">0001</P>
+                        <P type="MAC-Address">01-0C-CD-04-00-01</P>
+                        <P type="APPID">4001</P>
                         <P type="VLAN-ID">001</P>
                         <P type="VLAN-PRIORITY">3</P>
                     </Address>
-                    <MinTime unit="s" multiplier="m">2</MinTime>
-                    <MaxTime unit="s" multiplier="m">200</MaxTime>
-                </GSE>
-                <GSE ldInst="ldInst1" cbName="gse3" >
+                </SMV>
+                <SMV ldInst="ldInst1" cbName="smv3" >
                     <Address>
-                        <P xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="tP_MAC" type="MAC-Address">01-0C-CD-01-00-02</P>
+                        <P xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="tP_MAC" type="MAC-Address">01-0C-CD-04-00-02</P>
                         <P type="APPID">0002</P>
                     </Address>
-                </GSE>
+                </SMV>
             </ConnectedAP>
         </SubNetwork>
     </Communication>
     <IED name="IED" >
+        <Services>
+            <ConfDataSet max="15" />
+            <SMVsc max="15" />
+        </Services>
         <AccessPoint name="AP1">
             <Server>
                 <LDevice inst="ldInst1">
@@ -142,8 +144,13 @@ export const otherGseControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <GSEControl name="gse1" type="GSSE" appID="" securityEnabled="Signature" fixedOffs="true" />
-                        <GSEControl name="gse3" type="GOOSE" appID="someAppID" desc="GOOSE with GSE" />
+                        <DataSet name="datSet2">
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
+                            <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
+                        </DataSet>
+                        <SampledValueControl name="smv1" multicast="false" smvID="" securityEnabled="Signature" smpMod="SmpPerSec" smpRate="4000" nofASDU="1" />
+                        <SampledValueControl name="smv3" smvID="someSmvID" desc="SMV with SMV" smpMod="SecPerSmp" smpRate="1" nofASDU="1"/>
                     </LN0>
                     <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
                 </LDevice>
@@ -160,8 +167,9 @@ export const otherGseControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <GSEControl name="gse1" type="GSSE" appID="" securityEnabled="Signature" fixedOffs="true" />
-                        <GSEControl name="gse3" type="GOOSE" appID="someAppID" desc="GOOSE with GSE" />
+                        <SampledValueControl name="smv1" smvID="" securityEnabled="Signature" />
+                        <SampledValueControl name="smv2" smvID="someSmvID" desc="SMV with SMV" datSet="datSet" />
+                        <SampledValueControl name="smv3" smvID="someSmvID" desc="SMV with SMV" />
                     </LN0>
                     <LN prefix="prefix" lnClass="MMXU" inst="1" lnType="MMXU" />
                 </LDevice>
