@@ -18,6 +18,7 @@ import {
 import '@material/mwc-button';
 import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
+import type { Button } from '@material/mwc-button';
 import type { Checkbox } from '@material/mwc-checkbox';
 
 import '../../foundation/components/scl-checkbox.js';
@@ -99,17 +100,23 @@ export class SampledValueControlElementEditor extends LitElement {
   private sampledValueControlDiff = false;
 
   @queryAll('.smvcontrol.attribute')
-  sampledValueControlInputs?: (SclTextfield | SclSelect | SclCheckbox)[];
+  sampledValueControlInputs!: (SclTextfield | SclSelect | SclCheckbox)[];
 
-  @queryAll('.smv.attribute') sMVInputs?: SclTextfield[];
+  @query('.smvcontrol.save') smvControlSave!: Button;
 
-  @queryAll('.smvopts.attribute') smvOptsInputs?: SclCheckbox[];
+  @queryAll('.smv.attribute') sMVInputs!: SclTextfield[];
+
+  @query('.smv.save') smvSave!: Button;
+
+  @queryAll('.smvopts.attribute') smvOptsInputs!: SclCheckbox[];
+
+  @query('.smvopts.save') smvOptsSave!: Button;
 
   @query('.smv.insttype') instType?: Checkbox;
 
   private onSampledValueControlInputChange(): void {
     if (
-      Array.from(this.sampledValueControlInputs ?? []).some(
+      Array.from(this.sampledValueControlInputs).some(
         input => !input.checkValidity()
       )
     ) {
@@ -118,11 +125,11 @@ export class SampledValueControlElementEditor extends LitElement {
     }
 
     const sampledValueControlAttrs: Record<string, string | null> = {};
-    for (const input of this.sampledValueControlInputs ?? [])
+    for (const input of this.sampledValueControlInputs)
       sampledValueControlAttrs[input.label] = input.maybeValue;
 
     this.sampledValueControlDiff = Array.from(
-      this.sampledValueControlInputs ?? []
+      this.sampledValueControlInputs
     ).some(
       input => this.element?.getAttribute(input.label) !== input.maybeValue
     );
@@ -132,7 +139,7 @@ export class SampledValueControlElementEditor extends LitElement {
     if (!this.element) return;
 
     const sampledValueControlAttrs: Record<string, string | null> = {};
-    for (const input of this.sampledValueControlInputs ?? [])
+    for (const input of this.sampledValueControlInputs)
       if (this.element?.getAttribute(input.label) !== input.maybeValue)
         sampledValueControlAttrs[input.label] = input.maybeValue;
 
@@ -149,16 +156,13 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   private onSMVInputChange(): void {
-    if (
-      Array.from(this.sMVInputs ?? []).some(input => !input.checkValidity())
-    ) {
+    if (Array.from(this.sMVInputs).some(input => !input.checkValidity())) {
       this.sMVdiff = false;
       return;
     }
 
     const pTypes: Record<string, string | null> = {};
-    for (const input of this.sMVInputs ?? [])
-      pTypes[input.label] = input.maybeValue;
+    for (const input of this.sMVInputs) pTypes[input.label] = input.maybeValue;
 
     this.sMVdiff = checkSMVDiff(this.sMV!, {
       pTypes,
@@ -170,7 +174,7 @@ export class SampledValueControlElementEditor extends LitElement {
     if (!this.sMV) return;
 
     const options: ChangeGseOrSmvAddressOptions = {};
-    for (const input of this.sMVInputs ?? []) {
+    for (const input of this.sMVInputs) {
       if (input.label === 'MAC-Address' && input.maybeValue)
         options.mac = input.maybeValue;
       if (input.label === 'APPID' && input.maybeValue)
@@ -192,18 +196,11 @@ export class SampledValueControlElementEditor extends LitElement {
   private onSmvOptsInputChange(): void {
     const smvOpts = this.element.querySelector(':scope > SmvOpts');
 
-    if (
-      Array.from(this.smvOptsInputs ?? []).some(input => !input.checkValidity())
-    ) {
-      this.smvOptsDiff = false;
-      return;
-    }
-
     const smvOptsAttrs: Record<string, string | null> = {};
-    for (const input of this.smvOptsInputs ?? [])
+    for (const input of this.smvOptsInputs)
       smvOptsAttrs[input.label] = input.maybeValue;
 
-    this.smvOptsDiff = Array.from(this.smvOptsInputs ?? []).some(
+    this.smvOptsDiff = Array.from(this.smvOptsInputs).some(
       input => smvOpts?.getAttribute(input.label) !== input.maybeValue
     );
   }
@@ -214,7 +211,7 @@ export class SampledValueControlElementEditor extends LitElement {
     if (!smvOpts) return;
 
     const smvOptsAttrs: Record<string, string | null> = {};
-    for (const input of this.smvOptsInputs ?? [])
+    for (const input of this.smvOptsInputs)
       if (smvOpts.getAttribute(input.label) !== input.maybeValue)
         smvOptsAttrs[input.label] = input.maybeValue;
 
@@ -265,7 +262,7 @@ export class SampledValueControlElementEditor extends LitElement {
         )}
       </div>
       <mwc-button
-        class="save"
+        class="smv save"
         label="save"
         icon="save"
         ?disabled=${!this.sMVdiff}
@@ -317,7 +314,7 @@ export class SampledValueControlElementEditor extends LitElement {
         )}
       </div>
       <mwc-button
-        class="save"
+        class="smvopts save"
         label="save"
         icon="save"
         ?disabled=${!this.smvOptsDiff}
@@ -435,7 +432,7 @@ export class SampledValueControlElementEditor extends LitElement {
           type => html`<mwc-list-item value="${type}">${type}</mwc-list-item>`
         )}</scl-select
       ><mwc-button
-        class="save"
+        class="smvcontrol save"
         label="save"
         icon="save"
         ?disabled=${!this.sampledValueControlDiff}
