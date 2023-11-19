@@ -39,8 +39,8 @@ export const smvControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Beh" daName="q" fc="ST" />
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="LLN0" doName="Mod" daName="t" fc="ST" />
                         </DataSet>
-                        <SampledValueControl name="smv1" smvID="" securityEnabled="Signature" smpMod="SmpPerSec" smpRate="4000" nofASDU="1" />
-                        <SampledValueControl name="smv2" smvID="someSmvID" desc="SMV with SMV" datSet="datSet" smpMod="SmpPerPeriod" smpRate="80" nofASDU="1" >
+                        <SampledValueControl name="smv1" multicast="false" smvID="" securityEnabled="Signature" smpMod="SmpPerSec" smpRate="4000" nofASDU="1" />
+                        <SampledValueControl name="smv2" smvID="someSmvID" desc="SMV with SMV" datSet="datSet" smpMod="SmpPerPeriod" smpRate="80" nofASDU="1" confRev="43">
                             <SmvOpts refreshTime="true" sampleSynchronized="true" sampleRate="true" dataSet="true" security="true" timestamp="true" synchSourceId="true" />
                         </SampledValueControl>
                         <SampledValueControl name="smv3" smvID="someSmvID" desc="SMV with SMV" smpMod="SecPerSmp" smpRate="1" nofASDU="1"/>
