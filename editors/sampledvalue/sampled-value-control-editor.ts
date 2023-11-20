@@ -36,7 +36,7 @@ export class SampledValueControlEditor extends LitElement {
 
   /** SCL change indicator */
   @property({ type: Number })
-  editCount = 0;
+  editCount = -1;
 
   @state()
   selectedSampledValueControl?: Element;
@@ -91,6 +91,13 @@ export class SampledValueControlEditor extends LitElement {
     const update = { element: control, attributes: { datSet: newName } };
 
     this.dispatchEvent(newEditEvent([insert, update]));
+
+    this.selectedDataSet =
+      this.selectedSampledValueControl?.parentElement?.querySelector(
+        `DataSet[name="${this.selectedSampledValueControl.getAttribute(
+          'datSet'
+        )}"]`
+      );
   }
 
   private selectDataSet(): void {
@@ -139,9 +146,7 @@ export class SampledValueControlEditor extends LitElement {
   private renderSelectDataSetDialog(): TemplateResult {
     return html`
       <mwc-dialog heading="Select Data Set">
-        <action-filtered-list
-          activatable
-          @selected=${() => this.selectDataSet()}
+        <action-filtered-list activatable @action=${() => this.selectDataSet()}
           >${Array.from(
             this.selectedSampledValueControl?.parentElement?.querySelectorAll(
               'DataSet'
