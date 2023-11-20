@@ -2,12 +2,16 @@
 
 ## What is this?
 
-This is an editor plugin for [open-scd-core](https://github.com/openscd/open-scd-core#readme), the new core editor engine for OpenSCD. With this plugin you can edit control block and related elements and its data sets. Visit the [SCLEditor](https://openenergytools.github.io/scl-editor) and see for yourself.
+This is an editor plugin for [open-scd-core](https://github.com/openenergytools/open-scd-core#readme), the new core editor engine for OpenSCD. With this plugin you can edit control block and related elements and its data sets. Visit the [SCLEditor](https://openenergytools.github.io/scl-editor) and see for yourself.
 
-## Missing features
+## Features on the roadmap
 
 - create `SampledValueControl` elements
 - re-allocate control blocks in data model (new once are allocated the first logical device `LLN0`)
+- show maximum size of DataSet element encoded with ASN.1 BER
+- more use guidance and notification in the UI
+
+If you see anything missing please file an [feature request issue](https://github.com/openenergytools/oscd-publisher/issues)
 
 ## Local Demo with `web-dev-server`
 
