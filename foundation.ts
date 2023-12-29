@@ -15,6 +15,15 @@ export function updateElementReference(
   return newElement;
 }
 
+export function pathIdentity(element: Element): string {
+  const id = identity(element);
+  if (Number.isNaN(id)) return 'UNDEFINED';
+
+  const paths = (id as string).split('>');
+  paths.pop();
+  return paths.join('>');
+}
+
 export const styles = css`
   .section {
     display: flex;

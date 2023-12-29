@@ -3,33 +3,27 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
-import type { ListItem } from '@material/mwc-list/mwc-list-item';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
   createDataSet,
-  find,
   identity,
   removeDataSet,
 } from '@openenergytools/scl-lib';
+import '@openenergytools/filterable-lists/dist/action-list.js';
+import type {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import './data-set-element-editor.js';
-import '../../foundation/components/action-filtered-list.js';
-import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
-import { styles, updateElementReference } from '../../foundation.js';
-
-function dataSetPath(dataSet: Element): string {
-  const id = identity(dataSet);
-  if (Number.isNaN(id)) return 'UNDEFINED';
-
-  const paths = (id as string).split('>');
-  paths.pop();
-  return paths.join('>');
-}
+import {
+  pathIdentity,
+  styles,
+  updateElementReference,
+} from '../../foundation.js';
 
 @customElement('data-set-editor')
 export class DataSetEditor extends LitElement {
@@ -44,7 +38,7 @@ export class DataSetEditor extends LitElement {
   @state()
   selectedDataSet?: Element;
 
-  @query('.selectionlist') selectionList!: ActionFilteredList;
+  @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectDataSetButton!: Button;
 
@@ -55,22 +49,12 @@ export class DataSetEditor extends LitElement {
 
       this.selectedDataSet = newDataSet ?? undefined;
 
+      /* TODO(Jakob Vogelsang): fix when action-list is activable
       if (!newDataSet && this.selectionList && this.selectionList.selected)
-        (this.selectionList.selected as ListItem).selected = false;
+        (this.selectionList.selected as ListItem).selected = false; */
     }
 
     super.update(props);
-  }
-
-  private selectDataSet(evt: Event): void {
-    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
-    const dataSet = find(this.doc, 'DataSet', id);
-
-    if (dataSet) {
-      this.selectedDataSet = dataSet;
-      (evt.target as ActionFilteredList).classList.add('hidden');
-      this.selectDataSetButton.classList.remove('hidden');
-    }
   }
 
   private renderElementEditorContainer(): TemplateResult {
@@ -86,67 +70,61 @@ export class DataSetEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<action-filtered-list
-      activatable
-      @action=${this.selectDataSet}
-      class="selectionlist"
-      >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
-        const ieditem = html`<mwc-list-item
-            class="listitem header"
-            noninteractive
-            graphic="icon"
-            value="${Array.from(ied.querySelectorAll('DataSet'))
-              .map(element => {
-                const id = identity(element) as string;
-                return typeof id === 'string' ? id : '';
-              })
-              .join(' ')}"
-          >
-            <span>${ied.getAttribute('name')}</span>
-            <mwc-icon slot="graphic">developer_board</mwc-icon>
-          </mwc-list-item>
-          <li divider role="separator"></li>
-          <mwc-list-item
-            slot="primaryAction"
-            style="height:56px;"
-            @request-selected="${(evt: Event) => {
-              evt.stopPropagation();
-
-              const insertDataSet = createDataSet(ied);
-              if (insertDataSet)
-                this.dispatchEvent(newEditEvent(insertDataSet));
-            }}"
-            ><mwc-icon>playlist_add</mwc-icon></mwc-list-item
-          >
-          <li slot="primaryAction" divider role="separator"></li>`;
-
-        const dataSets = Array.from(ied.querySelectorAll('DataSet')).map(
-          dataSet =>
-            html`<mwc-list-item twoline value="${identity(dataSet)}"
-                ><span>${dataSet.getAttribute('name')}</span
-                ><span slot="secondary">${dataSetPath(dataSet)}</span>
-                <span slot="meta"
-                  ><mwc-icon-button icon="delete"></mwc-icon-button>
-                </span>
-              </mwc-list-item>
-              <mwc-list-item
-                style="height:72px;"
-                slot="primaryAction"
-                @request-selected="${(evt: Event) => {
-                  evt.stopPropagation();
-                  this.dispatchEvent(
-                    newEditEvent(removeDataSet({ node: dataSet }))
-                  );
-                  // this.requestUpdate();
-                }}"
-              >
-                <mwc-icon>delete</mwc-icon>
-              </mwc-list-item>`
+    const items = Array.from(this.doc.querySelectorAll(':root > IED')).flatMap(
+      ied => {
+        const dataSets = Array.from(
+          ied.querySelectorAll(
+            ':scope > AccessPoint > Server > LDevice > LN0 > DataSet, :scope > AccessPoint > Server > LDevice > LN > DataSet'
+          )
         );
 
-        return [ieditem, ...dataSets];
-      })}</action-filtered-list
-    >`;
+        const item: ActionItem = {
+          headline: `${ied.getAttribute('name')}`,
+          startingIcon: 'developer_board',
+          divider: true,
+          filtergroup: dataSets.map(dataset => `${identity(dataset)}`),
+          actions: [
+            {
+              icon: 'playlist_add',
+              callback: () => {
+                const insertDataSet = createDataSet(ied);
+                if (insertDataSet)
+                  this.dispatchEvent(newEditEvent(insertDataSet));
+              },
+            },
+          ],
+        };
+
+        const dataset: ActionItem[] = dataSets.map(dataSet => ({
+          headline: `${dataSet.getAttribute('name')}`,
+          supportingText: `${pathIdentity(dataSet)}`,
+          primaryAction: () => {
+            this.selectedDataSet = dataSet;
+            this.selectionList.classList.add('hidden');
+            this.selectDataSetButton.classList.remove('hidden');
+          },
+          actions: [
+            {
+              icon: 'delete',
+              callback: () => {
+                this.dispatchEvent(
+                  newEditEvent(removeDataSet({ node: dataSet }))
+                );
+              },
+            },
+          ],
+        }));
+
+        return [item, ...dataset];
+      }
+    );
+
+    return html`<action-list
+      class="selectionlist"
+      .items=${items}
+      filterable
+      searchhelper="Filter DataSet's"
+    ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {

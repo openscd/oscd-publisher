@@ -9,12 +9,9 @@ import {
 } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-dialog';
 import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
-import type { Menu } from '@material/mwc-menu';
 
 import '@openscd/oscd-tree-grid';
 import { newEditEvent } from '@openscd/open-scd-core';
@@ -27,11 +24,14 @@ import {
   removeFCDA,
   updateDataSet,
 } from '@openenergytools/scl-lib';
+import '@openenergytools/filterable-lists/dist/action-list.js';
+import type {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import '../../foundation/components/scl-textfield.js';
-import '../../foundation/components/action-filtered-list.js';
 import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
-import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -120,7 +120,7 @@ export class DataSetElementEditor extends LitElement {
 
   @query('mwc-button.save') saveButton!: Button;
 
-  @query('.list.fcda') fcdaList!: ActionFilteredList;
+  @query('.list.fcda') fcdaList!: ActionList;
 
   @query('#dapickerbutton') daPickerButton!: Button;
 
@@ -201,84 +201,60 @@ export class DataSetElementEditor extends LitElement {
     this.dispatchEvent(newEditEvent([remove, insert]));
   }
 
-  updated(): void {
-    this.shadowRoot?.querySelectorAll('mwc-menu').forEach(menu => {
-      // eslint-disable-next-line no-param-reassign
-      (menu as Menu).anchor = menu.previousElementSibling as HTMLElement;
-    });
-  }
-
   private renderFCDAList(): TemplateResult {
-    return html` <action-filtered-list
-      class="list fcda"
-      style="position:relative"
-      >${Array.from(this.element!.querySelectorAll('FCDA')).map(fcda => {
-        const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
-          'ldInst',
-          'prefix',
-          'lnClass',
-          'lnInst',
-          'doName',
-          'daName',
-          'fc',
-        ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
+    const items: ActionItem[] = Array.from(
+      this.element!.querySelectorAll('FCDA')
+    ).map((fcda, i, arr) => {
+      const [ldInst, prefix, lnClass, lnInst, doName, daName, fc] = [
+        'ldInst',
+        'prefix',
+        'lnClass',
+        'lnInst',
+        'doName',
+        'daName',
+        'fc',
+      ].map(attributeName => fcda.getAttribute(attributeName) ?? '');
 
-        return html`<mwc-list-item selected twoline value="${identity(fcda)}"
-            ><span>${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}</span
-            ><span slot="secondary"
-              >${`${ldInst}/${prefix}${lnClass}${lnInst}`}</span
-            ></span>
-          </mwc-list-item>
-          <mwc-list-item 
-            style="height:72px;" 
-            slot="primaryAction" 
-            @request-selected="${(e: Event) => {
-              e.stopPropagation();
-              this.dispatchEvent(newEditEvent(removeFCDA({ node: fcda })));
-            }}">
-            <mwc-icon>delete</mwc-icon>
-          </mwc-list-item>
-          <div style="position:relative" slot="secondaryAction">
-          <mwc-list-item 
-            style="height:72px;" 
-            slot="secondaryAction"
-            @request-selected="${(e: Event) => {
-              e.stopPropagation();
-              ((e.target as Element).nextElementSibling as Menu).show();
-            }}"
-          >
-            <mwc-icon>more_vert</mwc-icon>
-          </mwc-list-item>
-          <mwc-menu corner="BOTTOM_LEFT" menuCorner="END">
-            <mwc-list-item
-              graphic="icon" 
-              ?disabled=${!fcda.previousElementSibling} 
-              @request-selected="${(evt: Event) => {
-                evt.stopPropagation();
-                this.onMoveFCDAUp(fcda);
-                ((evt.target as Element).parentElement as Menu).close();
-              }}"
-            >
-              <span>move up</span>
-              <mwc-icon slot="graphic">text_select_move_up</mwc-icon>
-            </mwc-list-item>
-            <mwc-list-item 
-              graphic="icon" 
-              ?disabled=${!fcda.nextElementSibling} 
-              @request-selected="${(evt: Event) => {
-                evt.stopPropagation();
-                this.onMoveFCDADown(fcda);
-                ((evt.target as Element).parentElement as Menu).close();
-              }}"
-            >
-              <span>move down</span>
-              <mwc-icon slot="graphic">text_select_move_down</mwc-icon>
-            </mwc-list-item>
-          </mwc-menu>
-          </div>
-          `;
-      })}</action-filtered-list
-    >`;
+      const actions = [
+        {
+          icon: 'delete',
+          label: '',
+          callback: () => {
+            this.dispatchEvent(newEditEvent(removeFCDA({ node: fcda })));
+          },
+        },
+      ];
+
+      if (i > 0)
+        actions.push({
+          icon: 'text_select_move_up',
+          label: 'move up',
+          callback: () => {
+            this.onMoveFCDAUp(fcda);
+          },
+        });
+      if (arr.length !== i + 1)
+        actions.push({
+          icon: 'text_select_move_down',
+          label: 'move down',
+          callback: () => {
+            this.onMoveFCDADown(fcda);
+          },
+        });
+
+      return {
+        headline: `${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}`,
+        supportingText: `${ldInst}/${prefix}${lnClass}${lnInst}`,
+        actions,
+      };
+    });
+
+    return html`<action-list
+      class="list fcda"
+      .items=${items}
+      filterable
+      searchhelper="Filter Data"
+    ></action-list>`;
   }
 
   private renderDataObjectPicker(): TemplateResult {
@@ -451,8 +427,8 @@ export class DataSetElementEditor extends LitElement {
       --mdc-dialog-max-width: 92vw;
     }
 
-    mwc-list-item {
-      --mdc-list-item-meta-size: 48px;
+    action-list {
+      z-index: 0;
     }
 
     *[iconTrailing='search'] {

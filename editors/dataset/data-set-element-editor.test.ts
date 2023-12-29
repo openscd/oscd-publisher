@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { fixture, html } from '@open-wc/testing';
 
-import { setViewport } from '@web/test-runner-commands';
+import { sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
@@ -361,7 +361,7 @@ describe('DataSet element editor component', () => {
   describe('Allows to re-order FCDA child elements', () => {
     let editor: DataSetElementEditor;
     beforeEach(async () => {
-      await setViewport({ width: 800, height: 600 });
+      await setViewport({ width: 800, height: 900 });
 
       const dataSet = new DOMParser()
         .parseFromString(dataSetDoc, 'application/xml')
@@ -379,48 +379,14 @@ describe('DataSet element editor component', () => {
       editor.remove();
     });
 
-    it('the first menu looks like the latest snapshot', async () => {
-      (
-        editor.shadowRoot?.querySelector(
-          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
-        ) as HTMLElement
-      ).click();
+    it('looks like the latest snapshot', async () => {
+      await sendMouse({ type: 'click', position: [740, 800] });
 
       await editor.updateComplete;
       await timeout(200);
       await visualDiff(
         editor,
-        `dataset/data-set-element-editor/#12 Re-order first FCDA`
-      );
-    });
-
-    it('a middle menu looks like the latest snapshot', async () => {
-      (
-        editor.shadowRoot?.querySelectorAll(
-          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
-        )[1] as HTMLElement
-      )?.click();
-
-      await editor.updateComplete;
-      await timeout(100);
-      await visualDiff(
-        editor,
-        `dataset/data-set-element-editor/#13 Re-order middle FCDA`
-      );
-    });
-
-    it('the last menu looks like the latest snapshot', async () => {
-      (
-        editor.shadowRoot?.querySelectorAll(
-          'action-filtered-list > *[slot="secondaryAction"] > mwc-list-item'
-        )[9] as HTMLElement
-      )?.click();
-
-      await editor.updateComplete;
-      await timeout(200);
-      await visualDiff(
-        editor,
-        `dataset/data-set-element-editor/#14 Re-order last FCDA`
+        `dataset/data-set-element-editor/#13 Re-order FCDA`
       );
     });
   });

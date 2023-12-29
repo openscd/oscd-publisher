@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect, fixture, html } from '@open-wc/testing';
+import { sendMouse, setViewport } from '@web/test-runner-commands';
+
 import { SinonSpy, spy } from 'sinon';
 
 import {
@@ -16,11 +18,11 @@ import type { DataSetElementEditor } from './data-set-element-editor.js';
 const doc = new DOMParser().parseFromString(dataSetDoc, 'application/xml');
 const dataSet = doc.querySelector('LDevice[inst="ldInst1"] DataSet')!;
 
-/* function timeout(ms: number) {
+function timeout(ms: number) {
   return new Promise(res => {
     setTimeout(res, ms);
   });
-} */
+}
 
 describe('DataSet element editor', () => {
   let editor: DataSetElementEditor;
@@ -62,21 +64,19 @@ describe('DataSet element editor', () => {
     );
   });
 
-  it('allows to remove DataSets element', () => {
-    (
-      editor.fcdaList.querySelector(
-        'mwc-list-item[slot="primaryAction"]'
-      ) as HTMLElement
-    ).click();
+  it('allows to remove DataSets child data', async () => {
+    await sendMouse({ type: 'click', position: [700, 550] });
 
     expect(editEvent).to.have.be.calledOnce;
     expect(editEvent.args[0][0].detail.length).to.equal(1);
     expect(editEvent.args[0][0].detail[0].node.tagName).to.equal('FCDA');
   });
 
-  it('allows to move FCDA child one step up', () => {
-    const menu = editor.fcdaList.querySelectorAll('mwc-menu')[1];
-    (menu.querySelector(':scope > mwc-list-item') as HTMLElement).click();
+  it('allows to move FCDA child one step up', async () => {
+    await setViewport({ width: 800, height: 1200 });
+    await sendMouse({ type: 'click', position: [740, 600] }); // open menu
+    await timeout(200); // await menu to be opened
+    await sendMouse({ type: 'click', position: [740, 700] }); // click on move up
 
     const toBeMovedFCDA = dataSet.querySelectorAll(':scope > FCDA')[1];
     const reference = toBeMovedFCDA.previousElementSibling;
@@ -91,9 +91,11 @@ describe('DataSet element editor', () => {
     expect(editEvent.args[0][0].detail[1].reference).to.equal(reference);
   });
 
-  it('allows to move FCDA child one step down', () => {
-    const menu = editor.fcdaList.querySelectorAll('mwc-menu')[1];
-    (menu.querySelectorAll(':scope > mwc-list-item')[1] as HTMLElement).click();
+  it('allows to move FCDA child one step down', async () => {
+    await setViewport({ width: 800, height: 1200 });
+    await sendMouse({ type: 'click', position: [740, 600] }); // open menu
+    await timeout(200); // await menu to be opened
+    await sendMouse({ type: 'click', position: [740, 780] }); // click on move down
 
     const toBeMovedFCDA = dataSet.querySelectorAll(':scope > FCDA')[1];
     const reference = toBeMovedFCDA.nextElementSibling?.nextElementSibling;

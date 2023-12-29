@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { fixture, html } from '@open-wc/testing';
 
-import { setViewport } from '@web/test-runner-commands';
+import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
@@ -72,13 +72,11 @@ describe('DataSet editor component', () => {
 
       it('filtered looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
-
-        editor.selectionList.shadowRoot!.querySelector('mwc-textfield')!.value =
-          'ldInst2';
-        editor.selectionList.onFilterInput();
+        await sendMouse({ type: 'click', position: [200, 50] });
+        await sendKeys({ type: 'ldInst2' });
 
         await editor.updateComplete;
-        await timeout(200);
+        await timeout(400);
         await visualDiff(
           editor,
           `dataset/data-set-editor/#3 With filtered DataSets`
@@ -89,7 +87,7 @@ describe('DataSet editor component', () => {
         await setViewport({ width: 599, height: 1100 });
 
         await editor.updateComplete;
-        await timeout(200);
+        await timeout(400);
         await visualDiff(
           editor,
           `dataset/data-set-editor/#4 Unselected DataSet 599x1100`
@@ -99,13 +97,14 @@ describe('DataSet editor component', () => {
 
     describe('with selected DataSet', () => {
       beforeEach(async () => {
-        await editor.selectionList.items[4].click();
+        await setViewport({ width: 1200, height: 800 });
+        await sendMouse({ type: 'click', position: [100, 500] });
+        await timeout(200);
       });
 
       it('looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,

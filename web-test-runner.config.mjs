@@ -131,6 +131,10 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
           </body>
         </html>`,
     },
+    {
+      name: 'unit',
+      files: 'dist/**/*.spec.js'
+    }
   ],
 
   /** Resolve bare module imports */
