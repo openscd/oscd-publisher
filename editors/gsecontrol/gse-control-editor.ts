@@ -1,200 +1,60 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, TemplateResult } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-dialog';
-import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
-import type { IconButton } from '@material/mwc-icon-button';
-import type { Dialog } from '@material/mwc-dialog';
-import type { ListItem } from '@material/mwc-list/mwc-list-item';
-import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openscd/open-scd-core';
+import { createGSEControl, removeControlBlock } from '@openenergytools/scl-lib';
 import {
-  createDataSet,
-  createGSEControl,
-  find,
-  findControlBlockSubscription,
-  identity,
-  removeControlBlock,
-} from '@openenergytools/scl-lib';
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/action-list.js';
 
-import '../dataset/data-set-element-editor.js';
 import './gse-control-element-editor.js';
-import '../../foundation/components/action-filtered-list.js';
-import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
-import { styles, updateElementReference } from '../../foundation.js';
-import { gooseIcon } from '../../foundation/icons.js';
+import {
+  pathIdentity,
+  styles,
+  updateElementReference,
+} from '../../foundation.js';
+import BaseElementEditor from '../base-element-editor.js';
 
 @customElement('gse-control-editor')
-export class GseControlEditor extends LitElement {
-  /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
-  @property({ attribute: false })
-  doc!: XMLDocument;
-
-  /** SCL change indicator */
-  @property({ type: Number })
-  editCount = -1;
-
-  @state()
-  selectedGseControl?: Element;
-
-  @state()
-  selectedDataSet?: Element | null;
-
-  @query('.selectionlist') selectionList!: ActionFilteredList;
+export class GseControlEditor extends BaseElementEditor {
+  @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectGSEControlButton!: Button;
-
-  @query('mwc-dialog') selectDataSetDialog!: Dialog;
-
-  @query('.new.dataset') newDataSet!: IconButton;
-
-  @query('.change.dataset') changeDataSet!: IconButton;
 
   /** Resets selected GOOSE and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
-    if (props.has('doc') && this.selectedGseControl) {
+    if (props.has('doc') && this.selectCtrlBlock) {
       const newGseControl = updateElementReference(
         this.doc,
-        this.selectedGseControl
+        this.selectCtrlBlock
       );
 
-      this.selectedGseControl = newGseControl ?? undefined;
-      this.selectedDataSet = this.selectedGseControl
+      this.selectCtrlBlock = newGseControl ?? undefined;
+      this.selectedDataSet = this.selectCtrlBlock
         ? updateElementReference(this.doc, this.selectedDataSet!)
         : undefined;
 
+      /* TODO(Jakob Vogelsang): comment when action-list is activeable
       if (!newGseControl && this.selectionList && this.selectionList.selected)
-        (this.selectionList.selected as ListItem).selected = false;
+        (this.selectionList.selected as ListItem).selected = false; */
     }
   }
 
-  private addNewDataSet(control: Element): void {
-    const parent = control.parentElement;
-    if (!parent) return;
-
-    const insert = createDataSet(parent);
-    if (!insert) return;
-
-    const newName = (insert.node as Element).getAttribute('name');
-    if (!newName) return;
-
-    const update = { element: control, attributes: { datSet: newName } };
-
-    this.dispatchEvent(newEditEvent([insert, update]));
-
-    this.selectedDataSet =
-      this.selectedGseControl?.parentElement?.querySelector(
-        `DataSet[name="${this.selectedGseControl.getAttribute('datSet')}"]`
-      );
-  }
-
-  private selectDataSet(): void {
-    const dataSetElement = (
-      this.selectDataSetDialog.querySelector(
-        'action-filtered-list'
-      ) as ActionFilteredList
-    ).selected;
-    if (!dataSetElement) return;
-
-    const dataSetName = (dataSetElement as ListItemBase).value;
-    const dataSet = this.selectedGseControl?.parentElement?.querySelector(
-      `DataSet[name="${dataSetName}"]`
-    );
-    if (!dataSet) return;
-
-    this.dispatchEvent(
-      newEditEvent({
-        element: this.selectedGseControl!,
-        attributes: { datSet: dataSetName },
-      })
-    );
-    this.selectedDataSet = dataSet;
-
-    this.selectDataSetDialog.close();
-  }
-
-  private selectGSEControl(evt: Event): void {
-    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
-    const gseControl = find(this.doc, 'GSEControl', id);
-    if (!gseControl) return;
-
-    this.selectedGseControl = gseControl;
-
-    if (gseControl) {
-      this.selectedDataSet = gseControl.parentElement?.querySelector(
-        `DataSet[name="${gseControl.getAttribute('datSet')}"]`
-      );
-      (evt.target as ActionFilteredList).classList.add('hidden');
-      this.selectGSEControlButton.classList.remove('hidden');
-    }
-  }
-
-  private renderSelectDataSetDialog(): TemplateResult {
-    return html`
-      <mwc-dialog heading="Select Data Set">
-        <action-filtered-list activatable @action=${() => this.selectDataSet()}
-          >${Array.from(
-            this.selectedGseControl?.parentElement?.querySelectorAll(
-              'DataSet'
-            ) ?? []
-          ).map(
-            dataSet =>
-              html`<mwc-list-item
-                twoline
-                ?selected=${(this.selectedDataSet?.getAttribute('name') ??
-                  'UNDEFINED') ===
-                (dataSet.getAttribute('name') ?? 'UNDEFINED')}
-                value="${dataSet.getAttribute('name') ?? 'UNDEFINED'}"
-                ><span>${dataSet.getAttribute('name') ?? 'UNDEFINED'}</span>
-                <span slot="secondary">${identity(dataSet)}</span>
-              </mwc-list-item>`
-          )}
-        </action-filtered-list>
-      </mwc-dialog>
-    `;
-  }
-
-  private renderElementEditorContainer(): TemplateResult {
-    if (this.selectedGseControl !== undefined)
+  protected renderElementEditorContainer(): TemplateResult {
+    if (this.selectCtrlBlock !== undefined)
       return html`<div class="elementeditorcontainer">
-        <div class="content dataSet">
-          ${this.renderSelectDataSetDialog()}
-          <data-set-element-editor
-            .element=${this.selectedDataSet!}
-            .showHeader=${false}
-            editCount="${this.editCount}"
-          >
-            <mwc-icon-button
-              class="change dataset"
-              slot="change"
-              icon="swap_vert"
-              ?disabled=${!!findControlBlockSubscription(
-                this.selectedGseControl
-              ).length}
-              @click=${() => this.selectDataSetDialog.show()}
-            ></mwc-icon-button>
-            <mwc-icon-button
-              class="new dataset"
-              slot="new"
-              icon="playlist_add"
-              ?disabled=${!!this.selectedGseControl.getAttribute('datSet')}
-              @click="${() => {
-                this.addNewDataSet(this.selectedGseControl!);
-              }}"
-            ></mwc-icon-button
-          ></data-set-element-editor>
-        </div>
+        ${this.renderDataSetElementContainer()}
         <gse-control-element-editor
           .doc=${this.doc}
-          .element=${this.selectedGseControl}
+          .element=${this.selectCtrlBlock}
           editCount="${this.editCount}"
         ></gse-control-element-editor>
       </div>`;
@@ -203,67 +63,68 @@ export class GseControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<action-filtered-list
-      activatable
-      @action=${this.selectGSEControl}
-      class="selectionlist"
-      >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
-        const ieditem = html`<mwc-list-item
-            class="listitem header"
-            noninteractive
-            graphic="icon"
-            value="${Array.from(ied.querySelectorAll('GSEControl'))
-              .map(element => {
-                const id = identity(element) as string;
-                return typeof id === 'string' ? id : '';
-              })
-              .join(' ')}"
-          >
-            <span>${ied.getAttribute('name')}</span>
-            <mwc-icon slot="graphic">developer_board</mwc-icon>
-          </mwc-list-item>
-          <li divider role="separator"></li>
-          <mwc-list-item
-            slot="primaryAction"
-            style="height:56px;"
-            @request-selected="${(evt: Event) => {
-              evt.stopPropagation();
-
-              const insertDataSet = createGSEControl(ied);
-              if (insertDataSet)
-                this.dispatchEvent(newEditEvent(insertDataSet));
-            }}"
-            ><mwc-icon>playlist_add</mwc-icon></mwc-list-item
-          >
-          <li slot="primaryAction" divider role="separator"></li>`;
-
-        const gseControls = Array.from(ied.querySelectorAll('GSEControl')).map(
-          gseControl =>
-            html`<mwc-list-item
-                twoline
-                value="${identity(gseControl)}"
-                graphic="icon"
-                ><span>${gseControl.getAttribute('name')}</span
-                ><span slot="secondary">${identity(gseControl)}</span>
-                <mwc-icon slot="graphic">${gooseIcon}</mwc-icon>
-              </mwc-list-item>
-              <mwc-list-item
-                style="height:72px;"
-                slot="primaryAction"
-                @request-selected="${(evt: Event) => {
-                  evt.stopPropagation();
-                  this.dispatchEvent(
-                    newEditEvent(removeControlBlock({ node: gseControl }))
-                  );
-                }}"
-              >
-                <mwc-icon>delete</mwc-icon>
-              </mwc-list-item>`
+    const items = Array.from(this.doc.querySelectorAll(':root > IED')).flatMap(
+      ied => {
+        const gseControls = Array.from(
+          ied.querySelectorAll(
+            ':scope > AccessPoint > Server > LDevice > LN0 > GSEControl'
+          )
         );
 
-        return [ieditem, ...gseControls];
-      })}</action-filtered-list
-    >`;
+        const item: ActionItem = {
+          headline: `${ied.getAttribute('name')}`,
+          startingIcon: 'developer_board',
+          divider: true,
+          filtergroup: gseControls.map(
+            gseControl => gseControl.getAttribute('name') ?? ''
+          ),
+          actions: [
+            {
+              icon: 'playlist_add',
+              callback: () => {
+                const insertGseControl = createGSEControl(ied);
+                if (insertGseControl)
+                  this.dispatchEvent(newEditEvent(insertGseControl));
+              },
+            },
+          ],
+        };
+
+        const dataset: ActionItem[] = gseControls.map(gseControl => ({
+          headline: `${gseControl.getAttribute('name')}`,
+          supportingText: `${pathIdentity(gseControl)}`,
+          primaryAction: () => {
+            this.selectCtrlBlock = gseControl;
+            this.selectedDataSet =
+              gseControl.parentElement?.querySelector(
+                `DataSet[name="${gseControl.getAttribute('datSet')}"]`
+              ) ?? null;
+
+            this.selectionList.classList.add('hidden');
+            this.selectGSEControlButton.classList.remove('hidden');
+          },
+          actions: [
+            {
+              icon: 'delete',
+              callback: () => {
+                this.dispatchEvent(
+                  newEditEvent(removeControlBlock({ node: gseControl }))
+                );
+              },
+            },
+          ],
+        }));
+
+        return [item, ...dataset];
+      }
+    );
+
+    return html`<action-list
+      class="selectionlist"
+      filterable
+      searchhelper="Filter GSEControl's"
+      .items=${items}
+    ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {
