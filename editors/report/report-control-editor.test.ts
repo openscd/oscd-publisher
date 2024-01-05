@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { fixture, html } from '@open-wc/testing';
 
-import { setViewport } from '@web/test-runner-commands';
+import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
@@ -77,10 +77,8 @@ describe('ReportControl editor component', () => {
 
       it('filtered looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
-
-        editor.selectionList.shadowRoot!.querySelector('mwc-textfield')!.value =
-          'rp2';
-        editor.selectionList.onFilterInput();
+        await sendMouse({ type: 'click', position: [200, 50] });
+        await sendKeys({ type: 'rp2' });
 
         await editor.updateComplete;
         await timeout(200);
@@ -104,7 +102,9 @@ describe('ReportControl editor component', () => {
 
     describe('with selected ReportControl', () => {
       beforeEach(async () => {
-        await editor.selectionList.items[1].click();
+        await setViewport({ width: 1200, height: 800 });
+        await sendMouse({ type: 'click', position: [150, 240] });
+        await timeout(200);
       });
 
       it('on 1900x120 looks like the latest snapshot', async () => {
@@ -184,7 +184,9 @@ describe('ReportControl editor component', () => {
 
     describe('with unreferenced DataSet', () => {
       beforeEach(async () => {
-        await editor.selectionList.items[2].click();
+        await setViewport({ width: 1200, height: 800 });
+        await sendMouse({ type: 'click', position: [150, 300] });
+        await timeout(200);
       });
 
       it('on 1900x120 looks like the latest snapshot', async () => {

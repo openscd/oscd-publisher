@@ -1,201 +1,68 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, TemplateResult } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
-import type { Dialog } from '@material/mwc-dialog';
-import type { IconButton } from '@material/mwc-icon-button';
-import type { ListItem } from '@material/mwc-list/mwc-list-item';
-import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
+import '@openenergytools/filterable-lists/dist/action-list.js';
 import { newEditEvent } from '@openscd/open-scd-core';
 import {
-  createDataSet,
   createReportControl,
-  find,
-  findControlBlockSubscription,
   identity,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
+import type {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/action-list.js';
 
-import '../dataset/data-set-element-editor.js';
 import './report-control-element-editor.js';
-import '../../foundation/components/action-filtered-list.js';
-import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
-import { styles, updateElementReference } from '../../foundation.js';
-import { reportIcon } from '../../foundation/icons.js';
+import {
+  pathIdentity,
+  styles,
+  updateElementReference,
+} from '../../foundation.js';
+import BaseElementEditor from '../base-element-editor.js';
 
 @customElement('report-control-editor')
-export class ReportControlEditor extends LitElement {
-  /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
-  @property({ attribute: false })
-  doc!: XMLDocument;
-
-  /** SCL change indicator */
-  @property({ type: Number })
-  editCount = 0;
-
-  @state()
-  selectedReportControl?: Element;
-
-  @state()
-  selectedDataSet?: Element | null;
-
-  @query('.selectionlist') selectionList!: ActionFilteredList;
+export class ReportControlEditor extends BaseElementEditor {
+  @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectReportControlButton!: Button;
-
-  @query('mwc-dialog') selectDataSetDialog!: Dialog;
-
-  @query('.new.dataset') newDataSet!: IconButton;
-
-  @query('.change.dataset') changeDataSet!: IconButton;
 
   /** Resets selected Report and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
-    if (props.has('doc') && this.selectedReportControl) {
+    if (props.has('doc') && this.selectCtrlBlock) {
       const newReportControl = updateElementReference(
         this.doc,
-        this.selectedReportControl
+        this.selectCtrlBlock
       );
 
-      this.selectedReportControl = newReportControl ?? undefined;
-      this.selectedDataSet = this.selectedReportControl
+      this.selectCtrlBlock = newReportControl ?? undefined;
+      this.selectedDataSet = this.selectCtrlBlock
         ? updateElementReference(this.doc, this.selectedDataSet!)
         : undefined;
 
+      /* TODO(Jakob Vogelsang): fix when action-list is activable
       if (
         !newReportControl &&
         this.selectionList &&
         this.selectionList.selected
       )
-        (this.selectionList.selected as ListItem).selected = false;
+        (this.selectionList.selected as ListItem).selected = false; */
     }
-  }
-
-  private addNewDataSet(control: Element): void {
-    const parent = control.parentElement;
-    if (!parent) return;
-
-    const insert = createDataSet(parent);
-    if (!insert) return;
-
-    const newName = (insert.node as Element).getAttribute('name');
-    if (!newName) return;
-
-    const update = { element: control, attributes: { datSet: newName } };
-
-    this.dispatchEvent(newEditEvent([insert, update]));
-  }
-
-  private selectDataSet(): void {
-    const dataSetElement = (
-      this.selectDataSetDialog.querySelector(
-        'action-filtered-list'
-      ) as ActionFilteredList
-    ).selected;
-    if (!dataSetElement) return;
-
-    const dataSetName = (dataSetElement as ListItemBase).value;
-
-    const dataSet = this.selectedReportControl?.parentElement?.querySelector(
-      `DataSet[name="${dataSetName}"]`
-    );
-    if (!dataSet) return;
-
-    this.dispatchEvent(
-      newEditEvent({
-        element: this.selectedReportControl!,
-        attributes: { datSet: dataSetName },
-      })
-    );
-    this.selectedDataSet = dataSet;
-
-    this.selectDataSetDialog.close();
-  }
-
-  private selectReportControl(evt: Event): void {
-    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
-    const reportControl = find(this.doc, 'ReportControl', id);
-    if (!reportControl) return;
-
-    this.selectedReportControl = reportControl;
-
-    if (this.selectedReportControl) {
-      this.selectedDataSet =
-        this.selectedReportControl.parentElement?.querySelector(
-          `DataSet[name="${this.selectedReportControl.getAttribute('datSet')}"]`
-        );
-      (evt.target as ActionFilteredList).classList.add('hidden');
-      this.selectReportControlButton.classList.remove('hidden');
-    }
-  }
-
-  private renderSelectDataSetDialog(): TemplateResult {
-    return html`
-      <mwc-dialog heading="Select Data Set">
-        <action-filtered-list
-          activatable
-          @selected=${() => this.selectDataSet()}
-          >${Array.from(
-            this.selectedReportControl?.parentElement?.querySelectorAll(
-              'DataSet'
-            ) ?? []
-          ).map(
-            dataSet =>
-              html`<mwc-list-item
-                twoline
-                ?selected=${(this.selectedDataSet?.getAttribute('name') ??
-                  'UNDEFINED') ===
-                (dataSet.getAttribute('name') ?? 'UNDEFINED')}
-                value="${dataSet.getAttribute('name') ?? 'UNDEFINED'}"
-                ><span>${dataSet.getAttribute('name') ?? 'UNDEFINED'}</span>
-                <span slot="secondary">${identity(dataSet)}</span>
-              </mwc-list-item>`
-          )}
-        </action-filtered-list>
-      </mwc-dialog>
-    `;
   }
 
   private renderElementEditorContainer(): TemplateResult {
-    if (this.selectedReportControl !== undefined)
+    if (this.selectCtrlBlock !== undefined)
       return html`<div class="elementeditorcontainer">
-        <div class="content dataSet">
-          ${this.renderSelectDataSetDialog()}
-          <data-set-element-editor
-            .element=${this.selectedDataSet!}
-            .showHeader=${false}
-            editCount="${this.editCount}"
-          >
-            <mwc-icon-button
-              class="change dataset"
-              slot="change"
-              icon="swap_vert"
-              ?disabled=${!!findControlBlockSubscription(
-                this.selectedReportControl
-              ).length}
-              @click=${() => this.selectDataSetDialog.show()}
-            ></mwc-icon-button>
-            <mwc-icon-button
-              class="new dataset"
-              slot="new"
-              icon="playlist_add"
-              ?disabled=${!!this.selectedReportControl.getAttribute('datSet')}
-              @click="${() => {
-                this.addNewDataSet(this.selectedReportControl!);
-              }}"
-            ></mwc-icon-button
-          ></data-set-element-editor>
-        </div>
+        ${this.renderDataSetElementContainer()}
         <report-control-element-editor
           .doc=${this.doc}
-          .element=${this.selectedReportControl}
+          .element=${this.selectCtrlBlock}
           editCount="${this.editCount}"
         ></report-control-element-editor>
       </div>`;
@@ -204,67 +71,66 @@ export class ReportControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<action-filtered-list
-      activatable
-      class="selectionlist"
-      @action=${this.selectReportControl}
-      >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
-        const ieditem = html`<mwc-list-item
-            class="listitem header"
-            noninteractive
-            graphic="icon"
-            value="${Array.from(ied.querySelectorAll('ReportControl'))
-              .map(element => {
-                const id = identity(element) as string;
-                return typeof id === 'string' ? id : '';
-              })
-              .join(' ')}"
-          >
-            <span>${ied.getAttribute('name')}</span>
-            <mwc-icon slot="graphic">developer_board</mwc-icon>
-          </mwc-list-item>
-          <li divider role="separator"></li>
-          <mwc-list-item
-            slot="primaryAction"
-            style="height:56px;"
-            @request-selected="${(evt: Event) => {
-              evt.stopPropagation();
-
-              const insertDataSet = createReportControl(ied);
-              if (insertDataSet)
-                this.dispatchEvent(newEditEvent(insertDataSet));
-            }}"
-            ><mwc-icon>playlist_add</mwc-icon></mwc-list-item
-          >
-          <li slot="primaryAction" divider role="separator"></li> `;
-
-        const reports = Array.from(ied.querySelectorAll('ReportControl')).map(
-          reportCb =>
-            html`<mwc-list-item
-                twoline
-                value="${identity(reportCb)}"
-                graphic="icon"
-                ><span>${reportCb.getAttribute('name')}</span
-                ><span slot="secondary">${identity(reportCb)}</span>
-                <mwc-icon slot="graphic">${reportIcon}</mwc-icon>
-              </mwc-list-item>
-              <mwc-list-item
-                style="height:72px;"
-                slot="primaryAction"
-                @request-selected="${(evt: Event) => {
-                  evt.stopPropagation();
-                  this.dispatchEvent(
-                    newEditEvent(removeControlBlock({ node: reportCb }))
-                  );
-                }}"
-              >
-                <mwc-icon>delete</mwc-icon>
-              </mwc-list-item>`
+    const items = Array.from(this.doc.querySelectorAll(':root > IED')).flatMap(
+      ied => {
+        const rpControls = Array.from(
+          ied.querySelectorAll(
+            ':scope > AccessPoint > Server > LDevice > LN0 > ReportControl, :scope > AccessPoint > Server > LDevice > LN > ReportControl'
+          )
         );
 
-        return [ieditem, ...reports];
-      })}</action-filtered-list
-    >`;
+        const item: ActionItem = {
+          headline: `${ied.getAttribute('name')}`,
+          startingIcon: 'developer_board',
+          divider: true,
+          filtergroup: rpControls.map(rpControl => `${identity(rpControl)}`),
+          actions: [
+            {
+              icon: 'playlist_add',
+              callback: () => {
+                const insertGseControl = createReportControl(ied);
+                if (insertGseControl)
+                  this.dispatchEvent(newEditEvent(insertGseControl));
+              },
+            },
+          ],
+        };
+
+        const reports: ActionItem[] = rpControls.map(rpControl => ({
+          headline: `${rpControl.getAttribute('name')}`,
+          supportingText: `${pathIdentity(rpControl)}`,
+          primaryAction: () => {
+            this.selectCtrlBlock = rpControl;
+            this.selectedDataSet =
+              rpControl.parentElement?.querySelector(
+                `:scope > DataSet[name="${rpControl.getAttribute('datSet')}"]`
+              ) ?? null;
+
+            this.selectionList.classList.add('hidden');
+            this.selectReportControlButton.classList.remove('hidden');
+          },
+          actions: [
+            {
+              icon: 'delete',
+              callback: () => {
+                this.dispatchEvent(
+                  newEditEvent(removeControlBlock({ node: rpControl }))
+                );
+              },
+            },
+          ],
+        }));
+
+        return [item, ...reports];
+      }
+    );
+
+    return html`<action-list
+      class="selectionlist"
+      filterable
+      searchhelper="Filter ReportControl's"
+      .items=${items}
+    ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {

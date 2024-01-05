@@ -2,7 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { setViewport } from '@web/test-runner-commands';
+import { sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { SinonSpy, spy } from 'sinon';
 
@@ -41,12 +41,8 @@ describe('ReportControl editor component', () => {
     window.addEventListener('oscd-edit', editEvent);
   });
 
-  it('allows to insert new ReportControl element', () => {
-    (
-      editor.selectionList.querySelectorAll(
-        'mwc-list-item[slot="primaryAction"]'
-      )[0] as HTMLElement
-    ).click();
+  it('allows to insert new ReportControl element', async () => {
+    await sendMouse({ type: 'click', position: [760, 100] });
 
     expect(editEvent).to.have.been.calledOnce;
 
@@ -55,12 +51,8 @@ describe('ReportControl editor component', () => {
     expect(editEvent.args[0][0].detail.node.tagName).to.equal('ReportControl');
   });
 
-  it('allows to remove and existing ReportControl element', () => {
-    (
-      editor.selectionList.querySelectorAll(
-        'mwc-list-item[slot="primaryAction"]'
-      )[2] as HTMLElement
-    ).click();
+  it('allows to remove and existing ReportControl element', async () => {
+    await sendMouse({ type: 'click', position: [760, 200] });
 
     expect(editEvent).to.have.been.calledOnce;
     expect(editEvent.args[0][0].detail[0]).to.satisfy(isRemove);
@@ -70,7 +62,7 @@ describe('ReportControl editor component', () => {
   });
 
   it('allows to insert new DataSet and link with existing ReportControl', async () => {
-    await editor.selectionList.items[1].click();
+    await sendMouse({ type: 'click', position: [400, 200] });
     editor.newDataSet.click();
 
     expect(editEvent).to.have.been.calledOnce;
@@ -80,18 +72,12 @@ describe('ReportControl editor component', () => {
   });
 
   it('allows to change an existing DataSet', async () => {
-    await setViewport({ width: 1900, height: 1200 });
-
-    await editor.selectionList.items[2].click();
+    await setViewport({ width: 800, height: 800 });
+    await sendMouse({ type: 'click', position: [400, 340] });
 
     editor.changeDataSet.click();
-
-    const listItem = Array.from(
-      editor.selectDataSetDialog.querySelectorAll(':scope mwc-list-item')
-    )[1] as HTMLElement;
     await timeout(200);
-
-    listItem.click();
+    await sendMouse({ type: 'click', position: [400, 410] });
 
     expect(editEvent).to.have.been.calledOnce;
     expect(editEvent.args[0][0].detail).to.satisfy(isUpdate);
