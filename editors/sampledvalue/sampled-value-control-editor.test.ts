@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { fixture, html } from '@open-wc/testing';
 
-import { setViewport } from '@web/test-runner-commands';
+import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { smvControlDoc, otherSmvControlDoc } from './smvControl.testfiles.js';
+import { otherSmvControlDoc, smvControlDoc } from './smvControl.testfiles.js';
 
 import './sampled-value-control-editor.js';
 import type { SampledValueControlEditor } from './sampled-value-control-editor.js';
@@ -76,10 +76,8 @@ describe('SampledValueControl editor component', () => {
 
       it('filtered looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
-
-        editor.selectionList.shadowRoot!.querySelector('mwc-textfield')!.value =
-          'smv2';
-        editor.selectionList.onFilterInput();
+        await sendMouse({ type: 'click', position: [200, 50] });
+        await sendKeys({ type: 'smv2' });
 
         await editor.updateComplete;
         await timeout(200);
@@ -103,13 +101,14 @@ describe('SampledValueControl editor component', () => {
 
     describe('with selected SampledValueControl', () => {
       beforeEach(async () => {
-        await editor.selectionList.items[1].click();
+        await setViewport({ width: 1200, height: 800 });
+        await sendMouse({ type: 'click', position: [150, 240] });
+        await timeout(200);
       });
 
       it('on 1900x120 looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,
@@ -120,7 +119,6 @@ describe('SampledValueControl editor component', () => {
       it('1200x800 looks like the latest snapshot', async () => {
         await setViewport({ width: 1200, height: 2000 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,
@@ -131,7 +129,6 @@ describe('SampledValueControl editor component', () => {
       it('on 800x600 screen looks like the latest snapshot', async () => {
         await setViewport({ width: 800, height: 2000 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,
@@ -142,7 +139,6 @@ describe('SampledValueControl editor component', () => {
       it('on a mobile screen looks like the latest snapshot', async () => {
         await setViewport({ width: 599, height: 2400 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,
@@ -183,13 +179,14 @@ describe('SampledValueControl editor component', () => {
 
     describe('with unreferenced DataSet', () => {
       beforeEach(async () => {
-        await editor.selectionList.items[2].click();
+        await setViewport({ width: 1200, height: 800 });
+        await sendMouse({ type: 'click', position: [150, 300] });
+        await timeout(200);
       });
 
       it('on 1900x120 looks like the latest snapshot', async () => {
         await setViewport({ width: 1900, height: 1200 });
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,
@@ -202,7 +199,6 @@ describe('SampledValueControl editor component', () => {
 
         await editor.changeDataSet.click();
 
-        await editor.updateComplete;
         await timeout(200);
         await visualDiff(
           editor,

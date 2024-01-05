@@ -1,208 +1,69 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, TemplateResult } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-list/mwc-list-item';
 import type { Button } from '@material/mwc-button';
-import type { Dialog } from '@material/mwc-dialog';
-import type { IconButton } from '@material/mwc-icon-button';
-import type { ListItem } from '@material/mwc-list/mwc-list-item';
-import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openscd/open-scd-core';
+import { identity, removeControlBlock } from '@openenergytools/scl-lib';
 import {
-  createDataSet,
-  find,
-  findControlBlockSubscription,
-  identity,
-  removeControlBlock,
-} from '@openenergytools/scl-lib';
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/action-list.js';
 
-import '../dataset/data-set-element-editor.js';
-import '../../foundation/components/action-filtered-list.js';
 import './sampled-value-control-element-editor.js';
-import type { ActionFilteredList } from '../../foundation/components/action-filtered-list.js';
 
 import { styles, updateElementReference } from '../../foundation.js';
-import { smvIcon } from '../../foundation/icons.js';
+import BaseElementEditor from '../base-element-editor.js';
+
+function smvControlPath(smvControl: Element): string {
+  const id = identity(smvControl);
+  if (Number.isNaN(id)) return 'UNDEFINED';
+
+  const paths = (id as string).split('>');
+  paths.pop();
+  return paths.join('>');
+}
 
 @customElement('sampled-value-control-editor')
-export class SampledValueControlEditor extends LitElement {
-  /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
-  @property({ attribute: false })
-  doc!: XMLDocument;
-
-  /** SCL change indicator */
-  @property({ type: Number })
-  editCount = -1;
-
-  @state()
-  selectedSampledValueControl?: Element;
-
-  @state()
-  selectedDataSet?: Element | null;
-
-  @query('.selectionlist') selectionList!: ActionFilteredList;
+export class SampledValueControlEditor extends BaseElementEditor {
+  @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectSampledValueControlButton!: Button;
-
-  @query('mwc-dialog') selectDataSetDialog!: Dialog;
-
-  @query('.new.dataset') newDataSet!: IconButton;
-
-  @query('.change.dataset') changeDataSet!: IconButton;
 
   /** Resets selected SMV and its DataSet, if not existing in new doc */
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
-    if (props.has('doc') && this.selectedSampledValueControl) {
+    if (props.has('doc') && this.selectCtrlBlock) {
       const newSampledValueControl = updateElementReference(
         this.doc,
-        this.selectedSampledValueControl
+        this.selectCtrlBlock
       );
 
-      this.selectedSampledValueControl = newSampledValueControl ?? undefined;
-      this.selectedDataSet = this.selectedSampledValueControl
+      this.selectCtrlBlock = newSampledValueControl ?? undefined;
+      this.selectedDataSet = this.selectCtrlBlock
         ? updateElementReference(this.doc, this.selectedDataSet!)
         : undefined;
 
-      if (
+      // TODO(JakobVogelsang): add activeable to ActionList
+      /* if (
         !newSampledValueControl &&
         this.selectionList &&
         this.selectionList.selected
       )
-        (this.selectionList.selected as ListItem).selected = false;
+        (this.selectionList.selected as ListItem).selected = false; */
     }
-  }
-
-  private addNewDataSet(control: Element): void {
-    const parent = control.parentElement;
-    if (!parent) return;
-
-    const insert = createDataSet(parent);
-    if (!insert) return;
-
-    const newName = (insert.node as Element).getAttribute('name');
-    if (!newName) return;
-
-    const update = { element: control, attributes: { datSet: newName } };
-
-    this.dispatchEvent(newEditEvent([insert, update]));
-
-    this.selectedDataSet =
-      this.selectedSampledValueControl?.parentElement?.querySelector(
-        `DataSet[name="${this.selectedSampledValueControl.getAttribute(
-          'datSet'
-        )}"]`
-      );
-  }
-
-  private selectDataSet(): void {
-    const dataSetElement = (
-      this.selectDataSetDialog.querySelector(
-        'action-filtered-list'
-      ) as ActionFilteredList
-    ).selected;
-    if (!dataSetElement) return;
-
-    const dataSetName = (dataSetElement as ListItemBase).value;
-    const dataSet =
-      this.selectedSampledValueControl?.parentElement?.querySelector(
-        `DataSet[name="${dataSetName}"]`
-      );
-    if (!dataSet) return;
-
-    this.dispatchEvent(
-      newEditEvent({
-        element: this.selectedSampledValueControl!,
-        attributes: { datSet: dataSetName },
-      })
-    );
-    this.selectedDataSet = dataSet;
-
-    this.selectDataSetDialog.close();
-  }
-
-  private selectSMVControl(evt: Event): void {
-    const id = ((evt.target as ActionFilteredList).selected as ListItem).value;
-    const smvControl = find(this.doc, 'SampledValueControl', id);
-    if (!smvControl) return;
-
-    this.selectedSampledValueControl = smvControl;
-
-    if (smvControl) {
-      this.selectedDataSet =
-        smvControl.parentElement?.querySelector(
-          `DataSet[name="${smvControl.getAttribute('datSet')}"]`
-        ) ?? null;
-      (evt.target as ActionFilteredList).classList.add('hidden');
-      this.selectSampledValueControlButton.classList.remove('hidden');
-    }
-  }
-
-  private renderSelectDataSetDialog(): TemplateResult {
-    return html`
-      <mwc-dialog heading="Select Data Set">
-        <action-filtered-list activatable @action=${() => this.selectDataSet()}
-          >${Array.from(
-            this.selectedSampledValueControl?.parentElement?.querySelectorAll(
-              'DataSet'
-            ) ?? []
-          ).map(
-            dataSet =>
-              html`<mwc-list-item
-                twoline
-                ?selected=${(this.selectedDataSet?.getAttribute('name') ??
-                  'UNDEFINED') ===
-                (dataSet.getAttribute('name') ?? 'UNDEFINED')}
-                value="${dataSet.getAttribute('name') ?? 'UNDEFINED'}"
-                ><span>${dataSet.getAttribute('name') ?? 'UNDEFINED'}</span>
-                <span slot="secondary">${identity(dataSet)}</span>
-              </mwc-list-item>`
-          )}
-        </action-filtered-list>
-      </mwc-dialog>
-    `;
   }
 
   private renderElementEditorContainer(): TemplateResult {
-    if (this.selectedSampledValueControl !== undefined)
+    if (this.selectCtrlBlock !== undefined)
       return html`<div class="elementeditorcontainer">
-        <div class="content dataSet">
-          ${this.renderSelectDataSetDialog()}
-          <data-set-element-editor
-            .element=${this.selectedDataSet!}
-            .showHeader=${false}
-            editCount="${this.editCount}"
-          >
-            <mwc-icon-button
-              class="change dataset"
-              slot="change"
-              icon="swap_vert"
-              ?disabled=${!!findControlBlockSubscription(
-                this.selectedSampledValueControl
-              ).length}
-              @click=${() => this.selectDataSetDialog.show()}
-            ></mwc-icon-button
-            ><mwc-icon-button
-              class="new dataset"
-              slot="new"
-              icon="playlist_add"
-              ?disabled=${!!this.selectedSampledValueControl.getAttribute(
-                'datSet'
-              )}
-              @click="${() => {
-                this.addNewDataSet(this.selectedSampledValueControl!);
-              }}"
-            ></mwc-icon-button>
-          </data-set-element-editor>
-        </div>
+        ${this.renderDataSetElementContainer()}
         <sampled-value-control-element-editor
           .doc=${this.doc}
-          .element=${this.selectedSampledValueControl}
+          .element=${this.selectCtrlBlock}
           editCount="${this.editCount}"
         ></sampled-value-control-element-editor>
       </div>`;
@@ -211,63 +72,56 @@ export class SampledValueControlEditor extends LitElement {
   }
 
   private renderSelectionList(): TemplateResult {
-    return html`<action-filtered-list
-      activatable
-      @action=${this.selectSMVControl}
-      class="selectionlist"
-      >${Array.from(this.doc.querySelectorAll('IED')).flatMap(ied => {
-        const ieditem = html`<mwc-list-item
-            class="listitem header"
-            noninteractive
-            graphic="icon"
-            value="${Array.from(ied.querySelectorAll('SampledValueControl'))
-              .map(element => {
-                const id = identity(element) as string;
-                return typeof id === 'string' ? id : '';
-              })
-              .join(' ')}"
-          >
-            <span>${ied.getAttribute('name')}</span>
-            <mwc-icon slot="graphic">developer_board</mwc-icon>
-          </mwc-list-item>
-          <li divider role="separator"></li>
-          <mwc-list-item
-            noninteractive
-            style="height:56px;"
-            slot="primaryAction"
-          >
-          </mwc-list-item>
-          <li slot="primaryAction" divider role="separator"></li>`;
-
-        const sampledValueControls = Array.from(
-          ied.querySelectorAll('SampledValueControl')
-        ).map(
-          smvControl =>
-            html`<mwc-list-item
-                twoline
-                value="${identity(smvControl)}"
-                graphic="icon"
-                ><span>${smvControl.getAttribute('name')}</span
-                ><span slot="secondary">${identity(smvControl)}</span>
-                <mwc-icon slot="graphic">${smvIcon}</mwc-icon>
-              </mwc-list-item>
-              <mwc-list-item
-                style="height:72px;"
-                slot="primaryAction"
-                @request-selected="${(evt: Event) => {
-                  evt.stopPropagation();
-                  this.dispatchEvent(
-                    newEditEvent(removeControlBlock({ node: smvControl }))
-                  );
-                }}"
-              >
-                <mwc-icon>delete</mwc-icon>
-              </mwc-list-item>`
+    const items = Array.from(this.doc.querySelectorAll(':root > IED')).flatMap(
+      ied => {
+        const smvControls = Array.from(
+          ied.querySelectorAll(
+            ':scope > AccessPoint > Server > LDevice > LN0 > SampledValueControl'
+          )
         );
 
-        return [ieditem, ...sampledValueControls];
-      })}</action-filtered-list
-    >`;
+        const item: ActionItem = {
+          headline: `${ied.getAttribute('name')}`,
+          startingIcon: 'developer_board',
+          divider: true,
+          filtergroup: smvControls.map(smvControl => `${identity(smvControl)}`),
+        };
+
+        const sampledValues: ActionItem[] = smvControls.map(smvControl => ({
+          headline: `${smvControl.getAttribute('name')}`,
+          supportingText: `${smvControlPath(smvControl)}`,
+          primaryAction: () => {
+            this.selectCtrlBlock = smvControl;
+            this.selectedDataSet =
+              smvControl.parentElement?.querySelector(
+                `DataSet[name="${smvControl.getAttribute('datSet')}"]`
+              ) ?? null;
+
+            this.selectionList.classList.add('hidden');
+            this.selectSampledValueControlButton.classList.remove('hidden');
+          },
+          actions: [
+            {
+              icon: 'delete',
+              callback: () => {
+                this.dispatchEvent(
+                  newEditEvent(removeControlBlock({ node: smvControl }))
+                );
+              },
+            },
+          ],
+        }));
+
+        return [item, ...sampledValues];
+      }
+    );
+
+    return html`<action-list
+      class="selectionlist"
+      filterable
+      searchhelper="Filter SampledValueControl's"
+      .items=${items}
+    ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {
