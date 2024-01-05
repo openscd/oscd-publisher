@@ -93,6 +93,19 @@ export default class PublisherPlugin extends LitElement {
   }
 
   static styles = css`
+    * {
+      --md-sys-color-primary: var(--oscd-primary);
+      --md-sys-color-secondary: var(--oscd-secondary);
+      --md-sys-typescale-body-large-font: var(--oscd-theme-text-font);
+      --md-outlined-text-field-input-text-color: var(--oscd-base01);
+
+      --md-sys-color-surface: var(--oscd-base3);
+      --md-sys-color-on-surface: var(--oscd-base00);
+      --md-sys-color-on-primary: var(--oscd-base2);
+      --md-sys-color-on-surface-variant: var(--oscd-base00);
+      --md-menu-container-color: var(--oscd-base3);
+    }
+
     .hidden {
       display: none;
     }
