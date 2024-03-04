@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import {
@@ -14,12 +15,14 @@ import type { Button } from '@material/mwc-button';
 import { newEditEvent } from '@openscd/open-scd-core';
 import { identity, updateReportControl } from '@openenergytools/scl-lib';
 
-import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/scl-select.js';
-import '../../foundation/components/scl-textfield.js';
-import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { SclSelect } from '../../foundation/components/scl-select.js';
-import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
+import '@openenergytools/scl-checkbox';
+import '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import '@openenergytools/scl-text-field';
+import type { SclCheckbox } from '@openenergytools/scl-checkbox';
+import type { SclSelect } from '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import { maxLength, patterns } from '../../foundation/pattern.js';
 import { updateMaxClients } from './foundation.js';
@@ -45,7 +48,7 @@ const trgOpsHelpers: Record<string, string> = {
 
 function checkRptEnabledValidity(
   rptEnabled: Element | null,
-  input: SclTextfield
+  input: SclTextField
 ): boolean {
   if (!input.checkValidity()) return false;
 
@@ -54,7 +57,7 @@ function checkRptEnabledValidity(
   const clientLNs = Array.from(
     rptEnabled.querySelectorAll(':scope > ClientLN')
   );
-  const maxRpt = input.maybeValue ?? '0';
+  const maxRpt = input.value ?? '0';
 
   if (clientLNs.length <= parseInt(maxRpt, 10)) return true;
 
@@ -96,21 +99,26 @@ export class ReportControlElementEditor extends LitElement {
   @query('.save.trgops') trgOpsSave!: Button;
 
   @queryAll('.report.attributes')
-  reportControlInputs!: (SclTextfield | SclSelect | SclCheckbox)[];
+  reportControlInputs!: (SclTextField | SclSelect | SclCheckbox)[];
 
   @query('.content.reportcontrol > .save') reportControlSave!: Button;
 
-  @query('.rptenabled.attributes') rptEnabledInput!: SclTextfield;
+  @query('.rptenabled.attributes') rptEnabledInput!: SclTextField;
+
+  private resetInputs(): void {
+    for (const input of this.reportControlInputs)
+      if (input instanceof SclTextField) input.reset();
+  }
 
   private onOptFieldsInputChange(): void {
     const optFields = this.element.querySelector(':scope > OptFields');
 
     const optFieldsAttrs: Record<string, string | null> = {};
     for (const input of this.optFieldsInputs)
-      optFieldsAttrs[input.label] = input.maybeValue;
+      optFieldsAttrs[input.label] = input.value;
 
     this.optFieldsDiff = Array.from(this.optFieldsInputs).some(
-      input => optFields?.getAttribute(input.label) !== input.maybeValue
+      input => optFields?.getAttribute(input.label) !== input.value
     );
   }
 
@@ -121,8 +129,8 @@ export class ReportControlElementEditor extends LitElement {
 
     const optFieldAttrs: Record<string, string | null> = {};
     for (const input of this.optFieldsInputs ?? [])
-      if (optFields.getAttribute(input.label) !== input.maybeValue)
-        optFieldAttrs[input.label] = input.maybeValue;
+      if (optFields.getAttribute(input.label) !== input.value)
+        optFieldAttrs[input.label] = input.value;
 
     const updateEdit = { element: optFields, attributes: optFieldAttrs };
     this.dispatchEvent(newEditEvent(updateEdit));
@@ -130,15 +138,16 @@ export class ReportControlElementEditor extends LitElement {
     this.onOptFieldsInputChange();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onTrgOpsInputChange(): void {
     const trgOps = this.element.querySelector(':scope > TrgOps');
 
     const trgOpsAttrs: Record<string, string | null> = {};
     for (const input of this.trgOpsInputs)
-      trgOpsAttrs[input.label] = input.maybeValue;
+      trgOpsAttrs[input.label] = input.value;
 
     this.trgOpsDiff = Array.from(this.trgOpsInputs).some(
-      input => trgOps?.getAttribute(input.label) !== input.maybeValue
+      input => trgOps?.getAttribute(input.label) !== input.value
     );
   }
 
@@ -149,8 +158,8 @@ export class ReportControlElementEditor extends LitElement {
 
     const trgOpsAttrs: Record<string, string | null> = {};
     for (const input of this.trgOpsInputs ?? [])
-      if (trgOps.getAttribute(input.label) !== input.maybeValue)
-        trgOpsAttrs[input.label] = input.maybeValue;
+      if (trgOps.getAttribute(input.label) !== input.value)
+        trgOpsAttrs[input.label] = input.value;
 
     const updateEdit = { element: trgOps, attributes: trgOpsAttrs };
     this.dispatchEvent(newEditEvent(updateEdit));
@@ -175,14 +184,13 @@ export class ReportControlElementEditor extends LitElement {
 
     const reportControlAttrs: Record<string, string | null> = {};
     for (const input of this.reportControlInputs)
-      reportControlAttrs[input.label] = input.maybeValue;
+      reportControlAttrs[input.label] = input.value;
 
     const someAttrDiff = Array.from(this.reportControlInputs).some(
-      input => reportControl?.getAttribute(input.label) !== input.maybeValue
+      input => reportControl?.getAttribute(input.label) !== input.value
     );
     const rptEnabledDiff =
-      (rptEnabled?.getAttribute('max') ?? null) !==
-      this.rptEnabledInput.maybeValue;
+      (rptEnabled?.getAttribute('max') ?? null) !== this.rptEnabledInput.value;
     this.reportControlDiff = someAttrDiff || rptEnabledDiff;
   }
 
@@ -191,15 +199,15 @@ export class ReportControlElementEditor extends LitElement {
 
     const reportControlAttrs: Record<string, string | null> = {};
     for (const input of this.reportControlInputs ?? [])
-      if (reportControl.getAttribute(input.label) !== input.maybeValue)
-        reportControlAttrs[input.label] = input.maybeValue;
+      if (reportControl.getAttribute(input.label) !== input.value)
+        reportControlAttrs[input.label] = input.value;
 
     const reportControlActions = updateReportControl({
       element: reportControl,
       attributes: reportControlAttrs,
     });
 
-    const max = this.rptEnabledInput.maybeValue;
+    const max = this.rptEnabledInput.value;
     const rptEnabledAction = updateMaxClients(reportControl, max);
 
     if (!rptEnabledAction)
@@ -208,6 +216,8 @@ export class ReportControlElementEditor extends LitElement {
       this.dispatchEvent(
         newEditEvent([...reportControlActions, rptEnabledAction])
       );
+
+    this.resetInputs();
 
     this.onReportControlInputChange();
   }
@@ -251,9 +261,9 @@ export class ReportControlElementEditor extends LitElement {
           ([key, value]) =>
             html`<scl-checkbox
               label="${key}"
-              .maybeValue=${value}
+              .value=${value}
               nullable
-              helper="${optFieldsHelpers[key]}"
+              supportingText="${optFieldsHelpers[key]}"
               @input=${this.onOptFieldsInputChange}
             ></scl-checkbox>`
         )}
@@ -284,10 +294,13 @@ export class ReportControlElementEditor extends LitElement {
           ([key, value]) =>
             html`<scl-checkbox
               label="${key}"
-              .maybeValue=${value}
+              .value=${value}
               nullable
-              helper="${trgOpsHelpers[key]}"
-              @input=${this.onTrgOpsInputChange}
+              supportingText="${trgOpsHelpers[key]}"
+              @input=${async (evt: Event) => {
+                await (evt.target as SclCheckbox).updateComplete;
+                this.onTrgOpsInputChange();
+              }}
             ></scl-checkbox>`
         )}
       </div>
@@ -320,83 +333,83 @@ export class ReportControlElementEditor extends LitElement {
       this.element.querySelector('RptEnabled')?.getAttribute('max') ?? null;
 
     return html`<div class="content reportcontrol">
-      <scl-textfield
+      <scl-text-field
         class="report attributes"
         label="name"
-        .maybeValue=${name}
-        helper="ReportControl Name"
+        .value=${name}
+        supportingText="ReportControl Name"
         required
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
         @input=${this.onReportControlInputChange}
-      ></scl-textfield
-      ><scl-textfield
+      ></scl-text-field
+      ><scl-text-field
         class="report attributes"
         label="desc"
-        .maybeValue=${desc}
+        .value=${desc}
         nullable
-        helper="ReportControl Description"
+        supportingText="ReportControl Description"
         @input=${this.onReportControlInputChange}
-      ></scl-textfield
+      ></scl-text-field
       ><scl-checkbox
         class="report attributes"
         label="buffered"
-        .maybeValue=${buffered}
+        .value=${buffered}
         helper="Whether ReportControl is Buffered"
         @input=${this.onReportControlInputChange}
       ></scl-checkbox
-      ><scl-textfield
+      ><scl-text-field
         class="report attributes"
         label="rptID"
-        .maybeValue=${rptID}
+        .value=${rptID}
         nullable
-        helper="ReportControl ID"
+        supportingText="ReportControl ID"
         @input=${this.onReportControlInputChange}
-      ></scl-textfield
+      ></scl-text-field
       ><scl-checkbox
         class="report attributes"
         label="indexed"
-        .maybeValue=${indexed}
+        .value=${indexed}
         nullable
         helper="Allow multiple Instances of this ReportControl"
         @input=${this.onReportControlInputChange}
       ></scl-checkbox
-      ><scl-textfield
+      ><scl-text-field
         class="rptenabled attributes"
         label="max Clients"
-        .maybeValue=${max}
-        helper="Number of ReportControl Instances"
+        .value=${max}
+        supportingText="Number of ReportControl Instances"
         nullable
         type="number"
         min="0"
         suffix="#"
         @input=${this.onReportControlInputChange}
-      ></scl-textfield
-      ><scl-textfield
+      ></scl-text-field
+      ><scl-text-field
         class="report attributes"
         label="bufTime"
-        .maybeValue=${bufTime}
-        helper="Minimum time between two ReportControl"
+        .value=${bufTime}
+        supportingText="Minimum time between two ReportControl"
         nullable
         required
         type="number"
         min="0"
         suffix="ms"
         @input=${this.onReportControlInputChange}
-      ></scl-textfield
-      ><scl-textfield
+      ></scl-text-field
+      ><scl-text-field
         class="report attributes"
         label="intgPd"
-        .maybeValue=${intgPd}
-        helper="Integrity Period"
+        .value=${intgPd}
+        supportingText="Integrity Period"
         nullable
         required
         type="number"
         min="0"
         suffix="ms"
         @input=${this.onReportControlInputChange}
-      ></scl-textfield>
+      ></scl-text-field>
       <mwc-button
         class="save"
         label="save"

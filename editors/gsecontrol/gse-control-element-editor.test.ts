@@ -5,11 +5,12 @@ import { setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
+
 import { gseControlDoc } from './gseControl.testfiles.js';
 
 import './gse-control-element-editor.js';
 import type { GseControlElementEditor } from './gse-control-element-editor.js';
-import { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

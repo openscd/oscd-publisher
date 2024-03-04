@@ -104,6 +104,8 @@ export default class PublisherPlugin extends LitElement {
       --md-sys-color-on-primary: var(--oscd-base2);
       --md-sys-color-on-surface-variant: var(--oscd-base00);
       --md-menu-container-color: var(--oscd-base3);
+      font-family: var(--oscd-theme-text-font);
+      --md-sys-color-surface-container-highest: var(--oscd-base2);
     }
 
     .hidden {

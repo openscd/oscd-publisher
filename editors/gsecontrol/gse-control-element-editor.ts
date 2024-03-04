@@ -22,12 +22,14 @@ import {
   updateGSEControl,
 } from '@openenergytools/scl-lib';
 
-import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/scl-select.js';
-import '../../foundation/components/scl-textfield.js';
-import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { SclSelect } from '../../foundation/components/scl-select.js';
-import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
+import '@openenergytools/scl-checkbox';
+import '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import '@openenergytools/scl-text-field';
+import type { SclCheckbox } from '@openenergytools/scl-checkbox';
+import type { SclSelect } from '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import {
   maxLength,
@@ -46,10 +48,17 @@ function pElementContent(gse: Element, type: string): string | null {
 }
 
 const gseHelpers: Record<string, string> = {
-  'MAC-Address': 'MAC address (01-0C-CD-04-xx-xx)',
-  APPID: 'APP ID (4xxx in hex)',
-  'VLAN-ID': 'VLAN ID (XXX in hex)',
+  'MAC-Address': 'MAC address (01-0C-CD-01-xx-xx)',
+  APPID: 'APP ID (4 hex values)',
+  'VLAN-ID': 'VLAN ID (3 hex value)',
   'VLAN-PRIORITY': 'VLAN Priority (0-7)',
+};
+
+const gsePlaceholders: Record<string, string> = {
+  'MAC-Address': '01-0C-CD-01-xx-xx',
+  APPID: '0000',
+  'VLAN-ID': '000',
+  'VLAN-PRIORITY': '4',
 };
 
 @customElement('gse-control-element-editor')
@@ -80,10 +89,29 @@ export class GseControlElementEditor extends LitElement {
 
   @state() private gSEControlDiff = false;
 
+  @queryAll('.content.gse > scl-text-field') gSEInputs?: SclTextField[];
+
+  @query('.content.gse > .save') gseSave!: Button;
+
+  @queryAll('.input.gsecontrol') gSEControlInputs!: (
+    | SclTextField
+    | SclSelect
+    | SclCheckbox
+  )[];
+
+  @query('.content.gsecontrol > .save') gseControlSave!: Button;
+
+  @query('#instType') instType?: Checkbox;
+
+  private resetInputs(): void {
+    for (const input of this.gSEControlInputs)
+      if (input instanceof SclTextField) input.reset();
+  }
+
   private onGSEControlInputChange(): void {
     if (
       Array.from(this.gSEControlInputs ?? []).some(
-        input => !input.checkValidity()
+        input => !input.reportValidity()
       )
     ) {
       this.gSEControlDiff = false;
@@ -92,10 +120,10 @@ export class GseControlElementEditor extends LitElement {
 
     const gSEControlAttrs: Record<string, string | null> = {};
     for (const input of this.gSEControlInputs ?? [])
-      gSEControlAttrs[input.label] = input.maybeValue;
+      gSEControlAttrs[input.label] = input.value;
 
     this.gSEControlDiff = Array.from(this.gSEControlInputs ?? []).some(
-      input => this.element?.getAttribute(input.label) !== input.maybeValue
+      input => this.element?.getAttribute(input.label) !== input.value
     );
   }
 
@@ -104,8 +132,8 @@ export class GseControlElementEditor extends LitElement {
 
     const gSEControlAttrs: Record<string, string | null> = {};
     for (const input of this.gSEControlInputs ?? [])
-      if (this.element?.getAttribute(input.label) !== input.maybeValue)
-        gSEControlAttrs[input.label] = input.maybeValue;
+      if (this.element?.getAttribute(input.label) !== input.value)
+        gSEControlAttrs[input.label] = input.value;
 
     this.dispatchEvent(
       newEditEvent(
@@ -116,12 +144,14 @@ export class GseControlElementEditor extends LitElement {
       )
     );
 
+    this.resetInputs();
+
     this.onGSEControlInputChange();
   }
 
   private onGSEInputChange(): void {
     if (
-      Array.from(this.gSEInputs ?? []).some(input => !input.checkValidity())
+      Array.from(this.gSEInputs ?? []).some(input => !input.reportValidity())
     ) {
       this.gSEdiff = false;
       return;
@@ -129,7 +159,7 @@ export class GseControlElementEditor extends LitElement {
 
     const gSEAttrs: Record<string, string | null> = {};
     for (const input of this.gSEInputs ?? [])
-      gSEAttrs[input.label] = input.maybeValue;
+      gSEAttrs[input.label] = input.value;
 
     this.gSEdiff = checkGSEDiff(this.gSE!, gSEAttrs, this.instType?.checked);
   }
@@ -139,18 +169,18 @@ export class GseControlElementEditor extends LitElement {
 
     const options: ChangeGSEContentOptions = { address: {}, timing: {} };
     for (const input of this.gSEInputs ?? []) {
-      if (input.label === 'MAC-Address' && input.maybeValue)
-        options.address!.mac = input.maybeValue;
-      if (input.label === 'APPID' && input.maybeValue)
-        options.address!.appId = input.maybeValue;
-      if (input.label === 'VLAN-ID' && input.maybeValue)
-        options.address!.vlanId = input.maybeValue;
-      if (input.label === 'VLAN-PRIORITY' && input.maybeValue)
-        options.address!.vlanPriority = input.maybeValue;
-      if (input.label === 'MinTime' && input.maybeValue)
-        options.timing!.MinTime = input.maybeValue;
-      if (input.label === 'MaxTime' && input.maybeValue)
-        options.timing!.MaxTime = input.maybeValue;
+      if (input.label === 'MAC-Address' && input.value)
+        options.address!.mac = input.value;
+      if (input.label === 'APPID' && input.value)
+        options.address!.appId = input.value;
+      if (input.label === 'VLAN-ID' && input.value)
+        options.address!.vlanId = input.value;
+      if (input.label === 'VLAN-PRIORITY' && input.value)
+        options.address!.vlanPriority = input.value;
+      if (input.label === 'MinTime' && input.value)
+        options.timing!.MinTime = input.value;
+      if (input.label === 'MaxTime' && input.value)
+        options.timing!.MaxTime = input.value;
     }
 
     if (this.instType?.checked === true) options.address!.instType = true;
@@ -161,20 +191,6 @@ export class GseControlElementEditor extends LitElement {
 
     this.onGSEInputChange();
   }
-
-  @queryAll('.content.gse > scl-textfield') gSEInputs?: SclTextfield[];
-
-  @query('.content.gse > .save') gseSave!: Button;
-
-  @queryAll('.input.gsecontrol') gSEControlInputs?: (
-    | SclTextfield
-    | SclSelect
-    | SclCheckbox
-  )[];
-
-  @query('.content.gsecontrol > .save') gseControlSave!: Button;
-
-  @query('#instType') instType?: Checkbox;
 
   private renderGseContent(): TemplateResult {
     const { gSE } = this;
@@ -208,33 +224,34 @@ export class GseControlElementEditor extends LitElement {
         ></mwc-checkbox></mwc-formfield
       >${Object.entries(attributes).map(
         ([key, value]) =>
-          html`<scl-textfield
+          html`<scl-text-field
             label="${key}"
             ?nullable=${typeNullable[key]}
-            .maybeValue=${value}
+            .value=${value}
             pattern="${typePattern[key]!}"
             required
-            helper="${gseHelpers[key]}"
+            supportingText="${gseHelpers[key]}"
+            placeholder="${gsePlaceholders[key]}"
             @input=${this.onGSEInputChange}
-          ></scl-textfield>`
-      )}<scl-textfield
+          ></scl-text-field>`
+      )}<scl-text-field
         label="MinTime"
-        .maybeValue=${minTime}
+        .value=${minTime}
         nullable
-        helper="Min repetition interval"
-        suffix="ms"
+        supportingText="Min repetition interval"
+        suffixText="ms"
         type="number"
         @input=${this.onGSEInputChange}
-      ></scl-textfield
-      ><scl-textfield
+      ></scl-text-field
+      ><scl-text-field
         label="MaxTime"
-        .maybeValue=${maxTime}
+        .value=${maxTime}
         nullable
-        helper="Max repetition interval"
-        suffix="ms"
+        supportingText="Max repetition interval"
+        suffixText="ms"
         type="number"
         @input=${this.onGSEInputChange}
-      ></scl-textfield>
+      ></scl-text-field>
       <mwc-button
         class="save"
         label="save"
@@ -255,83 +272,72 @@ export class GseControlElementEditor extends LitElement {
       'securityEnabled',
     ].map(attr => this.element!.getAttribute(attr));
 
+    /*
     const reservedGseControlNames = Array.from(
       this.element!.parentElement?.querySelectorAll('GSEControl') ?? []
     )
       .map(gseControl => gseControl.getAttribute('name')!)
       .filter(
         gseControlName => gseControlName !== this.element!.getAttribute('name')
-      );
+      ); */
 
     return html`<div class="content gsecontrol">
-      <scl-textfield
+      <scl-text-field
         class="input gsecontrol"
         label="name"
-        .maybeValue=${name}
-        helper="GSEControl Name"
+        .value=${name}
+        supportingText="GSEControl Name"
         required
-        validationMessage="textfield.required"
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
-        .reservedValues=${reservedGseControlNames}
+        mimLength="0"
         dialogInitialFocus
         @input=${this.onGSEControlInputChange}
-      ></scl-textfield>
-      <scl-textfield
+      ></scl-text-field>
+      <scl-text-field
         class="input gsecontrol"
         label="desc"
-        .maybeValue=${desc}
+        .value=${desc}
         nullable
-        helper="GSEControl Description"
+        supportingText="GSEControl Description"
         @input=${this.onGSEControlInputChange}
-      ></scl-textfield>
+      ></scl-text-field>
       <scl-select
         class="input gsecontrol"
         label="type"
-        .maybeValue=${type}
-        helper="GOOSE or GSSE"
+        .value=${type}
+        supportingText="GOOSE or GSSE"
         nullable
         required
-        @selected=${this.onGSEControlInputChange}
-        >${['GOOSE', 'GSSE'].map(
-          gseControlType =>
-            html`<mwc-list-item value="${gseControlType}"
-              >${gseControlType}</mwc-list-item
-            >`
-        )}</scl-select
-      >
-      <scl-textfield
+        .selectOptions=${['GOOSE', 'GSSE']}
+        @input=${this.onGSEControlInputChange}
+      ></scl-select>
+      <scl-text-field
         class="input gsecontrol"
         label="appID"
-        .maybeValue=${appID}
-        helper="GSEControl ID"
+        .value=${appID}
+        supportingText="GSEControl ID"
         required
-        validationMessage="textfield.nonempty"
         @input=${this.onGSEControlInputChange}
-      ></scl-textfield>
+      ></scl-text-field>
       <scl-checkbox
         class="input gsecontrol"
         label="fixedOffs"
-        .maybeValue=${fixedOffs}
+        .value=${fixedOffs}
         nullable
-        helper="Whether ASN.1 coding is done with fixed offsets"
+        supportingText="Whether ASN.1 coding is done with fixed offsets"
         @input=${this.onGSEControlInputChange}
       ></scl-checkbox>
       <scl-select
         class="input gsecontrol"
         label="securityEnabled"
-        .maybeValue=${securityEnabled}
+        .value=${securityEnabled}
         nullable
         required
         helper="GSEControl Security Settings"
-        @selected=${this.onGSEControlInputChange}
-        >${['None', 'Signature', 'SignatureAndEncryption'].map(
-          securityType =>
-            html`<mwc-list-item value="${securityType}"
-              >${securityType}</mwc-list-item
-            >`
-        )}</scl-select
-      >
+        @input=${this.onGSEControlInputChange}
+        .selectOptions=${['None', 'Signature', 'SignatureAndEncryption']}
+      ></scl-select>
       <mwc-button
         class="save"
         label="save"

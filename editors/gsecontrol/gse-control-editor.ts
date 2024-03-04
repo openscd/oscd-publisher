@@ -17,7 +17,7 @@ import './gse-control-element-editor.js';
 import {
   pathIdentity,
   styles,
-  updateElementReference,
+  //   updateElementReference,
 } from '../../foundation.js';
 import BaseElementEditor from '../base-element-editor.js';
 
@@ -27,7 +27,7 @@ export class GseControlEditor extends BaseElementEditor {
 
   @query('mwc-button') selectGSEControlButton!: Button;
 
-  /** Resets selected GOOSE and its DataSet, if not existing in new doc */
+  /** Resets selected GOOSE and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
@@ -44,9 +44,9 @@ export class GseControlEditor extends BaseElementEditor {
 
       /* TODO(Jakob Vogelsang): comment when action-list is activeable
       if (!newGseControl && this.selectionList && this.selectionList.selected)
-        (this.selectionList.selected as ListItem).selected = false; */
+        (this.selectionList.selected as ListItem).selected = false; 
     }
-  }
+  } */
 
   protected renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)

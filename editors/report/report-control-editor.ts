@@ -21,7 +21,7 @@ import './report-control-element-editor.js';
 import {
   pathIdentity,
   styles,
-  updateElementReference,
+  //  updateElementReference,
 } from '../../foundation.js';
 import BaseElementEditor from '../base-element-editor.js';
 
@@ -31,7 +31,7 @@ export class ReportControlEditor extends BaseElementEditor {
 
   @query('mwc-button') selectReportControlButton!: Button;
 
-  /** Resets selected Report and its DataSet, if not existing in new doc */
+  /** Resets selected Report and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
@@ -52,9 +52,9 @@ export class ReportControlEditor extends BaseElementEditor {
         this.selectionList &&
         this.selectionList.selected
       )
-        (this.selectionList.selected as ListItem).selected = false; */
+        (this.selectionList.selected as ListItem).selected = false; 
     }
-  }
+  } */
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)

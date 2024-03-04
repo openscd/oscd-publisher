@@ -25,13 +25,14 @@ import {
   updateDataSet,
 } from '@openenergytools/scl-lib';
 import '@openenergytools/filterable-lists/dist/action-list.js';
+// eslint-disable-next-line import/no-duplicates
+import '@openenergytools/scl-text-field';
 import type {
   ActionItem,
   ActionList,
 } from '@openenergytools/filterable-lists/dist/action-list.js';
-
-import '../../foundation/components/scl-textfield.js';
-import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
+// eslint-disable-next-line import/no-duplicates
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -116,7 +117,7 @@ export class DataSetElementEditor extends LitElement {
   @state()
   private someDiffOnInputs = false;
 
-  @queryAll('scl-textfield') inputs!: SclTextfield[];
+  @queryAll('scl-text-field') inputs!: SclTextField[];
 
   @query('mwc-button.save') saveButton!: Button;
 
@@ -134,9 +135,14 @@ export class DataSetElementEditor extends LitElement {
 
   @query('#dopicker > oscd-tree-grid') doPicker!: TreeGrid;
 
+  private resetInputs(): void {
+    for (const input of this.inputs)
+      if (input instanceof SclTextField) input.reset();
+  }
+
   private onInputChange(): void {
     this.someDiffOnInputs = Array.from(this.inputs ?? []).some(
-      input => this.element?.getAttribute(input.label) !== input.maybeValue
+      input => this.element?.getAttribute(input.label) !== input.value
     );
   }
 
@@ -145,12 +151,14 @@ export class DataSetElementEditor extends LitElement {
 
     const attributes: Record<string, string | null> = {};
     for (const input of this.inputs ?? [])
-      if (this.element.getAttribute(input.label) !== input.maybeValue)
-        attributes[input.label] = input.maybeValue;
+      if (this.element.getAttribute(input.label) !== input.value)
+        attributes[input.label] = input.value;
 
     this.dispatchEvent(
       newEditEvent(updateDataSet({ element: this.element, attributes }))
     );
+
+    this.resetInputs();
 
     this.onInputChange();
   }
@@ -331,25 +339,25 @@ export class DataSetElementEditor extends LitElement {
   }
 
   private renderDataSetAttributes(): TemplateResult {
-    return html`<scl-textfield
+    return html`<scl-text-field
         id="${identity(this.element)}"
         tag="${this.element?.tagName ?? ''}"
         label="name"
-        .maybeValue=${this.name}
-        helper="DataSet name"
+        .value=${this.name}
+        supportingText="DataSet name"
         required
         @input=${() => this.onInputChange()}
       >
-      </scl-textfield>
-      <scl-textfield
+      </scl-text-field>
+      <scl-text-field
         id="${identity(this.element)}"
         label="desc"
-        .maybeValue=${this.desc}
-        helper="DateSet Description"
+        .value=${this.desc}
+        supportingText="DateSet Description"
         nullable
         @input=${() => this.onInputChange()}
       >
-      </scl-textfield>
+      </scl-text-field>
       <mwc-button
         class="save"
         label="save"

@@ -22,7 +22,7 @@ import './data-set-element-editor.js';
 import {
   pathIdentity,
   styles,
-  updateElementReference,
+  //  updateElementReference,
 } from '../../foundation.js';
 
 @customElement('data-set-editor')
@@ -42,7 +42,7 @@ export class DataSetEditor extends LitElement {
 
   @query('mwc-button') selectDataSetButton!: Button;
 
-  /** Resets selected DataSet, if not existing in new doc */
+  /** Resets selected DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
     if (props.has('doc') && this.selectedDataSet) {
       const newDataSet = updateElementReference(this.doc, this.selectedDataSet);
@@ -51,11 +51,11 @@ export class DataSetEditor extends LitElement {
 
       /* TODO(Jakob Vogelsang): fix when action-list is activable
       if (!newDataSet && this.selectionList && this.selectionList.selected)
-        (this.selectionList.selected as ListItem).selected = false; */
+        (this.selectionList.selected as ListItem).selected = false; 
     }
 
     super.update(props);
-  }
+  } */
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectedDataSet)

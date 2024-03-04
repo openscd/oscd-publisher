@@ -4,6 +4,9 @@ import { expect, fixture, html } from '@open-wc/testing';
 
 import { SinonSpy, spy } from 'sinon';
 
+import { SclSelect } from '@openenergytools/scl-select';
+import { SclTextField } from '@openenergytools/scl-text-field';
+
 import { isUpdate } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
 import { smvControlDoc } from './smvControl.testfiles.js';
@@ -31,14 +34,16 @@ describe('SampledValueControl element editor component', () => {
   });
 
   it('allows to change the SampledValueControl elements attributes', async () => {
-    editor.sampledValueControlInputs![0].maybeValue = 'SomeNewName';
+    (editor.sampledValueControlInputs![0] as SclTextField).value =
+      'SomeNewName';
     editor.sampledValueControlInputs![1].nullSwitch?.click();
-    editor.sampledValueControlInputs![2].maybeValue = 'someOtherSmvID';
-    editor.sampledValueControlInputs![3].maybeValue = 'SmpPerSec';
-    editor.sampledValueControlInputs![4].maybeValue = '4000';
-    editor.sampledValueControlInputs![5].maybeValue = '2';
+    (editor.sampledValueControlInputs![2] as SclTextField).value =
+      'someOtherSmvID';
+    (editor.sampledValueControlInputs![3] as SclTextField).value = 'SmpPerSec';
+    (editor.sampledValueControlInputs![4] as SclTextField).value = '4000';
+    (editor.sampledValueControlInputs![5] as SclTextField).value = '2';
     editor.sampledValueControlInputs![6].nullSwitch?.click();
-    editor.sampledValueControlInputs![6].maybeValue = 'None';
+    (editor.sampledValueControlInputs![6] as SclSelect).value = 'None';
 
     await editor.updateComplete;
     editor.smvControlSave.click();
@@ -61,8 +66,8 @@ describe('SampledValueControl element editor component', () => {
   });
 
   it('allows to change the SMV element child element', async () => {
-    editor.sMVInputs![0].maybeValue = '01-0C-CD-04-00-13';
-    editor.sMVInputs![1].maybeValue = '1234';
+    editor.sMVInputs![0].value = '01-0C-CD-04-00-13';
+    editor.sMVInputs![1].value = '1234';
     editor.sMVInputs![2].nullSwitch?.click();
     editor.sMVInputs![3].nullSwitch?.click();
 
@@ -75,12 +80,12 @@ describe('SampledValueControl element editor component', () => {
 
   it('allows to change the SmvOpts element child element', async () => {
     editor.smvOptsInputs![0].nullSwitch?.click();
-    editor.smvOptsInputs![1].maybeValue = 'false';
+    editor.smvOptsInputs![1].value = 'false';
     editor.smvOptsInputs![2].nullSwitch?.click();
     editor.smvOptsInputs![3].nullSwitch?.click();
-    editor.smvOptsInputs![4].maybeValue = 'false';
-    editor.smvOptsInputs![5].maybeValue = 'false';
-    editor.smvOptsInputs![6].maybeValue = 'false';
+    editor.smvOptsInputs![4].value = 'false';
+    editor.smvOptsInputs![5].value = 'false';
+    editor.smvOptsInputs![6].value = 'false';
 
     await editor.updateComplete;
     editor.smvOptsSave.click();

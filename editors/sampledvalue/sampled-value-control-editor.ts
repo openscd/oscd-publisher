@@ -14,8 +14,10 @@ import {
 
 import './sampled-value-control-element-editor.js';
 
-import { styles, updateElementReference } from '../../foundation.js';
+// import { styles, updateElementReference } from '../../foundation.js';
+import { styles } from '../../foundation.js';
 import BaseElementEditor from '../base-element-editor.js';
+import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
 function smvControlPath(smvControl: Element): string {
   const id = identity(smvControl);
@@ -32,7 +34,10 @@ export class SampledValueControlEditor extends BaseElementEditor {
 
   @query('mwc-button') selectSampledValueControlButton!: Button;
 
-  /** Resets selected SMV and its DataSet, if not existing in new doc */
+  @query('sampled-value-control-element-editor')
+  elementContainer?: SampledValueControlElementEditor;
+
+  /** Resets selected SMV and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
 
@@ -53,9 +58,9 @@ export class SampledValueControlEditor extends BaseElementEditor {
         this.selectionList &&
         this.selectionList.selected
       )
-        (this.selectionList.selected as ListItem).selected = false; */
+        (this.selectionList.selected as ListItem).selected = false; 
     }
-  }
+  } */
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)

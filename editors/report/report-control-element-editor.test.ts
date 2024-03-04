@@ -4,12 +4,12 @@ import { fixture, html } from '@open-wc/testing';
 import { setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { reportControlDoc } from './reportControl.testfiles.js';
 
 import './report-control-element-editor.js';
 import type { ReportControlElementEditor } from './report-control-element-editor.js';
-import { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

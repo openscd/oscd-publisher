@@ -22,6 +22,14 @@ export function referencedGSE(gseControl: Element): Element | null {
   );
 }
 
+function pElementContent(gse: Element, type: string): string | null {
+  return (
+    Array.from(gse.querySelectorAll(':scope > Address > P'))
+      .find(p => p.getAttribute('type') === type)
+      ?.textContent?.trim() ?? null
+  );
+}
+
 /** @returns Whether the `gSE`s element attributes or instType has changed */
 export function checkGSEDiff(
   gSE: Element,
@@ -29,13 +37,18 @@ export function checkGSEDiff(
   instType?: boolean
 ): boolean {
   return Object.entries(attrs).some(([key, value]) => {
-    const oldValue = gSE.querySelector(gSEselectors[key])?.textContent ?? null;
+    if (key === 'MinTime' || key === 'MaxTime') {
+      const oldValue =
+        gSE.querySelector(`:scope > ${key}`)?.textContent?.trim() ?? null;
+      return oldValue !== value;
+    }
+
+    const oldValue = pElementContent(gSE, key);
     if (instType === undefined) return oldValue !== value;
 
-    const oldInstType =
-      key === 'MinTime' || key === 'MaxTime'
-        ? undefined
-        : gSE.querySelector(gSEselectors[key])?.hasAttribute('xsi:type');
+    const oldInstType = gSE
+      .querySelector(gSEselectors[key])
+      ?.hasAttribute('xsi:type');
     if (oldInstType === undefined) return oldValue !== value;
 
     return oldValue !== value || instType !== oldInstType;

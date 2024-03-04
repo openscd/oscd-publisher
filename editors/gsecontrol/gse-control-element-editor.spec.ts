@@ -29,14 +29,14 @@ describe('GSEControl element editor component', () => {
   });
 
   it('allows to change the GSEControl elements attributes', async () => {
-    editor.gSEControlInputs![0].maybeValue = 'SomeNewName';
+    editor.gSEControlInputs![0].value = 'SomeNewName';
     editor.gSEControlInputs![1].nullSwitch?.click();
-    editor.gSEControlInputs![1].maybeValue = 'SomeNewDesc';
-    editor.gSEControlInputs![2].maybeValue = 'GSSE';
-    editor.gSEControlInputs![3].maybeValue = 'someNewAppID';
+    editor.gSEControlInputs![1].value = 'SomeNewDesc';
+    editor.gSEControlInputs![2].value = 'GSSE';
+    editor.gSEControlInputs![3].value = 'someNewAppID';
     editor.gSEControlInputs![4].nullSwitch?.click();
     editor.gSEControlInputs![5].nullSwitch?.click();
-    editor.gSEControlInputs![5].maybeValue = 'None';
+    editor.gSEControlInputs![5].value = 'None';
 
     await editor.updateComplete;
     editor.gseControlSave.click();
@@ -58,12 +58,12 @@ describe('GSEControl element editor component', () => {
   });
 
   it('allows to change the GSE element child element', async () => {
-    editor.gSEInputs![0].maybeValue = '01-0C-CD-01-00-13';
-    editor.gSEInputs![1].maybeValue = '1234';
+    editor.gSEInputs![0].value = '01-0C-CD-01-00-13';
+    editor.gSEInputs![1].value = '1234';
     editor.gSEInputs![2].nullSwitch?.click();
     editor.gSEInputs![3].nullSwitch?.click();
-    editor.gSEInputs![4].maybeValue = '76';
-    editor.gSEInputs![5].maybeValue = '465';
+    editor.gSEInputs![4].value = '76';
+    editor.gSEInputs![5].value = '465';
 
     await editor.updateComplete;
     editor.gseSave.click();

@@ -21,12 +21,14 @@ import '@material/mwc-formfield';
 import type { Button } from '@material/mwc-button';
 import type { Checkbox } from '@material/mwc-checkbox';
 
-import '../../foundation/components/scl-checkbox.js';
-import '../../foundation/components/scl-select.js';
-import '../../foundation/components/scl-textfield.js';
-import type { SclCheckbox } from '../../foundation/components/scl-checkbox.js';
-import type { SclSelect } from '../../foundation/components/scl-select.js';
-import type { SclTextfield } from '../../foundation/components/scl-textfield.js';
+import '@openenergytools/scl-checkbox';
+import '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import '@openenergytools/scl-text-field';
+import type { SclCheckbox } from '@openenergytools/scl-checkbox';
+import type { SclSelect } from '@openenergytools/scl-select';
+// eslint-disable-next-line import/no-duplicates
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import {
   maxLength,
@@ -60,6 +62,13 @@ const smvHelpers: Record<string, string> = {
   APPID: 'APP ID (4xxx in hex)',
   'VLAN-ID': 'VLAN ID (XXX in hex)',
   'VLAN-PRIORITY': 'VLAN Priority (0-7)',
+};
+
+const smvPlaceholders: Record<string, string> = {
+  'MAC-Address': '01-0C-CD-02-xx-xx',
+  APPID: '4xxx',
+  'VLAN-ID': '000',
+  'VLAN-PRIORITY': '4',
 };
 
 @customElement('sampled-value-control-element-editor')
@@ -100,11 +109,11 @@ export class SampledValueControlElementEditor extends LitElement {
   private sampledValueControlDiff = false;
 
   @queryAll('.smvcontrol.attribute')
-  sampledValueControlInputs!: (SclTextfield | SclSelect | SclCheckbox)[];
+  sampledValueControlInputs!: (SclTextField | SclSelect | SclCheckbox)[];
 
   @query('.smvcontrol.save') smvControlSave!: Button;
 
-  @queryAll('.smv.attribute') sMVInputs!: SclTextfield[];
+  @queryAll('.smv.attribute') sMVInputs!: SclTextField[];
 
   @query('.smv.save') smvSave!: Button;
 
@@ -114,10 +123,15 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @query('.smv.insttype') instType?: Checkbox;
 
+  private resetInputs(): void {
+    for (const input of this.sampledValueControlInputs)
+      if (input instanceof SclTextField) input.reset();
+  }
+
   private onSampledValueControlInputChange(): void {
     if (
       Array.from(this.sampledValueControlInputs).some(
-        input => !input.checkValidity()
+        input => !input.reportValidity()
       )
     ) {
       this.sampledValueControlDiff = false;
@@ -126,13 +140,11 @@ export class SampledValueControlElementEditor extends LitElement {
 
     const sampledValueControlAttrs: Record<string, string | null> = {};
     for (const input of this.sampledValueControlInputs)
-      sampledValueControlAttrs[input.label] = input.maybeValue;
+      sampledValueControlAttrs[input.label] = input.value;
 
     this.sampledValueControlDiff = Array.from(
       this.sampledValueControlInputs
-    ).some(
-      input => this.element?.getAttribute(input.label) !== input.maybeValue
-    );
+    ).some(input => this.element?.getAttribute(input.label) !== input.value);
   }
 
   private saveSampledValueControlChanges(): void {
@@ -140,8 +152,8 @@ export class SampledValueControlElementEditor extends LitElement {
 
     const sampledValueControlAttrs: Record<string, string | null> = {};
     for (const input of this.sampledValueControlInputs)
-      if (this.element?.getAttribute(input.label) !== input.maybeValue)
-        sampledValueControlAttrs[input.label] = input.maybeValue;
+      if (this.element?.getAttribute(input.label) !== input.value)
+        sampledValueControlAttrs[input.label] = input.value;
 
     this.dispatchEvent(
       newEditEvent(
@@ -152,17 +164,19 @@ export class SampledValueControlElementEditor extends LitElement {
       )
     );
 
+    this.resetInputs();
+
     this.onSampledValueControlInputChange();
   }
 
   private onSMVInputChange(): void {
-    if (Array.from(this.sMVInputs).some(input => !input.checkValidity())) {
+    if (Array.from(this.sMVInputs).some(input => !input.reportValidity())) {
       this.sMVdiff = false;
       return;
     }
 
     const pTypes: Record<string, string | null> = {};
-    for (const input of this.sMVInputs) pTypes[input.label] = input.maybeValue;
+    for (const input of this.sMVInputs) pTypes[input.label] = input.value;
 
     this.sMVdiff = checkSMVDiff(this.sMV!, {
       pTypes,
@@ -175,14 +189,13 @@ export class SampledValueControlElementEditor extends LitElement {
 
     const options: ChangeGseOrSmvAddressOptions = {};
     for (const input of this.sMVInputs) {
-      if (input.label === 'MAC-Address' && input.maybeValue)
-        options.mac = input.maybeValue;
-      if (input.label === 'APPID' && input.maybeValue)
-        options.appId = input.maybeValue;
-      if (input.label === 'VLAN-ID' && input.maybeValue)
-        options.vlanId = input.maybeValue;
-      if (input.label === 'VLAN-PRIORITY' && input.maybeValue)
-        options.vlanPriority = input.maybeValue;
+      if (input.label === 'MAC-Address' && input.value)
+        options.mac = input.value;
+      if (input.label === 'APPID' && input.value) options.appId = input.value;
+      if (input.label === 'VLAN-ID' && input.value)
+        options.vlanId = input.value;
+      if (input.label === 'VLAN-PRIORITY' && input.value)
+        options.vlanPriority = input.value;
     }
 
     if (this.instType?.checked === true) options.instType = true;
@@ -198,10 +211,10 @@ export class SampledValueControlElementEditor extends LitElement {
 
     const smvOptsAttrs: Record<string, string | null> = {};
     for (const input of this.smvOptsInputs)
-      smvOptsAttrs[input.label] = input.maybeValue;
+      smvOptsAttrs[input.label] = input.value;
 
     this.smvOptsDiff = Array.from(this.smvOptsInputs).some(
-      input => smvOpts?.getAttribute(input.label) !== input.maybeValue
+      input => smvOpts?.getAttribute(input.label) !== input.value
     );
   }
 
@@ -212,8 +225,8 @@ export class SampledValueControlElementEditor extends LitElement {
 
     const smvOptsAttrs: Record<string, string | null> = {};
     for (const input of this.smvOptsInputs)
-      if (smvOpts.getAttribute(input.label) !== input.maybeValue)
-        smvOptsAttrs[input.label] = input.maybeValue;
+      if (smvOpts.getAttribute(input.label) !== input.value)
+        smvOptsAttrs[input.label] = input.value;
 
     const updateEdit = { element: smvOpts, attributes: smvOptsAttrs };
     this.dispatchEvent(newEditEvent(updateEdit));
@@ -249,16 +262,17 @@ export class SampledValueControlElementEditor extends LitElement {
           ></mwc-checkbox></mwc-formfield
         >${Object.entries(attributes).map(
           ([key, value]) =>
-            html`<scl-textfield
+            html`<scl-text-field
               class="smv attribute"
               label="${key}"
               ?nullable=${typeNullable[key]}
-              .maybeValue=${value}
+              .value=${value}
               pattern="${typePattern[key]!}"
               required
-              helper="${smvHelpers[key]}"
+              supportingText="${smvHelpers[key]}"
+              placeholder="${smvPlaceholders[key]}"
               @input=${this.onSMVInputChange}
-            ></scl-textfield>`
+            ></scl-text-field>`
         )}
       </div>
       <mwc-button
@@ -306,7 +320,7 @@ export class SampledValueControlElementEditor extends LitElement {
             html`<scl-checkbox
               class="smvopts attribute"
               label="${key}"
-              .maybeValue=${value}
+              .value=${value}
               nullable
               helper="${smvOptsHelpers[key]}"
               @input=${this.onSmvOptsInputChange}
@@ -350,87 +364,81 @@ export class SampledValueControlElementEditor extends LitElement {
     ].map(attr => this.element?.getAttribute(attr));
 
     return html`<div class="content smvcontrol">
-      <scl-textfield
+      <scl-text-field
         class="smvcontrol attribute"
         label="name"
-        .maybeValue=${name}
-        helper="Sampled Value Name"
+        .value=${name}
+        supportingText="Sampled Value Name"
         required
         pattern="${patterns.asciName}"
         maxLength="${maxLength.cbName}"
         dialogInitialFocus
         @input="${this.onSampledValueControlInputChange}"
-      ></scl-textfield>
-      <scl-textfield
+      ></scl-text-field>
+      <scl-text-field
         class="smvcontrol attribute"
         label="desc"
-        .maybeValue=${desc}
+        .value=${desc}
         nullable
-        helper="Sampled Value Description"
+        supportingText="Sampled Value Description"
         @input="${this.onSampledValueControlInputChange}"
-      ></scl-textfield>
+      ></scl-text-field>
       ${multicast === null || multicast === 'true'
         ? html``
         : html`<scl-checkbox
             class="smvcontrol attribute"
             label="multicast"
-            .maybeValue=${multicast}
-            helper="Whether Sample Value Stream is multicast"
+            .value=${multicast}
+            supportingText="Whether Sample Value Stream is multicast"
             @input="${this.onSampledValueControlInputChange}"
           ></scl-checkbox>`}
-      <scl-textfield
+      <scl-text-field
         class="smvcontrol attribute"
         label="smvID"
-        .maybeValue=${smvID}
-        helper="Sampled Value ID"
+        .value=${smvID}
+        supportingText="Sampled Value ID"
         required
         @input="${this.onSampledValueControlInputChange}"
-      ></scl-textfield>
+      ></scl-text-field>
       <scl-select
         class="smvcontrol attribute"
         label="smpMod"
-        .maybeValue=${smpMod}
+        .value=${smpMod}
         nullable
         required
-        helper="Sample mode (Samples per Second, Sampled per Period, Seconds per Sample)"
-        @selected="${this.onSampledValueControlInputChange}"
-        >${['SmpPerPeriod', 'SmpPerSec', 'SecPerSmp'].map(
-          option =>
-            html`<mwc-list-item value="${option}">${option}</mwc-list-item>`
-        )}</scl-select
-      >
-      <scl-textfield
+        supportingText="Sample mode (Samples per Second, Sampled per Period, Seconds per Sample)"
+        @input="${this.onSampledValueControlInputChange}"
+        .selectOptions=${['SmpPerPeriod', 'SmpPerSec', 'SecPerSmp']}
+      ></scl-select>
+      <scl-text-field
         class="smvcontrol attribute"
         label="smpRate"
-        .maybeValue=${smpRate}
-        helper="Sample Rate (Based on Sample Mode)"
+        .value=${smpRate}
+        supportingText="Sample Rate (Based on Sample Mode)"
         required
         type="number"
-        mscl-textfield
-        scl-textfield
         @input="${this.onSampledValueControlInputChange}"
-      ></scl-textfield>
-      <scl-textfield
+      ></scl-text-field>
+      <scl-text-field
         class="smvcontrol attribute"
         label="nofASDU"
-        .maybeValue=${nofASDU}
-        helper="Number of Samples per Ethernet packet"
+        .value=${nofASDU}
+        supportingText="Number of Samples per Ethernet packet"
         required
         type="number"
         min="0"
         @input="${this.onSampledValueControlInputChange}"
-      ></scl-textfield>
+      ></scl-text-field>
       <scl-select
         class="smvcontrol attribute"
         label="securityEnabled"
-        .maybeValue=${securityEnabled}
+        .value=${securityEnabled}
         nullable
         required
-        helper="Sampled Value Security Setting"
-        @selected="${this.onSampledValueControlInputChange}"
-        >${['None', 'Signature', 'SignatureAndEncryption'].map(
-          type => html`<mwc-list-item value="${type}">${type}</mwc-list-item>`
-        )}</scl-select
+        supportingText="Sampled Value Security Setting"
+        @input="${this.onSampledValueControlInputChange}"
+        .selectOptions=${['None', 'Signature', 'SignatureAndEncryption']}
+      ></scl-select
       ><mwc-button
         class="smvcontrol save"
         label="save"
