@@ -37,11 +37,11 @@
     "@material/mwc-select": "^0.27.0",
     "@material/mwc-switch": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
+    "@openenergytools/filterable-lists": "0.0.4",
     "@openenergytools/scl-checkbox": "^1.0.3",
+    "@openenergytools/scl-lib": "^0.9.20",
     "@openenergytools/scl-select": "^1.0.2",
     "@openenergytools/scl-text-field": "^1.0.4",
-    "@openenergytools/filterable-lists": "0.0.4",
-    "@openenergytools/scl-lib": "0.9.20",
     "@openscd/open-scd-core": "0.0.2",
     "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
     "lit": "^2.4.0"

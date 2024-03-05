@@ -18,6 +18,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   changeGSEContent,
   ChangeGSEContentOptions,
+  controlBlockGseOrSmv,
   identity,
   updateGSEControl,
 } from '@openenergytools/scl-lib';
@@ -72,17 +73,8 @@ export class GseControlElementEditor extends LitElement {
   editCount = -1;
 
   @property({ attribute: false })
-  get gSE(): Element | null | undefined {
-    const cbName = this.element!.getAttribute('name');
-    const iedName = this.element!.closest('IED')?.getAttribute('name');
-    const apName = this.element!.closest('AccessPoint')?.getAttribute('name');
-    const ldInst = this.element!.closest('LDevice')?.getAttribute('inst');
-
-    return this.element!.ownerDocument.querySelector(
-      `:root > Communication > SubNetwork > ` +
-        `ConnectedAP[iedName="${iedName}"][apName="${apName}"] > ` +
-        `GSE[ldInst="${ldInst}"][cbName="${cbName}"]`
-    );
+  get gSE(): Element | null {
+    return controlBlockGseOrSmv(this.element!);
   }
 
   @state() private gSEdiff = false;

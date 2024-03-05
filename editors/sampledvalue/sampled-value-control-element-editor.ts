@@ -11,6 +11,7 @@ import { newEditEvent } from '@openscd/open-scd-core';
 import {
   ChangeGseOrSmvAddressOptions,
   changeSMVContent,
+  controlBlockGseOrSmv,
   identity,
   updateSampledValueControl,
 } from '@openenergytools/scl-lib';
@@ -87,16 +88,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @property({ attribute: false })
   get sMV(): Element | null {
-    const cbName = this.element.getAttribute('name');
-    const iedName = this.element.closest('IED')?.getAttribute('name');
-    const apName = this.element.closest('AccessPoint')?.getAttribute('name');
-    const ldInst = this.element.closest('LDevice')?.getAttribute('inst');
-
-    return this.element.ownerDocument.querySelector(
-      `:root > Communication > SubNetwork 
-      > ConnectedAP[iedName="${iedName}"][apName="${apName}"] 
-      > SMV[ldInst="${ldInst}"][cbName="${cbName}"]`
-    );
+    return controlBlockGseOrSmv(this.element!);
   }
 
   @state()
