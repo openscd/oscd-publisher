@@ -81,7 +81,7 @@ export class GseControlElementEditor extends LitElement {
 
   @state() private gSEControlDiff = false;
 
-  @queryAll('.content.gse > scl-text-field') gSEInputs?: SclTextField[];
+  @queryAll('.content.gse > scl-text-field') gSEInputs!: SclTextField[];
 
   @query('.content.gse > .save') gseSave!: Button;
 
@@ -95,9 +95,14 @@ export class GseControlElementEditor extends LitElement {
 
   @query('#instType') instType?: Checkbox;
 
-  private resetInputs(): void {
-    for (const input of this.gSEControlInputs)
-      if (input instanceof SclTextField) input.reset();
+  private resetInputs(type: 'GSEControl' | 'GSE' = 'GSEControl'): void {
+    if (type === 'GSEControl')
+      for (const input of this.gSEControlInputs)
+        if (input instanceof SclTextField) input.reset();
+
+    if (type === 'GSE')
+      for (const input of this.gSEInputs)
+        if (input instanceof SclTextField) input.reset();
   }
 
   private onGSEControlInputChange(): void {
@@ -180,6 +185,8 @@ export class GseControlElementEditor extends LitElement {
       options.address!.instType = false;
 
     this.dispatchEvent(newEditEvent(changeGSEContent(this.gSE, options)));
+
+    this.resetInputs('GSE');
 
     this.onGSEInputChange();
   }

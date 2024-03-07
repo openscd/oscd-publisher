@@ -115,9 +115,16 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @query('.smv.insttype') instType?: Checkbox;
 
-  private resetInputs(): void {
-    for (const input of this.sampledValueControlInputs)
-      if (input instanceof SclTextField) input.reset();
+  private resetInputs(
+    type: 'SampledValueControl' | 'SMV' = 'SampledValueControl'
+  ): void {
+    if (type === 'SampledValueControl')
+      for (const input of this.sampledValueControlInputs)
+        if (input instanceof SclTextField) input.reset();
+
+    if (type === 'SMV')
+      for (const input of this.sMVInputs)
+        if (input instanceof SclTextField) input.reset();
   }
 
   private onSampledValueControlInputChange(): void {
@@ -195,6 +202,8 @@ export class SampledValueControlElementEditor extends LitElement {
 
     this.dispatchEvent(newEditEvent(changeSMVContent(this.sMV, options)));
 
+    this.resetInputs('SMV');
+
     this.onSMVInputChange();
   }
 
@@ -248,7 +257,7 @@ export class SampledValueControlElementEditor extends LitElement {
         <h3>Communication Settings (SMV)</h3>
         <mwc-formfield label="Add XMLSchema-instance type"
           ><mwc-checkbox
-            class="smv.insttype"
+            class="smv insttype"
             ?checked="${hasInstType}"
             @change=${this.onSMVInputChange}
           ></mwc-checkbox></mwc-formfield
