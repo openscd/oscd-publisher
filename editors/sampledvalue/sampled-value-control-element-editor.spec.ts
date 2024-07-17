@@ -39,15 +39,16 @@ describe('SampledValueControl element editor component', () => {
     editor.sampledValueControlInputs![1].nullSwitch?.click();
     await editor.updateComplete;
 
-    (editor.sampledValueControlInputs![2] as SclTextField).value =
+    (editor.sampledValueControlInputs![2] as SclTextField).value = '40001';
+    (editor.sampledValueControlInputs![3] as SclTextField).value =
       'someOtherSmvID';
-    (editor.sampledValueControlInputs![3] as SclTextField).value = 'SmpPerSec';
-    (editor.sampledValueControlInputs![4] as SclTextField).value = '4000';
-    (editor.sampledValueControlInputs![5] as SclTextField).value = '2';
-    editor.sampledValueControlInputs![6].nullSwitch?.click();
+    (editor.sampledValueControlInputs![4] as SclTextField).value = 'SmpPerSec';
+    (editor.sampledValueControlInputs![5] as SclTextField).value = '4000';
+    (editor.sampledValueControlInputs![6] as SclTextField).value = '2';
+    editor.sampledValueControlInputs![7].nullSwitch?.click();
     await editor.updateComplete;
 
-    (editor.sampledValueControlInputs![6] as SclSelect).value = 'None';
+    (editor.sampledValueControlInputs![7] as SclSelect).value = 'None';
 
     await editor.updateComplete;
     editor.smvControlSave.click();
@@ -60,6 +61,7 @@ describe('SampledValueControl element editor component', () => {
     expect(update.attributes).to.deep.equal({
       name: 'SomeNewName',
       desc: null,
+      confRev: '40001',
       smvID: 'someOtherSmvID',
       smpMod: 'SmpPerSec',
       smpRate: '4000',

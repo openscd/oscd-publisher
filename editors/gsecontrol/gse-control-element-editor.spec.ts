@@ -30,19 +30,22 @@ describe('GSEControl element editor component', () => {
 
   it('allows to change the GSEControl elements attributes', async () => {
     editor.gSEControlInputs![0].value = 'SomeNewName';
-    editor.gSEControlInputs![1].nullSwitch?.click();
-    await editor.updateComplete;
-
     editor.gSEControlInputs![1].value = 'SomeNewDesc';
     editor.gSEControlInputs![2].value = 'GSSE';
-    editor.gSEControlInputs![3].value = 'someNewAppID';
-    editor.gSEControlInputs![4].nullSwitch?.click();
+
+    editor.gSEControlInputs![3].nullSwitch?.click();
     await editor.updateComplete;
 
+    editor.gSEControlInputs![3].value = '10001';
+
+    editor.gSEControlInputs![4].value = 'someNewAppID';
     editor.gSEControlInputs![5].nullSwitch?.click();
     await editor.updateComplete;
 
-    editor.gSEControlInputs![5].value = 'None';
+    editor.gSEControlInputs![6].nullSwitch?.click();
+    await editor.updateComplete;
+
+    editor.gSEControlInputs![6].value = 'None';
 
     await editor.updateComplete;
     editor.gseControlSave.click();
@@ -52,9 +55,11 @@ describe('GSEControl element editor component', () => {
 
     const update = editEvent.args[0][0].detail[0];
     expect(update.element).to.equal(gseControl);
+
     expect(update.attributes).to.deep.equal({
       name: 'SomeNewName',
       desc: 'SomeNewDesc',
+      confRev: '10001',
       appID: 'someNewAppID',
       type: 'GSSE',
       fixedOffs: 'false',

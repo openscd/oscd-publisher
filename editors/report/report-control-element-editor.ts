@@ -333,9 +333,10 @@ export class ReportControlElementEditor extends LitElement {
   }
 
   private renderReportControlContent(): TemplateResult {
-    const [name, desc, buffered, rptID, indexed, bufTime, intgPd] = [
+    const [name, desc, confRev, buffered, rptID, indexed, bufTime, intgPd] = [
       'name',
       'desc',
+      'confRev',
       'buffered',
       'rptID',
       'indexed',
@@ -364,8 +365,17 @@ export class ReportControlElementEditor extends LitElement {
         nullable
         supportingText="ReportControl Description"
         @input=${this.onReportControlInputChange}
-      ></scl-text-field
-      ><scl-checkbox
+      ></scl-text-field>
+      <scl-text-field
+        class="input gsecontrol"
+        label="confRev"
+        .value=${confRev}
+        supportingText="Configuration Revision"
+        pattern="${patterns.unsigned}"
+        nullable
+        @input=${this.onReportControlInputChange}
+      ></scl-text-field>
+      <scl-checkbox
         class="report attributes"
         label="buffered"
         .value=${buffered}
