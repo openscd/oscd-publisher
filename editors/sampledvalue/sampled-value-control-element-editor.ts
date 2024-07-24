@@ -80,7 +80,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
   /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
-  element!: Element;
+  element: Element | null = null;
 
   /** SCL change indicator */
   @property({ type: Number })
@@ -88,7 +88,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @property({ attribute: false })
   get sMV(): Element | null {
-    return controlBlockGseOrSmv(this.element!);
+    return this.element ? controlBlockGseOrSmv(this.element!) : null;
   }
 
   @state()
@@ -115,9 +115,15 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @query('.smv.insttype') instType?: Checkbox;
 
-  private resetInputs(
+  public resetInputs(
     type: 'SampledValueControl' | 'SMV' = 'SampledValueControl'
   ): void {
+    this.element = null; // removes inputs and forces a re-render
+
+    // resets save button
+    this.sMVdiff = false;
+    this.sampledValueControlDiff = false;
+
     if (type === 'SampledValueControl')
       for (const input of this.sampledValueControlInputs)
         if (input instanceof SclTextField) input.reset();
@@ -169,6 +175,8 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   private onSMVInputChange(): void {
+    if (!this.sMV) return;
+
     if (Array.from(this.sMVInputs).some(input => !input.reportValidity())) {
       this.sMVdiff = false;
       return;
@@ -208,6 +216,8 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   private onSmvOptsInputChange(): void {
+    if (!this.element) return;
+
     const smvOpts = this.element.querySelector(':scope > SmvOpts');
 
     const smvOptsAttrs: Record<string, string | null> = {};
@@ -220,7 +230,7 @@ export class SampledValueControlElementEditor extends LitElement {
   }
 
   private saveSmvOptsChanges(): void {
-    const smvOpts = this.element.querySelector(':scope > SmvOpts');
+    const smvOpts = this.element!.querySelector(':scope > SmvOpts');
 
     if (!smvOpts) return;
 
@@ -303,7 +313,7 @@ export class SampledValueControlElementEditor extends LitElement {
       'timestamp',
       'synchSourceId',
     ].map(
-      attr => this.element.querySelector('SmvOpts')?.getAttribute(attr) ?? null
+      attr => this.element!.querySelector('SmvOpts')?.getAttribute(attr) ?? null
     );
 
     return html`<div class="content smvopts">

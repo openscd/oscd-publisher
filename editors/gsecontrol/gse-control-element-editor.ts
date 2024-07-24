@@ -74,7 +74,7 @@ export class GseControlElementEditor extends LitElement {
 
   @property({ attribute: false })
   get gSE(): Element | null {
-    return controlBlockGseOrSmv(this.element!);
+    return this.element ? controlBlockGseOrSmv(this.element!) : null;
   }
 
   @state() private gSEdiff = false;
@@ -95,7 +95,13 @@ export class GseControlElementEditor extends LitElement {
 
   @query('#instType') instType?: Checkbox;
 
-  private resetInputs(type: 'GSEControl' | 'GSE' = 'GSEControl'): void {
+  public resetInputs(type: 'GSEControl' | 'GSE' = 'GSEControl'): void {
+    this.element = null; // removes inputs and forces a re-render
+
+    // resets save button
+    this.gSEdiff = false;
+    this.gSEControlDiff = false;
+
     if (type === 'GSEControl')
       for (const input of this.gSEControlInputs)
         if (input instanceof SclTextField) input.reset();
@@ -106,6 +112,8 @@ export class GseControlElementEditor extends LitElement {
   }
 
   private onGSEControlInputChange(): void {
+    if (!this.element) return;
+
     if (
       Array.from(this.gSEControlInputs ?? []).some(
         input => !input.reportValidity()
@@ -120,11 +128,11 @@ export class GseControlElementEditor extends LitElement {
       gSEControlAttrs[input.label] = input.value;
 
     this.gSEControlDiff = Array.from(this.gSEControlInputs ?? []).some(
-      input => this.element?.getAttribute(input.label) !== input.value
+      input => this.element!.getAttribute(input.label) !== input.value
     );
   }
 
-  private saveGSEControlChanges(): void {
+  public saveGSEControlChanges(): void {
     if (!this.element) return;
 
     const gSEControlAttrs: Record<string, string | null> = {};
@@ -147,6 +155,8 @@ export class GseControlElementEditor extends LitElement {
   }
 
   private onGSEInputChange(): void {
+    if (!this.element) return;
+
     if (
       Array.from(this.gSEInputs ?? []).some(input => !input.reportValidity())
     ) {

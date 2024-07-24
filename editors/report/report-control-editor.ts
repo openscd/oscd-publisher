@@ -18,6 +18,10 @@ import type {
 } from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import './report-control-element-editor.js';
+import '../dataset/data-set-element-editor.js';
+import type { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
+import type { ReportControlElementEditor } from './report-control-element-editor.js';
+
 import {
   pathIdentity,
   styles,
@@ -30,6 +34,12 @@ export class ReportControlEditor extends BaseElementEditor {
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectReportControlButton!: Button;
+
+  @query('report-control-element-editor')
+  rpControlElementEditor!: ReportControlElementEditor;
+
+  @query('data-set-element-editor')
+  dataSetElementEditor!: DataSetElementEditor;
 
   /** Resets selected Report and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
@@ -100,6 +110,14 @@ export class ReportControlEditor extends BaseElementEditor {
           headline: `${rpControl.getAttribute('name')}`,
           supportingText: `${pathIdentity(rpControl)}`,
           primaryAction: () => {
+            if (this.selectCtrlBlock === rpControl) return;
+
+            if (this.rpControlElementEditor)
+              this.rpControlElementEditor.resetInputs();
+
+            if (this.dataSetElementEditor)
+              this.dataSetElementEditor.resetInputs();
+
             this.selectCtrlBlock = rpControl;
             this.selectedDataSet =
               rpControl.parentElement?.querySelector(
@@ -116,6 +134,8 @@ export class ReportControlEditor extends BaseElementEditor {
                 this.dispatchEvent(
                   newEditEvent(removeControlBlock({ node: rpControl }))
                 );
+
+                this.selectCtrlBlock = undefined;
               },
             },
           ],

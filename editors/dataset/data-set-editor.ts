@@ -18,6 +18,7 @@ import type {
 } from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import './data-set-element-editor.js';
+import type { DataSetElementEditor } from './data-set-element-editor.js';
 
 import {
   pathIdentity,
@@ -41,6 +42,9 @@ export class DataSetEditor extends LitElement {
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectDataSetButton!: Button;
+
+  @query('data-set-element-editor')
+  dataSetElementEditor!: DataSetElementEditor;
 
   /** Resets selected DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
@@ -99,6 +103,11 @@ export class DataSetEditor extends LitElement {
           headline: `${dataSet.getAttribute('name')}`,
           supportingText: `${pathIdentity(dataSet)}`,
           primaryAction: () => {
+            if (this.selectedDataSet === dataSet) return;
+
+            if (this.dataSetElementEditor)
+              this.dataSetElementEditor.resetInputs();
+
             this.selectedDataSet = dataSet;
             this.selectionList.classList.add('hidden');
             this.selectDataSetButton.classList.remove('hidden');
@@ -110,6 +119,8 @@ export class DataSetEditor extends LitElement {
                 this.dispatchEvent(
                   newEditEvent(removeDataSet({ node: dataSet }))
                 );
+
+                this.selectedDataSet = undefined;
               },
             },
           ],

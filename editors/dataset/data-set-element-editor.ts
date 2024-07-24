@@ -135,7 +135,12 @@ export class DataSetElementEditor extends LitElement {
 
   @query('#dopicker > oscd-tree-grid') doPicker!: TreeGrid;
 
-  private resetInputs(): void {
+  public resetInputs(): void {
+    this.element = null; // removes inputs and forces a re-render
+
+    // reset save button
+    this.someDiffOnInputs = false;
+
     for (const input of this.inputs)
       if (input instanceof SclTextField) input.reset();
   }

@@ -73,7 +73,7 @@ export class ReportControlElementEditor extends LitElement {
 
   /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
-  element!: Element;
+  element: Element | null = null;
 
   /** SCL change indicator */
   @property({ type: Number })
@@ -105,13 +105,20 @@ export class ReportControlElementEditor extends LitElement {
 
   @query('.rptenabled.attributes') rptEnabledInput!: SclTextField;
 
-  private resetInputs(): void {
+  public resetInputs(): void {
+    this.element = null; // removes inputs and forces a re-render
+
+    // reset save button
+    this.optFieldsDiff = false;
+    this.trgOpsDiff = false;
+    this.reportControlDiff = false;
+
     for (const input of this.reportControlInputs)
       if (input instanceof SclTextField) input.reset();
   }
 
   private onOptFieldsInputChange(): void {
-    const optFields = this.element.querySelector(':scope > OptFields');
+    const optFields = this.element!.querySelector(':scope > OptFields');
 
     const optFieldsAttrs: Record<string, string | null> = {};
     for (const input of this.optFieldsInputs)
@@ -123,7 +130,7 @@ export class ReportControlElementEditor extends LitElement {
   }
 
   private saveOptFieldChanges(): void {
-    const optFields = this.element.querySelector(':scope > OptFields');
+    const optFields = this.element!.querySelector(':scope > OptFields');
 
     if (!optFields) return;
 
@@ -140,7 +147,9 @@ export class ReportControlElementEditor extends LitElement {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onTrgOpsInputChange(): void {
-    const trgOps = this.element.querySelector(':scope > TrgOps');
+    if (!this.element) return;
+
+    const trgOps = this.element!.querySelector(':scope > TrgOps');
 
     const trgOpsAttrs: Record<string, string | null> = {};
     for (const input of this.trgOpsInputs)
@@ -152,7 +161,9 @@ export class ReportControlElementEditor extends LitElement {
   }
 
   private saveTrgOpsChanges(): void {
-    const trgOps = this.element.querySelector(':scope > TrgOps');
+    if (!this.element) return;
+
+    const trgOps = this.element!.querySelector(':scope > TrgOps');
 
     if (!trgOps) return;
 
@@ -168,6 +179,8 @@ export class ReportControlElementEditor extends LitElement {
   }
 
   private onReportControlInputChange(): void {
+    if (!this.element) return;
+
     const reportControl = this.element;
     const rptEnabled = reportControl.querySelector(':scope > RptEnabled');
 
@@ -199,16 +212,16 @@ export class ReportControlElementEditor extends LitElement {
 
     const reportControlAttrs: Record<string, string | null> = {};
     for (const input of this.reportControlInputs ?? [])
-      if (reportControl.getAttribute(input.label) !== input.value)
+      if (reportControl!.getAttribute(input.label) !== input.value)
         reportControlAttrs[input.label] = input.value;
 
     const reportControlActions = updateReportControl({
-      element: reportControl,
+      element: reportControl!,
       attributes: reportControlAttrs,
     });
 
     const max = this.rptEnabledInput.value;
-    const rptEnabledAction = updateMaxClients(reportControl, max);
+    const rptEnabledAction = updateMaxClients(reportControl!, max);
 
     if (!rptEnabledAction)
       this.dispatchEvent(newEditEvent(reportControlActions));
@@ -243,7 +256,7 @@ export class ReportControlElementEditor extends LitElement {
       'bufOvfl',
     ].map(
       attr =>
-        this.element.querySelector('OptFields')?.getAttribute(attr) ?? null
+        this.element!.querySelector('OptFields')?.getAttribute(attr) ?? null
     );
 
     return html`<div class="content optfields">
@@ -285,7 +298,7 @@ export class ReportControlElementEditor extends LitElement {
       'period',
       'gi',
     ].map(
-      attr => this.element.querySelector('TrgOps')?.getAttribute(attr) ?? null
+      attr => this.element!.querySelector('TrgOps')?.getAttribute(attr) ?? null
     );
 
     return html`<div class="content trgops">
@@ -330,7 +343,7 @@ export class ReportControlElementEditor extends LitElement {
       'intgPd',
     ].map(attr => this.element?.getAttribute(attr));
     const max =
-      this.element.querySelector('RptEnabled')?.getAttribute('max') ?? null;
+      this.element!.querySelector('RptEnabled')?.getAttribute('max') ?? null;
 
     return html`<div class="content reportcontrol">
       <scl-text-field

@@ -13,6 +13,10 @@ import {
 } from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import './gse-control-element-editor.js';
+import type { GseControlElementEditor } from './gse-control-element-editor.js';
+
+import '../dataset/data-set-element-editor.js';
+import type { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
 
 import {
   pathIdentity,
@@ -26,6 +30,12 @@ export class GseControlEditor extends BaseElementEditor {
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('mwc-button') selectGSEControlButton!: Button;
+
+  @query('gse-control-element-editor')
+  gseControlElementEditor!: GseControlElementEditor;
+
+  @query('data-set-element-editor')
+  dataSetElementEditor!: DataSetElementEditor;
 
   /** Resets selected GOOSE and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
@@ -94,6 +104,14 @@ export class GseControlEditor extends BaseElementEditor {
           headline: `${gseControl.getAttribute('name')}`,
           supportingText: `${pathIdentity(gseControl)}`,
           primaryAction: () => {
+            if (this.selectCtrlBlock === gseControl) return;
+
+            if (this.gseControlElementEditor)
+              this.gseControlElementEditor.resetInputs();
+
+            if (this.dataSetElementEditor)
+              this.dataSetElementEditor.resetInputs();
+
             this.selectCtrlBlock = gseControl;
             this.selectedDataSet =
               gseControl.parentElement?.querySelector(
@@ -110,6 +128,8 @@ export class GseControlEditor extends BaseElementEditor {
                 this.dispatchEvent(
                   newEditEvent(removeControlBlock({ node: gseControl }))
                 );
+
+                this.selectCtrlBlock = undefined;
               },
             },
           ],

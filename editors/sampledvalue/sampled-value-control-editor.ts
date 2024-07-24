@@ -13,11 +13,13 @@ import {
 } from '@openenergytools/filterable-lists/dist/action-list.js';
 
 import './sampled-value-control-element-editor.js';
+import '../dataset/data-set-element-editor.js';
+import type { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
+import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
 // import { styles, updateElementReference } from '../../foundation.js';
 import { styles } from '../../foundation.js';
 import BaseElementEditor from '../base-element-editor.js';
-import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
 function smvControlPath(smvControl: Element): string {
   const id = identity(smvControl);
@@ -36,6 +38,9 @@ export class SampledValueControlEditor extends BaseElementEditor {
 
   @query('sampled-value-control-element-editor')
   elementContainer?: SampledValueControlElementEditor;
+
+  @query('data-set-element-editor')
+  dataSetElementEditor!: DataSetElementEditor;
 
   /** Resets selected SMV and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
@@ -96,6 +101,13 @@ export class SampledValueControlEditor extends BaseElementEditor {
           headline: `${smvControl.getAttribute('name')}`,
           supportingText: `${smvControlPath(smvControl)}`,
           primaryAction: () => {
+            if (this.selectCtrlBlock === smvControl) return;
+
+            if (this.elementContainer) this.elementContainer.resetInputs();
+
+            if (this.dataSetElementEditor)
+              this.dataSetElementEditor.resetInputs();
+
             this.selectCtrlBlock = smvControl;
             this.selectedDataSet =
               smvControl.parentElement?.querySelector(
@@ -112,6 +124,8 @@ export class SampledValueControlEditor extends BaseElementEditor {
                 this.dispatchEvent(
                   newEditEvent(removeControlBlock({ node: smvControl }))
                 );
+
+                this.selectCtrlBlock = undefined;
               },
             },
           ],
