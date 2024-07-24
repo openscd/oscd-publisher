@@ -151,6 +151,10 @@ export class DataSetEditor extends LitElement {
   static styles = css`
     ${styles}
 
+    .selectionlist {
+      z-index: 2;
+    }
+
     data-set-element-editor {
       flex: auto;
     }

@@ -168,6 +168,11 @@ export class SampledValueControlEditor extends BaseElementEditor {
       display: flex;
       flex-direction: column;
     }
+
+    .selectionlist {
+      z-index: 2;
+    }
+
     mwc-list-item {
       --mdc-list-item-meta-size: 48px;
     }

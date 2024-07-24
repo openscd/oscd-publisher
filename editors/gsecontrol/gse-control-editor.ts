@@ -166,6 +166,10 @@ export class GseControlEditor extends BaseElementEditor {
       flex-direction: column;
     }
 
+    .selectionlist {
+      z-index: 2;
+    }
+
     data-set-element-editor {
       grid-column: 1 / 2;
     }
