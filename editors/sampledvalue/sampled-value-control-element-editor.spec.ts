@@ -37,12 +37,16 @@ describe('SampledValueControl element editor component', () => {
     (editor.sampledValueControlInputs![0] as SclTextField).value =
       'SomeNewName';
     editor.sampledValueControlInputs![1].nullSwitch?.click();
+    await editor.updateComplete;
+
     (editor.sampledValueControlInputs![2] as SclTextField).value =
       'someOtherSmvID';
     (editor.sampledValueControlInputs![3] as SclTextField).value = 'SmpPerSec';
     (editor.sampledValueControlInputs![4] as SclTextField).value = '4000';
     (editor.sampledValueControlInputs![5] as SclTextField).value = '2';
     editor.sampledValueControlInputs![6].nullSwitch?.click();
+    await editor.updateComplete;
+
     (editor.sampledValueControlInputs![6] as SclSelect).value = 'None';
 
     await editor.updateComplete;
@@ -56,7 +60,6 @@ describe('SampledValueControl element editor component', () => {
     expect(update.attributes).to.deep.equal({
       name: 'SomeNewName',
       desc: null,
-      confRev: '10043',
       smvID: 'someOtherSmvID',
       smpMod: 'SmpPerSec',
       smpRate: '4000',
@@ -69,7 +72,10 @@ describe('SampledValueControl element editor component', () => {
     editor.sMVInputs![0].value = '01-0C-CD-04-00-13';
     editor.sMVInputs![1].value = '1234';
     editor.sMVInputs![2].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.sMVInputs![3].nullSwitch?.click();
+    await editor.updateComplete;
 
     await editor.updateComplete;
     editor.smvSave.click();
@@ -80,9 +86,15 @@ describe('SampledValueControl element editor component', () => {
 
   it('allows to change the SmvOpts element child element', async () => {
     editor.smvOptsInputs![0].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.smvOptsInputs![1].value = 'false';
     editor.smvOptsInputs![2].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.smvOptsInputs![3].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.smvOptsInputs![4].value = 'false';
     editor.smvOptsInputs![5].value = 'false';
     editor.smvOptsInputs![6].value = 'false';

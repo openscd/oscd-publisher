@@ -36,15 +36,19 @@ describe('ReportControl element editor component', () => {
   it('allows to change the ReportControl elements attributes', async () => {
     editor.reportControlInputs![0].value = 'SomeNewName';
     editor.reportControlInputs![1].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.reportControlInputs![2].value = 'false';
     editor.reportControlInputs![3].value = 'someOtherID';
     editor.reportControlInputs![4].value = 'false';
     editor.reportControlInputs![5].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.reportControlInputs![6].value = '43';
 
     editor.rptEnabledInput.nullSwitch?.click();
+    await editor.updateComplete;
 
-    await editor.requestUpdate();
     editor.reportControlSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -75,12 +79,16 @@ describe('ReportControl element editor component', () => {
     editor.optFieldsInputs![0].value = 'false';
     editor.optFieldsInputs![1].value = 'false';
     editor.optFieldsInputs![2].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.optFieldsInputs![3].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.optFieldsInputs![4].value = 'false';
     editor.optFieldsInputs![5].value = 'false';
     editor.optFieldsInputs![6].nullSwitch?.click();
-
     await editor.updateComplete;
+
     editor.optFieldsSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -102,9 +110,12 @@ describe('ReportControl element editor component', () => {
   it('allows to change the TrgOps element child element', async () => {
     editor.trgOpsInputs![0].value = 'false';
     editor.trgOpsInputs![1].nullSwitch?.click();
+    await editor.updateComplete;
+
     editor.trgOpsInputs![2].value = 'false';
     editor.trgOpsInputs![3].value = 'false';
     editor.trgOpsInputs![4].nullSwitch?.click();
+    await editor.updateComplete;
 
     await editor.updateComplete;
     editor.trgOpsSave.click();
