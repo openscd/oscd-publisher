@@ -8,7 +8,7 @@ function findFcda(
     ldInst: string;
     prefix: string;
     lnClass: string;
-    lnInst: string;
+    lnInst?: string;
     doName: string;
     daName?: string;
     fc: string;
@@ -69,7 +69,7 @@ export function addFCDAs(dataSet: Element, paths: Element[][]): Insert[] {
       ldInst,
       prefix,
       lnClass,
-      lnInst,
+      ...(lnClass !== 'LLN0' && { lnInst }),
       doName,
       daName,
       fc,

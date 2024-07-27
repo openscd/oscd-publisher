@@ -104,6 +104,13 @@ describe('Utility functions for FCDA element', () => {
       expect(addFCDAs(dataSet1, paths).length).to.equal(1);
     });
 
+    it('returns FCDA without lnInst for LLN0', () => {
+      const paths = [[lDevice, anyLn1, dO, sDO, dA, bDA1, bDA3]];
+      const insertEdit = addFCDAs(dataSet1, paths);
+      const newFcda = insertEdit[0].node as Element;
+      expect(newFcda.hasAttribute('lnInst')).to.equal(false);
+    });
+
     it('allows multiple FCDA inserts', () => {
       const paths = [
         [lDevice, anyLn, dO, sDO, dA, bDA1, bDA2],
