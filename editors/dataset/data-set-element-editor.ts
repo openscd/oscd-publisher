@@ -280,7 +280,7 @@ export class DataSetElementEditor extends LitElement {
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.doPickerDialog?.show()}
       ></mwc-button
-      ><mwc-dialog id="dopicker" heading="Add Data Attributes">
+      ><mwc-dialog id="dopicker" heading="Add Data Objects">
         <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
         <mwc-button
           slot="secondaryAction"
