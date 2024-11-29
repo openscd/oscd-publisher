@@ -24,6 +24,7 @@ import type { SclSelect } from '@openenergytools/scl-select';
 // eslint-disable-next-line import/no-duplicates
 import { SclTextField } from '@openenergytools/scl-text-field';
 
+import { createElement } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 import { maxLength, patterns } from '../../foundation/pattern.js';
 import { updateMaxClients } from './foundation.js';
 
@@ -130,17 +131,28 @@ export class ReportControlElementEditor extends LitElement {
   }
 
   private saveOptFieldChanges(): void {
-    const optFields = this.element!.querySelector(':scope > OptFields');
+    if (!this.element) return;
 
-    if (!optFields) return;
+    const optFields = this.element!.querySelector(':scope > OptFields');
 
     const optFieldAttrs: Record<string, string | null> = {};
     for (const input of this.optFieldsInputs ?? [])
-      if (optFields.getAttribute(input.label) !== input.value)
+      if (optFields?.getAttribute(input.label) !== input.value)
         optFieldAttrs[input.label] = input.value;
 
-    const updateEdit = { element: optFields, attributes: optFieldAttrs };
-    this.dispatchEvent(newEditEvent(updateEdit));
+    if (!optFields) {
+      const node = createElement(
+        this.element.ownerDocument,
+        'OptFields',
+        optFieldAttrs
+      );
+      this.dispatchEvent(
+        newEditEvent({ parent: this.element, node, reference: null })
+      );
+    } else {
+      const updateEdit = { element: optFields!, attributes: optFieldAttrs };
+      this.dispatchEvent(newEditEvent(updateEdit));
+    }
 
     this.onOptFieldsInputChange();
   }
@@ -165,15 +177,25 @@ export class ReportControlElementEditor extends LitElement {
 
     const trgOps = this.element!.querySelector(':scope > TrgOps');
 
-    if (!trgOps) return;
-
     const trgOpsAttrs: Record<string, string | null> = {};
-    for (const input of this.trgOpsInputs ?? [])
-      if (trgOps.getAttribute(input.label) !== input.value)
+    for (const input of this.trgOpsInputs ?? []) {
+      if (trgOps?.getAttribute(input.label) !== input.value)
         trgOpsAttrs[input.label] = input.value;
+    }
 
-    const updateEdit = { element: trgOps, attributes: trgOpsAttrs };
-    this.dispatchEvent(newEditEvent(updateEdit));
+    if (!trgOps) {
+      const node = createElement(
+        this.element.ownerDocument,
+        'TrgOps',
+        trgOpsAttrs
+      );
+      this.dispatchEvent(
+        newEditEvent({ parent: this.element, node, reference: null })
+      );
+    } else {
+      const updateEdit = { element: trgOps!, attributes: trgOpsAttrs };
+      this.dispatchEvent(newEditEvent(updateEdit));
+    }
 
     this.onTrgOpsInputChange();
   }

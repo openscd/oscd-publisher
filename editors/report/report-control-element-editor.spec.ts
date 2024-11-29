@@ -5,6 +5,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { SinonSpy, spy } from 'sinon';
 
 import {
+  isInsert,
   isRemove,
   isUpdate,
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
@@ -133,5 +134,69 @@ describe('ReportControl element editor component', () => {
       period: 'false',
       gi: null,
     });
+  });
+
+  it('allows to create the TrgOps child element', async () => {
+    reportControl = new DOMParser()
+      .parseFromString(reportControlDoc, 'application/xml')
+      .querySelector('ReportControl[name="rp3"]')!;
+
+    editor = await fixture(
+      html`<report-control-element-editor
+        .element="${reportControl}"
+      ></report-control-element-editor>`
+    );
+
+    editor.trgOpsInputs![1].nullSwitch?.click();
+    editor.trgOpsInputs![1].value = 'true';
+    await editor.updateComplete;
+
+    editor.trgOpsInputs![2].nullSwitch?.click();
+    editor.trgOpsInputs![2].value = 'true';
+    await editor.updateComplete;
+
+    await editor.updateComplete;
+    editor.trgOpsSave.click();
+
+    expect(editEvent).to.be.calledOnce;
+    expect(editEvent.args[0][0].detail).to.satisfy(isInsert);
+
+    const insert = editEvent.args[0][0].detail;
+    expect(insert.parent.tagName).to.equal('ReportControl');
+    expect(insert.node.tagName).to.equal('TrgOps');
+    expect(insert.node.hasAttribute('qchg')).to.equal(true);
+    expect(insert.node.hasAttribute('dupd')).to.equal(true);
+  });
+
+  it('allows to create the OptFields child element', async () => {
+    reportControl = new DOMParser()
+      .parseFromString(reportControlDoc, 'application/xml')
+      .querySelector('ReportControl[name="rp3"]')!;
+
+    editor = await fixture(
+      html`<report-control-element-editor
+        .element="${reportControl}"
+      ></report-control-element-editor>`
+    );
+
+    editor.optFieldsInputs![1].nullSwitch?.click();
+    editor.optFieldsInputs![1].value = 'true';
+    await editor.updateComplete;
+
+    editor.optFieldsInputs![2].nullSwitch?.click();
+    editor.optFieldsInputs![2].value = 'true';
+    await editor.updateComplete;
+
+    await editor.updateComplete;
+    editor.optFieldsSave.click();
+
+    expect(editEvent).to.be.calledOnce;
+    expect(editEvent.args[0][0].detail).to.satisfy(isInsert);
+
+    const insert = editEvent.args[0][0].detail;
+    expect(insert.parent.tagName).to.equal('ReportControl');
+    expect(insert.node.tagName).to.equal('OptFields');
+    expect(insert.node.hasAttribute('timeStamp')).to.equal(true);
+    expect(insert.node.hasAttribute('dataSet')).to.equal(true);
   });
 });

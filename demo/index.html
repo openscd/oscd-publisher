@@ -1,8 +1,18 @@
 <title>oscd-save Demo</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&display=block">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-<open-scd plugins='{
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Material+Icons&display=block"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+  rel="stylesheet"
+/>
+<open-scd
+  plugins='{
   "menu": 
   [
     {"name": "Open File", "translations": {"de": "Datei öffnen"}, "icon": "folder_open", "active": true, "src": "https://openscd.github.io/oscd-open/oscd-open.js"}, 
@@ -12,54 +22,68 @@
   [
     {"name": "Publisher", "translations": {"de": "Kontroll-Block"}, "icon": "publish", "active": true, "src": "/dist/oscd-publisher.js"}
   ]
-}'></open-scd>
+}'
+></open-scd>
+
+<script>
+  const _customElementsDefine = window.customElements.define;
+  window.customElements.define = (name, cl, conf) => {
+    if (!customElements.get(name)) {
+      try {
+        _customElementsDefine.call(window.customElements, name, cl, conf);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  };
+</script>
 
 <script type="module">
-import '@openscd/open-scd-core/open-scd.js';
+  import '@openscd/open-scd-core/open-scd.js';
 
-const editor = document.querySelector('open-scd');
-const params = (new URL(document.location)).searchParams;
-for (const [name, value] of params) {
-editor.setAttribute(name, value);
-}
+  const editor = document.querySelector('open-scd');
+  const params = new URL(document.location).searchParams;
+  for (const [name, value] of params) {
+    editor.setAttribute(name, value);
+  }
 </script>
 <style>
-* {
-  margin: 0px;
-  padding: 0px;
-  --mdc-icon-font: 'Material Symbols Outlined';
+  * {
+    margin: 0px;
+    padding: 0px;
+    --mdc-icon-font: 'Material Symbols Outlined';
 
-  --oscd-theme-primary: #2aa198;
-  --oscd-theme-secondary: #6c71c4;
-  --oscd-theme-error: #dc322f;
-  
-  --oscd-theme-base03: #002b36;
-  --oscd-theme-base02: #073642;
-  --oscd-theme-base01: #586e75;
-  --oscd-theme-base00: #657b83;
-  --oscd-theme-base0: #839496;
-  --oscd-theme-base1: #93a1a1;
-  --oscd-theme-base2: #eee8d5;
-  --oscd-theme-base3: #fdf6e3;
-  
-  --oscd-theme-text-font: 'Roboto';
-  --oscd-theme-icon-font: 'Material Symbols Outlined';
+    --oscd-theme-primary: #2aa198;
+    --oscd-theme-secondary: #6c71c4;
+    --oscd-theme-error: #dc322f;
 
-  --oscd-primary: var(--oscd-theme-primary,#2aa198);
-  --oscd-secondary: var(--oscd-theme-secondary, #6c71c4);
-  --oscd-error: var(--oscd-theme-error, #dc322f);
-    
-  --oscd-base03: var(--oscd-theme-base03, #002b36);
-  --oscd-base02: var(--oscd-theme-base02, #073642);
-  --oscd-base01: var(--oscd-theme-base01, #586e75);
-  --oscd-base00: var(--oscd-theme-base00, #657b83);
-  --oscd-base0: var(--oscd-theme-base0, #839496);
-  --oscd-base1: var(--oscd-theme-base1, #93a1a1);
-  --oscd-base2: var(--oscd-theme-base2, #eee8d5);
-  --oscd-base3: var(--oscd-theme-base3, #fdf6e3);
-}
+    --oscd-theme-base03: #002b36;
+    --oscd-theme-base02: #073642;
+    --oscd-theme-base01: #586e75;
+    --oscd-theme-base00: #657b83;
+    --oscd-theme-base0: #839496;
+    --oscd-theme-base1: #93a1a1;
+    --oscd-theme-base2: #eee8d5;
+    --oscd-theme-base3: #fdf6e3;
 
-body {
-  background: white;
-}
+    --oscd-theme-text-font: 'Roboto';
+    --oscd-theme-icon-font: 'Material Symbols Outlined';
+
+    --oscd-primary: var(--oscd-theme-primary, #2aa198);
+    --oscd-secondary: var(--oscd-theme-secondary, #6c71c4);
+    --oscd-error: var(--oscd-theme-error, #dc322f);
+
+    --oscd-base03: var(--oscd-theme-base03, #002b36);
+    --oscd-base02: var(--oscd-theme-base02, #073642);
+    --oscd-base01: var(--oscd-theme-base01, #586e75);
+    --oscd-base00: var(--oscd-theme-base00, #657b83);
+    --oscd-base0: var(--oscd-theme-base0, #839496);
+    --oscd-base1: var(--oscd-theme-base1, #93a1a1);
+    --oscd-base2: var(--oscd-theme-base2, #eee8d5);
+    --oscd-base3: var(--oscd-theme-base3, #fdf6e3);
+  }
+
+  body {
+    background: white;
+  }
 </style>
