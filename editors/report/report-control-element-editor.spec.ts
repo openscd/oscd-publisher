@@ -199,4 +199,34 @@ describe('ReportControl element editor component', () => {
     expect(insert.node.hasAttribute('timeStamp')).to.equal(true);
     expect(insert.node.hasAttribute('dataSet')).to.equal(true);
   });
+
+  it('correctly orders TrgOps child element when OptFields inserted first', async () => {
+    reportControl = new DOMParser()
+      .parseFromString(reportControlDoc, 'application/xml')
+      .querySelector('ReportControl[name="rp4"]')!;
+
+    editor = await fixture(
+      html`<report-control-element-editor
+        .element="${reportControl}"
+      ></report-control-element-editor>`
+    );
+
+    editor.trgOpsInputs![1].nullSwitch?.click();
+    editor.trgOpsInputs![1].value = 'true';
+    await editor.updateComplete;
+
+    editor.trgOpsInputs![2].nullSwitch?.click();
+    editor.trgOpsInputs![2].value = 'true';
+    await editor.updateComplete;
+
+    editor.trgOpsSave.click();
+    await editor.updateComplete;
+
+    expect(editEvent).to.be.calledOnce;
+
+    const edit = editEvent.getCall(0).args[0].detail;
+    expect(edit).to.satisfy(isInsert);
+    expect(edit.parent.tagName).to.equal('ReportControl');
+    expect(edit.reference.tagName).to.equal('OptFields');
+  });
 });

@@ -13,7 +13,11 @@ import '@material/mwc-button';
 import type { Button } from '@material/mwc-button';
 
 import { newEditEvent } from '@openscd/open-scd-core';
-import { identity, updateReportControl } from '@openenergytools/scl-lib';
+import {
+  getReference,
+  identity,
+  updateReportControl,
+} from '@openenergytools/scl-lib';
 
 import '@openenergytools/scl-checkbox';
 import '@openenergytools/scl-select';
@@ -147,7 +151,11 @@ export class ReportControlElementEditor extends LitElement {
         optFieldAttrs
       );
       this.dispatchEvent(
-        newEditEvent({ parent: this.element, node, reference: null })
+        newEditEvent({
+          parent: this.element,
+          node,
+          reference: getReference(this.element, 'OptFields'),
+        })
       );
     } else {
       const updateEdit = { element: optFields!, attributes: optFieldAttrs };
@@ -190,7 +198,11 @@ export class ReportControlElementEditor extends LitElement {
         trgOpsAttrs
       );
       this.dispatchEvent(
-        newEditEvent({ parent: this.element, node, reference: null })
+        newEditEvent({
+          parent: this.element,
+          node,
+          reference: getReference(this.element, 'TrgOps'),
+        })
       );
     } else {
       const updateEdit = { element: trgOps!, attributes: trgOpsAttrs };

@@ -62,6 +62,9 @@ export const reportControlDoc = `
                             <FCDA ldInst="ldInst" prefix="prefix" lnClass="MMXU" lnInst="1" doName="Phv.phsA" daName="q" fc="MX" />
                         </DataSet>
                         <ReportControl name="rp3" datSet="datSet" />
+                        <ReportControl name="rp4" datSet="datSet">
+                            <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+                        </ReportControl>
                     </LN>
                 </LDevice>
             </Server>
