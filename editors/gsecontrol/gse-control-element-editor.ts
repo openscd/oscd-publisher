@@ -14,7 +14,7 @@ import '@material/mwc-checkbox';
 import type { Button } from '@material/mwc-button';
 import type { Checkbox } from '@material/mwc-checkbox';
 
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   changeGSEContent,
   ChangeGSEContentOptions,

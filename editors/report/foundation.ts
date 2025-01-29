@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Insert, Remove, Update } from '@openscd/open-scd-core';
+import { Insert, Remove, SetAttributes } from '@openenergytools/open-scd-core';
 
 import { getReference } from '@openenergytools/scl-lib';
 
@@ -20,7 +20,7 @@ function createElement(
 export function updateMaxClients(
   reportControl: Element,
   max: string | null
-): Remove | Update | Insert | null {
+): Remove | SetAttributes | Insert | null {
   const rptEnabled = reportControl.querySelector(':scope > RptEnabled');
 
   if (rptEnabled && !max) return { node: rptEnabled };
@@ -39,5 +39,5 @@ export function updateMaxClients(
     };
   }
 
-  return { element: rptEnabled!, attributes: { max } };
+  return { element: rptEnabled!, attributes: { max }, attributesNS: {} };
 }

@@ -7,7 +7,7 @@ import type { Dialog } from '@material/mwc-dialog';
 import type { IconButton } from '@material/mwc-icon-button';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   createDataSet,
   findControlBlockSubscription,

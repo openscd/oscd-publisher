@@ -7,7 +7,7 @@ import {
   queryAll,
   state,
 } from 'lit/decorators.js';
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   ChangeGseOrSmvAddressOptions,
   changeSMVContent,

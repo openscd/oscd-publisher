@@ -5,7 +5,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import '@material/mwc-button';
 import type { Button } from '@material/mwc-button';
 
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   createDataSet,
   identity,

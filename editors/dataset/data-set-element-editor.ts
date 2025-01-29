@@ -14,7 +14,7 @@ import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
 
 import '@openscd/oscd-tree-grid';
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
 import {
   canAddFCDA,

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { createElement } from '@openenergytools/scl-lib/dist/foundation/utils';
-import { Insert } from '@openscd/open-scd-core';
+import { Insert } from '@openenergytools/open-scd-core';
 
 function findFcda(
   dataSet: Element,

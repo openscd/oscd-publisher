@@ -7,7 +7,7 @@ import {
   isInsert,
   isRemove,
   isUpdate,
-} from '@openscd/open-scd-core';
+} from '@openenergytools/open-scd-core';
 
 import { updateMaxClients } from './foundation.js';
 

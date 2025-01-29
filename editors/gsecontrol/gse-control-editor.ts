@@ -5,7 +5,7 @@ import '@material/mwc-button';
 import type { Button } from '@material/mwc-button';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import { createGSEControl, removeControlBlock } from '@openenergytools/scl-lib';
 import {
   ActionItem,

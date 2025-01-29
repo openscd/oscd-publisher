@@ -6,7 +6,7 @@ import '@material/mwc-button';
 import type { Button } from '@material/mwc-button';
 
 import '@openenergytools/filterable-lists/dist/action-list.js';
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   createReportControl,
   identity,
