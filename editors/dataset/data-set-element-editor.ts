@@ -101,17 +101,17 @@ export class DataSetElementEditor extends LitElement {
 
   @state()
   private get name(): string | null {
-    return this.element!.getAttribute('name');
+    return this.element?.getAttribute('name') ?? null;
   }
 
   @state()
   private get desc(): string | null {
-    return this.element!.getAttribute('desc');
+    return this.element?.getAttribute('desc') ?? null;
   }
 
   @state()
   private get fcdaCount(): number {
-    return this.element!.querySelectorAll('FCDA').length;
+    return this.element?.querySelectorAll('FCDA').length ?? 0;
   }
 
   @state()

@@ -401,7 +401,7 @@ export class ReportControlElementEditor extends LitElement {
         @input=${this.onReportControlInputChange}
       ></scl-text-field>
       <scl-text-field
-        class="input gsecontrol"
+        class="report attributes"
         label="confRev"
         .value=${confRev}
         supportingText="Configuration Revision"

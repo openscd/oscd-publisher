@@ -406,7 +406,7 @@ export class SampledValueControlElementEditor extends LitElement {
             @input="${this.onSampledValueControlInputChange}"
           ></scl-checkbox>`}
       <scl-text-field
-        class="input gsecontrol"
+        class="smvcontrol attribute"
         label="confRev"
         .value=${confRev}
         supportingText="Configuration Revision"

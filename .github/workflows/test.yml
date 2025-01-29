@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -20,4 +20,4 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run tests
-        run: npm run-script test
+        run: npm run test

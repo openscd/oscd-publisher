@@ -137,7 +137,7 @@ describe('SampledValueControl element editor component', () => {
 
       await timeout(400);
 
-      (editor.sampledValueControlInputs![3] as SclCheckbox).nullSwitch?.click();
+      (editor.sampledValueControlInputs![4] as SclCheckbox).nullSwitch?.click();
 
       await editor.updateComplete;
       await timeout(400);
@@ -153,7 +153,7 @@ describe('SampledValueControl element editor component', () => {
     beforeEach(async () => {
       const smvControl = new DOMParser()
         .parseFromString(smvControlDoc, 'application/xml')
-        .querySelector('SampledValueControl[name="smv3"]')!;
+        .querySelector('SampledValueControl[name="smv2"]')!;
 
       editor = await fixture(
         html`<sampled-value-control-element-editor

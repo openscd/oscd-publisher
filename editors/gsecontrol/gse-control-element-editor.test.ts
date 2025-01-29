@@ -137,7 +137,7 @@ describe('GSEControl element editor component', () => {
 
       await timeout(400);
 
-      (editor.gSEControlInputs![4] as SclCheckbox).nullSwitch?.click();
+      (editor.gSEControlInputs![5] as SclCheckbox).nullSwitch?.click();
 
       await editor.updateComplete;
       await timeout(400);
@@ -153,7 +153,7 @@ describe('GSEControl element editor component', () => {
     beforeEach(async () => {
       const gseControl = new DOMParser()
         .parseFromString(gseControlDoc, 'application/xml')
-        .querySelector('GSEControl[name="gse3"]')!;
+        .querySelector('GSEControl[name="gse2"]')!;
 
       editor = await fixture(
         html`<gse-control-element-editor

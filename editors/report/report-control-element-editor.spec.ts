@@ -65,11 +65,10 @@ describe('ReportControl element editor component', () => {
     expect(update.attributes).to.deep.equal({
       name: 'SomeNewName',
       desc: null,
-      confRev: '40001',
+      confRev: '10053',
       rptID: 'someOtherID',
       buffered: 'false',
-      indexed: 'false',
-      bufTime: null,
+      indexed: null,
       intgPd: '43',
     });
 
