@@ -25,7 +25,7 @@ describe('GSEControl element editor component', () => {
     );
 
     editEvent = spy();
-    window.addEventListener('oscd-edit', editEvent);
+    window.addEventListener('oscd-edit-v2', editEvent);
   });
 
   it('allows to change the GSEControl elements attributes', async () => {
@@ -51,9 +51,9 @@ describe('GSEControl element editor component', () => {
     editor.gseControlSave.click();
 
     expect(editEvent).to.be.calledOnce;
-    expect(editEvent.args[0][0].detail.length).to.equal(2);
+    expect(editEvent.args[0][0].detail.edit.length).to.equal(2);
 
-    const update = editEvent.args[0][0].detail[0];
+    const update = editEvent.args[0][0].detail.edit[0];
     expect(update.element).to.equal(gseControl);
 
     expect(update.attributes).to.deep.equal({
@@ -85,6 +85,6 @@ describe('GSEControl element editor component', () => {
     // remove old MinTime
     // insert new MaxTime
     // remove old MaxTime
-    expect(editEvent.args[0][0].detail.length).to.equal(6);
+    expect(editEvent.args[0][0].detail.edit.length).to.equal(6);
   });
 });

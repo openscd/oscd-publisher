@@ -38,7 +38,7 @@ describe('ReportControl editor component', () => {
     );
 
     editEvent = spy();
-    window.addEventListener('oscd-edit', editEvent);
+    window.addEventListener('oscd-edit-v2', editEvent);
   });
 
   it('allows to insert new ReportControl element', async () => {
@@ -46,17 +46,19 @@ describe('ReportControl editor component', () => {
 
     expect(editEvent).to.have.been.calledOnce;
 
-    expect(editEvent.args[0][0].detail).to.satisfy(isInsert);
-    expect(editEvent.args[0][0].detail.parent.tagName).to.equal('LN0');
-    expect(editEvent.args[0][0].detail.node.tagName).to.equal('ReportControl');
+    expect(editEvent.args[0][0].detail.edit).to.satisfy(isInsert);
+    expect(editEvent.args[0][0].detail.edit.parent.tagName).to.equal('LN0');
+    expect(editEvent.args[0][0].detail.edit.node.tagName).to.equal(
+      'ReportControl'
+    );
   });
 
   it('allows to remove and existing ReportControl element', async () => {
     await sendMouse({ type: 'click', position: [760, 200] });
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail[0]).to.satisfy(isRemove);
-    expect(editEvent.args[0][0].detail[0].node.tagName).to.equal(
+    expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isRemove);
+    expect(editEvent.args[0][0].detail.edit[0].node.tagName).to.equal(
       'ReportControl'
     );
   });
@@ -66,9 +68,11 @@ describe('ReportControl editor component', () => {
     editor.newDataSet.click();
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail[0]).to.satisfy(isInsert);
-    expect(editEvent.args[0][0].detail[0].parent.tagName).to.equal('LN0');
-    expect(editEvent.args[0][0].detail[0].node.tagName).to.equal('DataSet');
+    expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isInsert);
+    expect(editEvent.args[0][0].detail.edit[0].parent.tagName).to.equal('LN0');
+    expect(editEvent.args[0][0].detail.edit[0].node.tagName).to.equal(
+      'DataSet'
+    );
   });
 
   it('allows to change an existing DataSet', async () => {
@@ -80,10 +84,12 @@ describe('ReportControl editor component', () => {
     await sendMouse({ type: 'click', position: [400, 410] });
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail).to.satisfy(isUpdate);
-    expect(editEvent.args[0][0].detail.element.tagName).to.equal(
+    expect(editEvent.args[0][0].detail.edit).to.satisfy(isUpdate);
+    expect(editEvent.args[0][0].detail.edit.element.tagName).to.equal(
       'ReportControl'
     );
-    expect(editEvent.args[0][0].detail.attributes.datSet).to.equal('datSet2');
+    expect(editEvent.args[0][0].detail.edit.attributes.datSet).to.equal(
+      'datSet2'
+    );
   });
 });

@@ -43,10 +43,13 @@ export default class BaseElementEditor extends LitElement {
     if (!name || !this.selectCtrlBlock) return;
 
     this.dispatchEvent(
-      newEditEvent({
-        element: this.selectCtrlBlock,
-        attributes: { datSet: name },
-      })
+      newEditEvent(
+        {
+          element: this.selectCtrlBlock,
+          attributes: { datSet: name },
+        },
+        { title: `Change Data Set of ${identity(this.selectCtrlBlock)}` }
+      )
     );
     this.selectedDataSet = dataSet;
 
@@ -65,7 +68,9 @@ export default class BaseElementEditor extends LitElement {
 
     const update = { element: control, attributes: { datSet: newName } };
 
-    this.dispatchEvent(newEditEvent([insert, update]));
+    this.dispatchEvent(
+      newEditEvent([insert, update], { title: 'Add New Data Set' })
+    );
 
     this.selectedDataSet = this.selectCtrlBlock?.parentElement?.querySelector(
       `:scope > DataSet[name="${this.selectCtrlBlock.getAttribute('datSet')}"]`

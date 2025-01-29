@@ -160,7 +160,9 @@ export class DataSetElementEditor extends LitElement {
         attributes[input.label] = input.value;
 
     this.dispatchEvent(
-      newEditEvent(updateDataSet({ element: this.element, attributes }))
+      newEditEvent(updateDataSet({ element: this.element, attributes }), {
+        title: `Update DataSet ${identity(this.element)}`,
+      })
     );
 
     this.resetInputs();
@@ -176,7 +178,11 @@ export class DataSetElementEditor extends LitElement {
       functionalConstraintPaths(this.element!.ownerDocument, paths)
     );
 
-    this.dispatchEvent(newEditEvent(actions));
+    this.dispatchEvent(
+      newEditEvent(actions, {
+        title: `Add Data Object to DataSet ${identity(this.element)}`,
+      })
+    );
     this.doPickerDialog.close();
   }
 
@@ -188,7 +194,11 @@ export class DataSetElementEditor extends LitElement {
       dataAttributePaths(this.element!.ownerDocument, paths)
     );
 
-    this.dispatchEvent(newEditEvent(actions));
+    this.dispatchEvent(
+      newEditEvent(actions, {
+        title: `Add Data Attributes to DataSet ${identity(this.element)}`,
+      })
+    );
     this.daPickerDialog.close();
   }
 
@@ -200,7 +210,9 @@ export class DataSetElementEditor extends LitElement {
       reference: fcda.previousElementSibling,
     };
 
-    this.dispatchEvent(newEditEvent([remove, insert]));
+    this.dispatchEvent(
+      newEditEvent([remove, insert], { title: 'Change FCDA order' })
+    );
   }
 
   private onMoveFCDADown(fcda: Element): void {
@@ -211,7 +223,9 @@ export class DataSetElementEditor extends LitElement {
       reference: fcda.nextElementSibling?.nextElementSibling,
     };
 
-    this.dispatchEvent(newEditEvent([remove, insert]));
+    this.dispatchEvent(
+      newEditEvent([remove, insert], { title: 'Change FCDA order' })
+    );
   }
 
   private renderFCDAList(): TemplateResult {
@@ -233,7 +247,9 @@ export class DataSetElementEditor extends LitElement {
           icon: 'delete',
           label: '',
           callback: () => {
-            this.dispatchEvent(newEditEvent(removeFCDA({ node: fcda })));
+            this.dispatchEvent(
+              newEditEvent(removeFCDA({ node: fcda }), { title: 'Remove FCDA' })
+            );
           },
         },
       ];

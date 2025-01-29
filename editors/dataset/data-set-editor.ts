@@ -93,7 +93,9 @@ export class DataSetEditor extends LitElement {
               callback: () => {
                 const insertDataSet = createDataSet(ied);
                 if (insertDataSet)
-                  this.dispatchEvent(newEditEvent(insertDataSet));
+                  this.dispatchEvent(
+                    newEditEvent(insertDataSet, { title: `Create New DataSet` })
+                  );
               },
             },
           ],
@@ -117,7 +119,9 @@ export class DataSetEditor extends LitElement {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
-                  newEditEvent(removeDataSet({ node: dataSet }))
+                  newEditEvent(removeDataSet({ node: dataSet }), {
+                    title: `Remove DataSet`,
+                  })
                 );
 
                 this.selectedDataSet = undefined;

@@ -145,7 +145,8 @@ export class GseControlElementEditor extends LitElement {
         updateGSEControl({
           element: this.element,
           attributes: gSEControlAttrs,
-        })
+        }),
+        { title: `Update GSEControl ${identity(this.element)}` }
       )
     );
 
@@ -194,7 +195,11 @@ export class GseControlElementEditor extends LitElement {
     else if (this.instType?.checked === false)
       options.address!.instType = false;
 
-    this.dispatchEvent(newEditEvent(changeGSEContent(this.gSE, options)));
+    this.dispatchEvent(
+      newEditEvent(changeGSEContent(this.gSE, options), {
+        title: `Update GSE ${identity(this.gSE)}`,
+      })
+    );
 
     this.resetInputs('GSE');
 

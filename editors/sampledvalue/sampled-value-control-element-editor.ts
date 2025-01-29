@@ -165,7 +165,8 @@ export class SampledValueControlElementEditor extends LitElement {
         updateSampledValueControl({
           element: this.element,
           attributes: sampledValueControlAttrs,
-        })
+        }),
+        { title: `Update SampledValueControl ${identity(this.element)}` }
       )
     );
 
@@ -208,7 +209,11 @@ export class SampledValueControlElementEditor extends LitElement {
     if (this.instType?.checked === true) options.instType = true;
     else if (this.instType?.checked === false) options.instType = false;
 
-    this.dispatchEvent(newEditEvent(changeSMVContent(this.sMV, options)));
+    this.dispatchEvent(
+      newEditEvent(changeSMVContent(this.sMV, options), {
+        title: `Update SampledValueControl SMV ${identity(this.element)}`,
+      })
+    );
 
     this.resetInputs('SMV');
 
@@ -240,7 +245,11 @@ export class SampledValueControlElementEditor extends LitElement {
         smvOptsAttrs[input.label] = input.value;
 
     const updateEdit = { element: smvOpts, attributes: smvOptsAttrs };
-    this.dispatchEvent(newEditEvent(updateEdit));
+    this.dispatchEvent(
+      newEditEvent(updateEdit, {
+        title: `Update SampledValueControl Options ${identity(this.element)}`,
+      })
+    );
 
     this.onSmvOptsInputChange();
   }

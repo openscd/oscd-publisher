@@ -151,15 +151,22 @@ export class ReportControlElementEditor extends LitElement {
         optFieldAttrs
       );
       this.dispatchEvent(
-        newEditEvent({
-          parent: this.element,
-          node,
-          reference: getReference(this.element, 'OptFields'),
-        })
+        newEditEvent(
+          {
+            parent: this.element,
+            node,
+            reference: getReference(this.element, 'OptFields'),
+          },
+          { title: `Update ReportControl OptFields ${this.element}` }
+        )
       );
     } else {
       const updateEdit = { element: optFields!, attributes: optFieldAttrs };
-      this.dispatchEvent(newEditEvent(updateEdit));
+      this.dispatchEvent(
+        newEditEvent(updateEdit, {
+          title: `Update ReportControl OptFields ${this.element}`,
+        })
+      );
     }
 
     this.onOptFieldsInputChange();
@@ -198,15 +205,22 @@ export class ReportControlElementEditor extends LitElement {
         trgOpsAttrs
       );
       this.dispatchEvent(
-        newEditEvent({
-          parent: this.element,
-          node,
-          reference: getReference(this.element, 'TrgOps'),
-        })
+        newEditEvent(
+          {
+            parent: this.element,
+            node,
+            reference: getReference(this.element, 'TrgOps'),
+          },
+          { title: `Update ReportControl Triggers ${this.element}` }
+        )
       );
     } else {
       const updateEdit = { element: trgOps!, attributes: trgOpsAttrs };
-      this.dispatchEvent(newEditEvent(updateEdit));
+      this.dispatchEvent(
+        newEditEvent(updateEdit, {
+          title: `Update ReportControl Triggers ${this.element}`,
+        })
+      );
     }
 
     this.onTrgOpsInputChange();
@@ -258,10 +272,16 @@ export class ReportControlElementEditor extends LitElement {
     const rptEnabledAction = updateMaxClients(reportControl!, max);
 
     if (!rptEnabledAction)
-      this.dispatchEvent(newEditEvent(reportControlActions));
+      this.dispatchEvent(
+        newEditEvent(reportControlActions, {
+          title: `Update ReportControl ${this.element}`,
+        })
+      );
     else
       this.dispatchEvent(
-        newEditEvent([...reportControlActions, rptEnabledAction])
+        newEditEvent([...reportControlActions, rptEnabledAction], {
+          title: `Update ReportControl ${this.element}`,
+        })
       );
 
     this.resetInputs();

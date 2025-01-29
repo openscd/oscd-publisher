@@ -122,7 +122,9 @@ export class SampledValueControlEditor extends BaseElementEditor {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
-                  newEditEvent(removeControlBlock({ node: smvControl }))
+                  newEditEvent(removeControlBlock({ node: smvControl }), {
+                    title: `Remove SampledValueControl`,
+                  })
                 );
 
                 this.selectCtrlBlock = undefined;

@@ -94,7 +94,11 @@ export class GseControlEditor extends BaseElementEditor {
               callback: () => {
                 const insertGseControl = createGSEControl(ied);
                 if (insertGseControl)
-                  this.dispatchEvent(newEditEvent(insertGseControl));
+                  this.dispatchEvent(
+                    newEditEvent(insertGseControl, {
+                      title: 'Create New GSEControl',
+                    })
+                  );
               },
             },
           ],
@@ -126,7 +130,9 @@ export class GseControlEditor extends BaseElementEditor {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
-                  newEditEvent(removeControlBlock({ node: gseControl }))
+                  newEditEvent(removeControlBlock({ node: gseControl }), {
+                    title: 'Remove GSEControl',
+                  })
                 );
 
                 this.selectCtrlBlock = undefined;

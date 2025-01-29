@@ -37,24 +37,28 @@ describe('GSEControl editor component', () => {
     );
 
     editEvent = spy();
-    window.addEventListener('oscd-edit', editEvent);
+    window.addEventListener('oscd-edit-v2', editEvent);
   });
 
   it('allows to insert new GSEControl element', async () => {
     await sendMouse({ type: 'click', position: [760, 100] });
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail[0]).to.satisfy(isInsert);
-    expect(editEvent.args[0][0].detail[0].parent.tagName).to.equal('LN0');
-    expect(editEvent.args[0][0].detail[0].node.tagName).to.equal('GSEControl');
+    expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isInsert);
+    expect(editEvent.args[0][0].detail.edit[0].parent.tagName).to.equal('LN0');
+    expect(editEvent.args[0][0].detail.edit[0].node.tagName).to.equal(
+      'GSEControl'
+    );
   });
 
   it('allows to remove and existing GSEControl element', async () => {
     await sendMouse({ type: 'click', position: [760, 200] });
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail[0]).to.satisfy(isRemove);
-    expect(editEvent.args[0][0].detail[0].node.tagName).to.equal('GSEControl');
+    expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isRemove);
+    expect(editEvent.args[0][0].detail.edit[0].node.tagName).to.equal(
+      'GSEControl'
+    );
   });
 
   it('allows to insert new DataSet and link with existing GSEControl', async () => {
@@ -62,9 +66,11 @@ describe('GSEControl editor component', () => {
     editor.newDataSet.click();
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail[0]).to.satisfy(isInsert);
-    expect(editEvent.args[0][0].detail[0].parent.tagName).to.equal('LN0');
-    expect(editEvent.args[0][0].detail[0].node.tagName).to.equal('DataSet');
+    expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isInsert);
+    expect(editEvent.args[0][0].detail.edit[0].parent.tagName).to.equal('LN0');
+    expect(editEvent.args[0][0].detail.edit[0].node.tagName).to.equal(
+      'DataSet'
+    );
   });
 
   it('allows to change an existing DataSet', async () => {
@@ -76,8 +82,12 @@ describe('GSEControl editor component', () => {
     await sendMouse({ type: 'click', position: [400, 420] });
 
     expect(editEvent).to.have.been.calledOnce;
-    expect(editEvent.args[0][0].detail).to.satisfy(isUpdate);
-    expect(editEvent.args[0][0].detail.element.tagName).to.equal('GSEControl');
-    expect(editEvent.args[0][0].detail.attributes.datSet).to.equal('datSet2');
+    expect(editEvent.args[0][0].detail.edit).to.satisfy(isUpdate);
+    expect(editEvent.args[0][0].detail.edit.element.tagName).to.equal(
+      'GSEControl'
+    );
+    expect(editEvent.args[0][0].detail.edit.attributes.datSet).to.equal(
+      'datSet2'
+    );
   });
 });

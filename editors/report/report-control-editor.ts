@@ -100,7 +100,11 @@ export class ReportControlEditor extends BaseElementEditor {
               callback: () => {
                 const insertGseControl = createReportControl(ied);
                 if (insertGseControl)
-                  this.dispatchEvent(newEditEvent(insertGseControl));
+                  this.dispatchEvent(
+                    newEditEvent(insertGseControl, {
+                      title: 'Create New ReportControl',
+                    })
+                  );
               },
             },
           ],
@@ -132,7 +136,9 @@ export class ReportControlEditor extends BaseElementEditor {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
-                  newEditEvent(removeControlBlock({ node: rpControl }))
+                  newEditEvent(removeControlBlock({ node: rpControl }), {
+                    title: `Remove ReportControl ${rpControl}`,
+                  })
                 );
 
                 this.selectCtrlBlock = undefined;
