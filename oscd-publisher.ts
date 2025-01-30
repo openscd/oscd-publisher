@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import '@material/mwc-radio';
 import '@material/mwc-formfield';
+import '@scopedelement/material-web/radio/radio.js';
 
 import './editors/report/report-control-editor.js';
 import './editors/gsecontrol/gse-control-editor.js';
@@ -25,43 +27,52 @@ export default class PublisherPlugin extends LitElement {
     'GOOSE';
 
   render() {
-    return html`<div class="publishertypeselector">
-        <mwc-formfield label="Report"
-          ><mwc-radio
-            value="Report"
+    return html`<form class="publishertypeselector">
+        <span>
+          <md-radio
+            id="report-radio"
+            value="report"
             ?checked=${this.publisherType === 'Report'}
-            eslint-disable-next-line
-            no-return-assign
-            @checked=${() => {
+            @change=${() => {
               this.publisherType = 'Report';
             }}
-          ></mwc-radio></mwc-formfield
-        ><mwc-formfield label="GOOSE"
-          ><mwc-radio
-            value="GOOSE"
+          ></md-radio>
+          <label for="report-radio">Report</label>
+        </span>
+        <span>
+          <md-radio
+            id="goose-radio"
+            value="goose"
             ?checked=${this.publisherType === 'GOOSE'}
-            @checked=${() => {
+            @change=${() => {
               this.publisherType = 'GOOSE';
             }}
-          ></mwc-radio></mwc-formfield
-        ><mwc-formfield label="SampledValue"
-          ><mwc-radio
-            value="SampledValue"
+          ></md-radio>
+          <label for="goose-radio">GOOSE</label>
+        </span>
+        <span>
+          <md-radio
+            id="smv-radio"
+            value="smv"
             ?checked=${this.publisherType === 'SampledValue'}
-            @checked=${() => {
+            @change=${() => {
               this.publisherType = 'SampledValue';
             }}
-          ></mwc-radio></mwc-formfield
-        ><mwc-formfield label="DataSet"
-          ><mwc-radio
-            value="DataSet"
+          ></md-radio>
+          <label for="smv-radio">SampledValue</label>
+        </span>
+        <span>
+          <md-radio
+            id="ds-radio"
+            value="ds"
             ?checked=${this.publisherType === 'DataSet'}
-            @checked=${() => {
+            @change=${() => {
               this.publisherType = 'DataSet';
             }}
-          ></mwc-radio
-        ></mwc-formfield>
-      </div>
+          ></md-radio>
+          <label for="ds-radio">DataSet</label>
+        </span>
+      </form>
       <report-control-editor
         .doc=${this.doc}
         editCount="${this.editCount}"
@@ -114,9 +125,15 @@ export default class PublisherPlugin extends LitElement {
 
     .publishertypeselector {
       margin: 4px 8px 8px;
-      background-color: var(--mdc-theme-surface);
-      width: calc(100% - 16px);
-      justify-content: space-around;
+      padding: 8px;
+      background-color: var(--oscd-theme-surface);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, auto));
+      gap: 5px;
+    }
+
+    .publishertypeselector > span > label {
+      margin-left: 10px;
     }
   `;
 }
