@@ -466,7 +466,7 @@ export class DataSetElementEditor extends LitElement {
       --mdc-shape-small: 28px;
     }
 
-    ::slotted(mwc-icon-button[disabled]) {
+    ::slotted(md-icon-button[disabled]) {
       display: none;
     }
   `;

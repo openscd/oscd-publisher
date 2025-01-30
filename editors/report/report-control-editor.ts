@@ -207,7 +207,7 @@ export class ReportControlEditor extends BaseElementEditor {
       --mdc-list-item-meta-size: 48px;
     }
 
-    mwc-icon-button[icon='playlist_add'] {
+    md-icon-button[icon='playlist_add'] {
       pointer-events: all;
     }
 

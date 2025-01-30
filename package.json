@@ -28,12 +28,6 @@
   "dependencies": {
     "@material/mwc-button": "^0.27.0",
     "@material/mwc-dialog": "^0.27.0",
-    "@material/mwc-icon-button": "^0.27.0",
-    "@material/mwc-list": "^0.27.0",
-    "@material/mwc-menu": "^0.27.0",
-    "@material/mwc-select": "^0.27.0",
-    "@material/mwc-switch": "^0.27.0",
-    "@material/mwc-textfield": "^0.27.0",
     "@scopedelement/material-web":"3.9.0",
     "@openenergytools/filterable-lists": "0.0.4",
     "@openenergytools/scl-checkbox": "^1.0.3",

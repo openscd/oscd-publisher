@@ -174,7 +174,7 @@ export class DataSetEditor extends LitElement {
       flex: auto;
     }
 
-    mwc-icon-button[icon='playlist_add'] {
+    md-icon-button[icon='playlist_add'] {
       pointer-events: all;
     }
 

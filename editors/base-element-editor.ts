@@ -2,11 +2,11 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 
 import '@material/mwc-dialog';
-import '@material/mwc-icon-button';
 import type { Dialog } from '@material/mwc-dialog';
-import type { IconButton } from '@material/mwc-icon-button';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
+// import '@scopedelement/material-web/iconbutton/icon-button.js';
+import type { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
+
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
   createDataSet,
@@ -34,9 +34,9 @@ export default class BaseElementEditor extends LitElement {
 
   @query('mwc-dialog') selectDataSetDialog!: Dialog;
 
-  @query('.new.dataset') newDataSet!: IconButton;
+  @query('.new.dataset') newDataSet!: MdIconButton;
 
-  @query('.change.dataset') changeDataSet!: IconButton;
+  @query('.change.dataset') changeDataSet!: MdIconButton;
 
   protected selectDataSet(dataSet: Element): void {
     const name = dataSet.getAttribute('name');
@@ -104,24 +104,24 @@ export default class BaseElementEditor extends LitElement {
           .showHeader=${false}
           editCount="${this.editCount}"
         >
-          <mwc-icon-button
+          <md-icon-button
             class="change dataset"
             slot="change"
-            icon="swap_vert"
             ?disabled=${!!findControlBlockSubscription(this.selectCtrlBlock!)
               .length}
             @click=${() => this.selectDataSetDialog.show()}
-          ></mwc-icon-button>
-          <mwc-icon-button
+            ><md-icon>swap_vert</md-icon></md-icon-button
+          >
+          <md-icon-button
             class="new dataset"
             slot="new"
-            icon="playlist_add"
             ?disabled=${!!this.selectCtrlBlock!.getAttribute('datSet')}
             @click="${() => {
               this.addNewDataSet(this.selectCtrlBlock!);
             }}"
-          ></mwc-icon-button
-        ></data-set-element-editor>
+            ><md-icon>playlist_add</md-icon></md-icon-button
+          ></data-set-element-editor
+        >
       </div>
     `;
   }
