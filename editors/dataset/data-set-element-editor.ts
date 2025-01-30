@@ -13,6 +13,8 @@ import '@material/mwc-dialog';
 import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
 
+// import '@scopedelement/material-web/icon/icon.js'
+
 import '@openscd/oscd-tree-grid';
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import type { TreeGrid } from '@openscd/oscd-tree-grid';
@@ -355,7 +357,7 @@ export class DataSetElementEditor extends LitElement {
     return html`<h3
       style="display: flex; flex-direction:row;align-self: center;"
     >
-      Entries: <mwc-icon>${loadIcon(is / max)}</mwc-icon> ${is}/${max}
+      Entries: <md-icon>${loadIcon(is / max)}</md-icon> ${is}/${max}
     </h3>`;
   }
 
