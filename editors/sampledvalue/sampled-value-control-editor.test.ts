@@ -7,6 +7,7 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { otherSmvControlDoc, smvControlDoc } from './smvControl.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './sampled-value-control-editor.js';
 import type { SampledValueControlEditor } from './sampled-value-control-editor.js';
 

@@ -1,8 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -29,7 +29,7 @@ import BaseElementEditor from '../base-element-editor.js';
 export class GseControlEditor extends BaseElementEditor {
   @query('.selectionlist') selectionList!: ActionList;
 
-  @query('mwc-button') selectGSEControlButton!: Button;
+  @query('.change.scl.element') selectGSEControlButton!: MdOutlinedButton;
 
   @query('gse-control-element-editor')
   gseControlElementEditor!: GseControlElementEditor;
@@ -154,15 +154,14 @@ export class GseControlEditor extends BaseElementEditor {
   }
 
   private renderToggleButton(): TemplateResult {
-    return html`<mwc-button
+    return html`<md-outlined-button
       class="change scl element"
-      outlined
-      label="Selected GOOSE"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectGSEControlButton.classList.add('hidden');
       }}
-    ></mwc-button>`;
+      >Selected GOOSE</md-outlined-button
+    >`;
   }
 
   render(): TemplateResult {

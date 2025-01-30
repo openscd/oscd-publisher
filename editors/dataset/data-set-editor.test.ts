@@ -5,10 +5,16 @@ import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+
 import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
 import './data-set-editor.js';
 import type { DataSetEditor } from './data-set-editor.js';
+
+window.customElements.define('md-outlined-button', MdOutlinedButton);
+window.customElements.define('md-text-button', MdTextButton);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

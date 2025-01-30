@@ -9,6 +9,7 @@ import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { gseControlDoc } from './gseControl.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './gse-control-element-editor.js';
 import type { GseControlElementEditor } from './gse-control-element-editor.js';
 

@@ -10,6 +10,7 @@ import {
   otherReportControlDoc,
 } from './reportControl.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './report-control-editor.js';
 import type { ReportControlEditor } from './report-control-editor.js';
 

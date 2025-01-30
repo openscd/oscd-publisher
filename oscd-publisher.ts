@@ -6,10 +6,16 @@ import { classMap } from 'lit/directives/class-map.js';
 import '@material/mwc-radio';
 import '@scopedelement/material-web/radio/radio.js';
 
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+
 import './editors/report/report-control-editor.js';
 import './editors/gsecontrol/gse-control-editor.js';
 import './editors/dataset/data-set-editor.js';
 import './editors/sampledvalue/sampled-value-control-editor.js';
+
+window.customElements.define('md-outlined-button', MdOutlinedButton);
+window.customElements.define('md-text-button', MdTextButton);
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends LitElement {

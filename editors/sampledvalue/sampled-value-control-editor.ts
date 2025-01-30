@@ -1,8 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -34,7 +34,8 @@ function smvControlPath(smvControl: Element): string {
 export class SampledValueControlEditor extends BaseElementEditor {
   @query('.selectionlist') selectionList!: ActionList;
 
-  @query('mwc-button') selectSampledValueControlButton!: Button;
+  @query('.change.scl.element')
+  selectSampledValueControlButton!: MdOutlinedButton;
 
   @query('sampled-value-control-element-editor')
   elementContainer?: SampledValueControlElementEditor;
@@ -146,15 +147,14 @@ export class SampledValueControlEditor extends BaseElementEditor {
   }
 
   private renderToggleButton(): TemplateResult {
-    return html`<mwc-button
+    return html`<md-outlined-button
       class="change scl element"
-      outlined
-      label="Select Sampled Value Control"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectSampledValueControlButton.classList.add('hidden');
       }}
-    ></mwc-button>`;
+      >Select Sampled Value Control</md-outlined-button
+    >`;
   }
 
   render(): TemplateResult {

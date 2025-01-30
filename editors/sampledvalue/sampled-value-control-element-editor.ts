@@ -16,11 +16,9 @@ import {
   updateSampledValueControl,
 } from '@openenergytools/scl-lib';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
-
 // import '@scopedelement/material-web/checkbox/checkbox.js'
 import type { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 
 import '@openenergytools/scl-checkbox';
 import '@openenergytools/scl-select';
@@ -103,15 +101,15 @@ export class SampledValueControlElementEditor extends LitElement {
   @queryAll('.smvcontrol.attribute')
   sampledValueControlInputs!: (SclTextField | SclSelect | SclCheckbox)[];
 
-  @query('.smvcontrol.save') smvControlSave!: Button;
+  @query('.smvcontrol.save') smvControlSave!: MdTextButton;
 
   @queryAll('.smv.attribute') sMVInputs!: SclTextField[];
 
-  @query('.smv.save') smvSave!: Button;
+  @query('.smv.save') smvSave!: MdTextButton;
 
   @queryAll('.smvopts.attribute') smvOptsInputs!: SclCheckbox[];
 
-  @query('.smvopts.save') smvOptsSave!: Button;
+  @query('.smvopts.save') smvOptsSave!: MdTextButton;
 
   @query('.smv.insttype') instType?: MdCheckbox;
 
@@ -297,13 +295,12 @@ export class SampledValueControlElementEditor extends LitElement {
             ></scl-text-field>`
         )}
       </div>
-      <mwc-button
+      <md-text-button
         class="smv save"
-        label="save"
-        icon="save"
         ?disabled=${!this.sMVdiff}
         @click=${() => this.saveSMVChanges()}
-      ></mwc-button>`;
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >`;
   }
 
   private renderSmvOptsContent(): TemplateResult {
@@ -349,13 +346,12 @@ export class SampledValueControlElementEditor extends LitElement {
             ></scl-checkbox>`
         )}
       </div>
-      <mwc-button
+      <md-text-button
         class="smvopts save"
-        label="save"
-        icon="save"
         ?disabled=${!this.smvOptsDiff}
         @click=${() => this.saveSmvOptsChanges()}
-      ></mwc-button>`;
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >`;
   }
 
   private renderOtherElements(): TemplateResult {
@@ -472,13 +468,14 @@ export class SampledValueControlElementEditor extends LitElement {
         @input="${this.onSampledValueControlInputChange}"
         .selectOptions=${['None', 'Signature', 'SignatureAndEncryption']}
       ></scl-select
-      ><mwc-button
+      ><md-text-button
         class="smvcontrol save"
         label="save"
         icon="save"
         ?disabled=${!this.sampledValueControlDiff}
         @click="${this.saveSampledValueControlChanges}"
-      ></mwc-button>
+        >Save<md-icon slot="save"></md-icon
+      ></md-text-button>
     </div>`;
   }
 

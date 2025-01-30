@@ -8,8 +8,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 
 // import '@scopedelement/material-web/checkbox/checkbox.js'
 import type { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
@@ -83,7 +82,7 @@ export class GseControlElementEditor extends LitElement {
 
   @queryAll('.content.gse > scl-text-field') gSEInputs!: SclTextField[];
 
-  @query('.content.gse > .save') gseSave!: Button;
+  @query('.content.gse > .save') gseSave!: MdTextButton;
 
   @queryAll('.input.gsecontrol') gSEControlInputs!: (
     | SclTextField
@@ -91,7 +90,7 @@ export class GseControlElementEditor extends LitElement {
     | SclCheckbox
   )[];
 
-  @query('.content.gsecontrol > .save') gseControlSave!: Button;
+  @query('.content.gsecontrol > .save') gseControlSave!: MdTextButton;
 
   @query('#instType') instType?: MdCheckbox;
 
@@ -268,13 +267,12 @@ export class GseControlElementEditor extends LitElement {
         type="number"
         @input=${this.onGSEInputChange}
       ></scl-text-field>
-      <mwc-button
+      <md-text-button
         class="save"
-        label="save"
-        icon="save"
         ?disabled=${!this.gSEdiff}
         @click=${() => this.saveGSEChanges()}
-      ></mwc-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
     </div>`;
   }
 
@@ -364,13 +362,12 @@ export class GseControlElementEditor extends LitElement {
         @input=${this.onGSEControlInputChange}
         .selectOptions=${['None', 'Signature', 'SignatureAndEncryption']}
       ></scl-select>
-      <mwc-button
+      <md-text-button
         class="save"
-        label="save"
-        icon="save"
         ?disabled=${!this.gSEControlDiff}
         @click=${() => this.saveGSEControlChanges()}
-      ></mwc-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
     </div>`;
   }
 

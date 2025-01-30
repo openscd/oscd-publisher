@@ -2,8 +2,7 @@
 import { css, html, TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
 import '@openenergytools/filterable-lists/dist/action-list.js';
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -33,7 +32,7 @@ import BaseElementEditor from '../base-element-editor.js';
 export class ReportControlEditor extends BaseElementEditor {
   @query('.selectionlist') selectionList!: ActionList;
 
-  @query('mwc-button') selectReportControlButton!: Button;
+  @query('.change.scl.element') selectReportControlButton!: MdOutlinedButton;
 
   @query('report-control-element-editor')
   rpControlElementEditor!: ReportControlElementEditor;
@@ -160,15 +159,14 @@ export class ReportControlEditor extends BaseElementEditor {
   }
 
   private renderToggleButton(): TemplateResult {
-    return html`<mwc-button
+    return html`<md-outlined-button
       class="change scl element"
-      outlined
-      label="Select Report"
       @click=${() => {
         this.selectionList.classList.remove('hidden');
         this.selectReportControlButton.classList.add('hidden');
       }}
-    ></mwc-button>`;
+      >Select Report</md-outlined-button
+    >`;
   }
 
   render(): TemplateResult {

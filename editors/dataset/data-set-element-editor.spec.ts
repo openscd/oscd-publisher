@@ -95,7 +95,7 @@ describe('DataSet element editor', () => {
     await setViewport({ width: 800, height: 1200 });
     await sendMouse({ type: 'click', position: [740, 600] }); // open menu
     await timeout(200); // await menu to be opened
-    await sendMouse({ type: 'click', position: [740, 780] }); // click on move down
+    await sendMouse({ type: 'click', position: [740, 760] }); // click on move down
 
     const toBeMovedFCDA = dataSet.querySelectorAll(':scope > FCDA')[1];
     const reference = toBeMovedFCDA.nextElementSibling?.nextElementSibling;

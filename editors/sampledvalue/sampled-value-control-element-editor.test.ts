@@ -9,6 +9,7 @@ import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { smvControlDoc } from './smvControl.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './sampled-value-control-element-editor.js';
 import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 

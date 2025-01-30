@@ -9,8 +9,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import '@material/mwc-button';
-import type { Button } from '@material/mwc-button';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
@@ -96,17 +95,17 @@ export class ReportControlElementEditor extends LitElement {
   @queryAll('.content.optfields > scl-checkbox')
   optFieldsInputs!: SclCheckbox[];
 
-  @query('.save.optfields') optFieldsSave!: Button;
+  @query('.save.optfields') optFieldsSave!: MdTextButton;
 
   @queryAll('.content.trgops > scl-checkbox')
   trgOpsInputs!: SclCheckbox[];
 
-  @query('.save.trgops') trgOpsSave!: Button;
+  @query('.save.trgops') trgOpsSave!: MdTextButton;
 
   @queryAll('.report.attributes')
   reportControlInputs!: (SclTextField | SclSelect | SclCheckbox)[];
 
-  @query('.content.reportcontrol > .save') reportControlSave!: Button;
+  @query('.content.reportcontrol > .save') reportControlSave!: MdTextButton;
 
   @query('.rptenabled.attributes') rptEnabledInput!: SclTextField;
 
@@ -335,13 +334,12 @@ export class ReportControlElementEditor extends LitElement {
             ></scl-checkbox>`
         )}
       </div>
-      <mwc-button
+      <md-text-button
         class="save optfields"
-        label="save"
-        icon="save"
         ?disabled=${!this.optFieldsDiff}
         @click=${() => this.saveOptFieldChanges()}
-      ></mwc-button>`;
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >`;
   }
 
   private renderTrgOpsContent(): TemplateResult {
@@ -371,13 +369,12 @@ export class ReportControlElementEditor extends LitElement {
             ></scl-checkbox>`
         )}
       </div>
-      <mwc-button
+      <md-text-button
         class="save trgops"
-        label="save"
-        icon="save"
         ?disabled=${!this.trgOpsDiff}
         @click=${() => this.saveTrgOpsChanges()}
-      ></mwc-button>`;
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >`;
   }
 
   private renderChildElements(): TemplateResult {
@@ -487,13 +484,12 @@ export class ReportControlElementEditor extends LitElement {
         suffix="ms"
         @input=${this.onReportControlInputChange}
       ></scl-text-field>
-      <mwc-button
+      <md-text-button
         class="save"
-        label="save"
-        icon="save"
         ?disabled=${!this.reportControlDiff}
         @click=${() => this.saveReportControlChanges()}
-      ></mwc-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
     </div>`;
   }
 

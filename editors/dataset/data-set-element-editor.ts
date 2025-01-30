@@ -8,11 +8,10 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import '@material/mwc-button';
 import '@material/mwc-dialog';
-import type { Button } from '@material/mwc-button';
 import type { Dialog } from '@material/mwc-dialog';
 
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 // import '@scopedelement/material-web/icon/icon.js'
 
 import '@openscd/oscd-tree-grid';
@@ -121,17 +120,17 @@ export class DataSetElementEditor extends LitElement {
 
   @queryAll('scl-text-field') inputs!: SclTextField[];
 
-  @query('mwc-button.save') saveButton!: Button;
+  @query('.dataset.save') saveButton!: MdTextButton;
 
   @query('.list.fcda') fcdaList!: ActionList;
 
-  @query('#dapickerbutton') daPickerButton!: Button;
+  @query('#dapickerbutton') daPickerButton!: MdTextButton;
 
   @query('#dapicker') daPickerDialog!: Dialog;
 
   @query('#dapicker > oscd-tree-grid') daPicker!: TreeGrid;
 
-  @query('#dopickerbutton') doPickerButton!: Button;
+  @query('#dopickerbutton') doPickerButton!: MdTextButton;
 
   @query('#dopicker') doPickerDialog!: Dialog;
 
@@ -148,6 +147,8 @@ export class DataSetElementEditor extends LitElement {
   }
 
   private onInputChange(): void {
+    if (!this.element) return;
+
     this.someDiffOnInputs = Array.from(this.inputs ?? []).some(
       input => this.element?.getAttribute(input.label) !== input.value
     );
@@ -291,52 +292,44 @@ export class DataSetElementEditor extends LitElement {
   private renderDataObjectPicker(): TemplateResult {
     const server = this.element?.closest('Server')!;
 
-    return html` <mwc-button
+    return html` <md-text-button
         id="doPickerButton"
-        label="Add data object"
         icon="playlist_add"
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.doPickerDialog?.show()}
-      ></mwc-button
+      >Add data object<md-icon slot="icon">playlist_add</me-icon></md-text-button
       ><mwc-dialog id="dopicker" heading="Add Data Objects">
         <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
-        <mwc-button
+        <md-text-button
           slot="secondaryAction"
-          label="close"
           @click=${() => this.doPickerDialog?.close()}
-        ></mwc-button>
-        <mwc-button
+        >Close</md-text-button>
+        <md-text-button
           slot="primaryAction"
-          label="save"
-          icon="save"
           @click=${this.saveDataObjects}
-        ></mwc-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button>
       </mwc-dialog>`;
   }
 
   private renderDataAttributePicker(): TemplateResult {
     const server = this.element?.closest('Server')!;
 
-    return html` <mwc-button
+    return html` <md-text-button
         id="daPickerButton"
-        label="Add data attribute"
         icon="playlist_add"
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.daPickerDialog.show()}
-      ></mwc-button
+      >Add data attribute<md-icon slot="icon">playlist_add</me-icon></md-text-button
       ><mwc-dialog id="dapicker" heading="Add Data Attributes"
         ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
-        <mwc-button
+        <md-text-button
           slot="secondaryAction"
-          label="close"
           @click=${() => this.daPickerDialog?.close()}
-        ></mwc-button>
-        <mwc-button
+        >Close</md-text-button>
+        <md-text-button
           slot="primaryAction"
-          label="save"
-          icon="save"
           @click=${this.saveDataAttributes}
-        ></mwc-button>
+        >Save<md-icon slot="icon">Save</md-icon></md-text-button>
       </mwc-dialog>`;
   }
 
@@ -381,13 +374,12 @@ export class DataSetElementEditor extends LitElement {
         @input=${() => this.onInputChange()}
       >
       </scl-text-field>
-      <mwc-button
-        class="save"
-        label="save"
-        icon="save"
+      <md-text-button
+        class="dataset save"
         ?disabled=${!this.someDiffOnInputs}
         @click=${() => this.saveChanges()}
-      ></mwc-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
       <hr color="lightgrey" />`;
   }
 

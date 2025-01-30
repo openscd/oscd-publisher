@@ -8,6 +8,7 @@ import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { reportControlDoc } from './reportControl.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './report-control-element-editor.js';
 import type { ReportControlElementEditor } from './report-control-element-editor.js';
 

@@ -7,6 +7,7 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { dataSetDoc } from './data-set-editor.testfiles.js';
 
+import '../../oscd-publisher.js'; // for loading of components only
 import './data-set-element-editor.js';
 import type { DataSetElementEditor } from './data-set-element-editor.js';
 
@@ -281,7 +282,7 @@ describe('DataSet element editor component', () => {
 
       const dataSet = new DOMParser()
         .parseFromString(dataSetDoc, 'application/xml')
-        .querySelector('LDevice[inst="ldInst1"] DataSet')!;
+        .querySelector('LDevice[inst="ldInst2"] DataSet')!;
 
       editor = await fixture(
         html`<data-set-element-editor
@@ -324,7 +325,7 @@ describe('DataSet element editor component', () => {
 
       const dataSet = new DOMParser()
         .parseFromString(dataSetDoc, 'application/xml')
-        .querySelector('LDevice[inst="ldInst1"] DataSet')!;
+        .querySelector('LDevice[inst="ldInst2"] DataSet')!;
 
       editor = await fixture(
         html`<data-set-element-editor
