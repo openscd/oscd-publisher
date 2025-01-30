@@ -60,10 +60,10 @@ describe('Utility function for GSE element', () => {
         checkGSEDiff(findElement(withInstType, 'GSE')!, buildAttr(), true)
       ).to.equal(false));
 
-    it('ignores instType check if instType is undefined', () => {
+    it('undefined instType is seen a false', () => {
       expect(
         checkGSEDiff(findElement(withInstType, 'GSE')!, buildAttr())
-      ).to.equal(false);
+      ).to.equal(true);
 
       expect(
         checkGSEDiff(findElement(woInstType, 'GSE')!, buildAttr())
@@ -78,16 +78,6 @@ describe('Utility function for GSE element', () => {
       expect(
         checkGSEDiff(findElement(partlyInstType, 'GSE')!, buildAttr(), true)
       ).to.equal(true);
-    });
-
-    it('ignores if instType is undefined', () => {
-      expect(
-        checkGSEDiff(findElement(withInstType, 'GSE')!, buildAttr())
-      ).to.equal(false);
-
-      expect(
-        checkGSEDiff(findElement(woInstType, 'GSE')!, buildAttr())
-      ).to.equal(false);
     });
 
     it('checks also missing parts', () =>

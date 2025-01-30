@@ -1,12 +1,3 @@
-const gSEselectors: Record<string, string> = {
-  MinTime: ':scope > MinTime',
-  MaxTime: ':scope > MaxTime',
-  'MAC-Address': ':scope > Address > P[type="MAC-Address"]',
-  APPID: ':scope > Address > P[type="APPID"]',
-  'VLAN-ID': ':scope > Address > P[type="VLAN-ID"]',
-  'VLAN-PRIORITY': ':scope > Address > P[type="VLAN-PRIORITY"]',
-};
-
 /** @returns a `GSE` element referenced to `GSEControl` element or `null` */
 export function referencedGSE(gseControl: Element): Element | null {
   const iedName = gseControl.closest('IED')?.getAttribute('name');
@@ -30,13 +21,21 @@ function pElementContent(gse: Element, type: string): string | null {
   );
 }
 
+function pElement(smv: Element, type: string): Element | null {
+  return (
+    Array.from(smv.querySelectorAll(':scope > Address > P')).find(
+      p => p.getAttribute('type') === type
+    ) ?? null
+  );
+}
+
 /** @returns Whether the `gSE`s element attributes or instType has changed */
 export function checkGSEDiff(
   gSE: Element,
   attrs: Record<string, string | null>,
   instType?: boolean
 ): boolean {
-  return Object.entries(attrs).some(([key, value]) => {
+  const valueDiff = Object.entries(attrs).some(([key, value]) => {
     if (key === 'MinTime' || key === 'MaxTime') {
       const oldValue =
         gSE.querySelector(`:scope > ${key}`)?.textContent?.trim() ?? null;
@@ -44,13 +43,18 @@ export function checkGSEDiff(
     }
 
     const oldValue = pElementContent(gSE, key);
-    if (instType === undefined) return oldValue !== value;
-
-    const oldInstType = gSE
-      .querySelector(gSEselectors[key])
-      ?.hasAttribute('xsi:type');
-    if (oldInstType === undefined) return oldValue !== value;
-
-    return oldValue !== value || instType !== oldInstType;
+    return oldValue !== value;
   });
+
+  if (valueDiff) return valueDiff;
+
+  const instTypeDiff = Object.keys(attrs).some(key => {
+    const pType = pElement(gSE, key);
+    if (!pType) return false;
+
+    const hasInstType = pType.hasAttribute('xsi:type');
+    return hasInstType !== !!instType;
+  });
+
+  return instTypeDiff;
 }
