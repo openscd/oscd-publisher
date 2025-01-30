@@ -17,10 +17,10 @@ import {
 } from '@openenergytools/scl-lib';
 
 import '@material/mwc-button';
-import '@material/mwc-checkbox';
-import '@material/mwc-formfield';
 import type { Button } from '@material/mwc-button';
-import type { Checkbox } from '@material/mwc-checkbox';
+
+// import '@scopedelement/material-web/checkbox/checkbox.js'
+import type { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import '@openenergytools/scl-checkbox';
 import '@openenergytools/scl-select';
@@ -113,7 +113,7 @@ export class SampledValueControlElementEditor extends LitElement {
 
   @query('.smvopts.save') smvOptsSave!: Button;
 
-  @query('.smv.insttype') instType?: Checkbox;
+  @query('.smv.insttype') instType?: MdCheckbox;
 
   public resetInputs(
     type: 'SampledValueControl' | 'SMV' = 'SampledValueControl'
@@ -274,13 +274,15 @@ export class SampledValueControlElementEditor extends LitElement {
 
     return html` <div class="content smv">
         <h3>Communication Settings (SMV)</h3>
-        <mwc-formfield label="Add XMLSchema-instance type"
-          ><mwc-checkbox
+        <form>
+          <md-checkbox
             class="smv insttype"
             ?checked="${hasInstType}"
             @change=${this.onSMVInputChange}
-          ></mwc-checkbox></mwc-formfield
-        >${Object.entries(attributes).map(
+          ></md-checkbox>
+          <label class="insttype label">Add XMLSchema-instance type</label>
+        </form>
+        ${Object.entries(attributes).map(
           ([key, value]) =>
             html`<scl-text-field
               class="smv attribute"
@@ -535,6 +537,13 @@ export class SampledValueControlElementEditor extends LitElement {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    .insttype.label {
+      margin-left: 10px;
+      font-weight: 300;
+      font-family: var(--oscd-theme-text-font), sans-serif;
+      color: var(--oscd-theme-base00);
     }
 
     *[iconTrailing='search'] {

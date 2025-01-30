@@ -9,10 +9,10 @@ import {
 } from 'lit/decorators.js';
 
 import '@material/mwc-button';
-import '@material/mwc-formfield';
-import '@material/mwc-checkbox';
 import type { Button } from '@material/mwc-button';
-import type { Checkbox } from '@material/mwc-checkbox';
+
+// import '@scopedelement/material-web/checkbox/checkbox.js'
+import type { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
@@ -93,7 +93,7 @@ export class GseControlElementEditor extends LitElement {
 
   @query('.content.gsecontrol > .save') gseControlSave!: Button;
 
-  @query('#instType') instType?: Checkbox;
+  @query('#instType') instType?: MdCheckbox;
 
   public resetInputs(type: 'GSEControl' | 'GSE' = 'GSEControl'): void {
     this.element = null; // removes inputs and forces a re-render
@@ -230,13 +230,15 @@ export class GseControlElementEditor extends LitElement {
 
     return html`<div class="content gse">
       <h3>Communication Settings (GSE)</h3>
-      <mwc-formfield label="Add XMLSchema-instance type"
-        ><mwc-checkbox
+      <form>
+        <md-checkbox
           id="instType"
           ?checked="${hasInstType}"
           @change=${this.onGSEInputChange}
-        ></mwc-checkbox></mwc-formfield
-      >${Object.entries(attributes).map(
+        ></md-checkbox>
+        <label class="insttype label">Add XMLSchema-instance type</label>
+      </form>
+      ${Object.entries(attributes).map(
         ([key, value]) =>
           html`<scl-text-field
             label="${key}"
@@ -425,6 +427,13 @@ export class GseControlElementEditor extends LitElement {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    .insttype.label {
+      margin-left: 10px;
+      font-family: var(--oscd-theme-text-font), sans-serif;
+      font-weight: 300;
+      color: var(--oscd-theme-base00);
     }
 
     *[iconTrailing='search'] {

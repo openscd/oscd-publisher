@@ -4,7 +4,6 @@ import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import '@material/mwc-radio';
-import '@material/mwc-formfield';
 import '@scopedelement/material-web/radio/radio.js';
 
 import './editors/report/report-control-editor.js';
