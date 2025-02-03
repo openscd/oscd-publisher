@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@scopedelement/material-web":"3.10.0",
-    "@openenergytools/filterable-lists": "0.0.4",
+    "@openenergytools/filterable-lists": "1.0.0",
     "@openenergytools/scl-checkbox": "^1.0.3",
     "@openenergytools/scl-lib": "^0.14.5",
     "@openenergytools/scl-select": "^1.0.2",

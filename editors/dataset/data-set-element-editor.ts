@@ -29,7 +29,7 @@ import '@openenergytools/scl-text-field';
 import type {
   ActionItem,
   ActionList,
-} from '@openenergytools/filterable-lists/dist/action-list.js';
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 // eslint-disable-next-line import/no-duplicates
 import { SclTextField } from '@openenergytools/scl-text-field';
 

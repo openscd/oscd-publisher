@@ -10,7 +10,7 @@ import { identity, removeControlBlock } from '@openenergytools/scl-lib';
 import {
   ActionItem,
   ActionList,
-} from '@openenergytools/filterable-lists/dist/action-list.js';
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
 import './sampled-value-control-element-editor.js';
 import '../dataset/data-set-element-editor.js';

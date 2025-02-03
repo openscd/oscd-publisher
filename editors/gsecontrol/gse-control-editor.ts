@@ -10,7 +10,7 @@ import { createGSEControl, removeControlBlock } from '@openenergytools/scl-lib';
 import {
   ActionItem,
   ActionList,
-} from '@openenergytools/filterable-lists/dist/action-list.js';
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
 import './gse-control-element-editor.js';
 import type { GseControlElementEditor } from './gse-control-element-editor.js';

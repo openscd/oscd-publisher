@@ -14,7 +14,7 @@ import '@openenergytools/filterable-lists/dist/action-list.js';
 import type {
   ActionItem,
   ActionList,
-} from '@openenergytools/filterable-lists/dist/action-list.js';
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
 import './data-set-element-editor.js';
 import type { DataSetElementEditor } from './data-set-element-editor.js';
