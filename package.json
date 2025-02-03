@@ -26,7 +26,6 @@
     "test:visualw": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --group visual --watch --coverage\""
   },
   "dependencies": {
-    "@material/mwc-dialog": "^0.27.0",
     "@scopedelement/material-web":"3.10.0",
     "@openenergytools/filterable-lists": "0.0.4",
     "@openenergytools/scl-checkbox": "^1.0.3",

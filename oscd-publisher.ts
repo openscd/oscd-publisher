@@ -6,6 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import '@material/mwc-radio';
 import '@scopedelement/material-web/radio/radio.js';
 
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 
@@ -14,6 +15,7 @@ import './editors/gsecontrol/gse-control-editor.js';
 import './editors/dataset/data-set-editor.js';
 import './editors/sampledvalue/sampled-value-control-editor.js';
 
+window.customElements.define('md-dialog', MdDialog);
 window.customElements.define('md-outlined-button', MdOutlinedButton);
 window.customElements.define('md-text-button', MdTextButton);
 
@@ -122,6 +124,7 @@ export default class PublisherPlugin extends LitElement {
       --md-menu-container-color: var(--oscd-base3);
       font-family: var(--oscd-theme-text-font);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
+      --md-dialog-container-color: var(--oscd-base3);
     }
 
     .hidden {

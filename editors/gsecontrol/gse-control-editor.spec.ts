@@ -11,10 +11,18 @@ import {
   isUpdate,
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+
 import { gseControlDoc } from './gseControl.testfiles.js';
 
 import './gse-control-editor.js';
 import type { GseControlEditor } from './gse-control-editor.js';
+
+window.customElements.define('md-outlined-button', MdOutlinedButton);
+window.customElements.define('md-text-button', MdTextButton);
+window.customElements.define('md-dialog', MdDialog);
 
 function timeout(ms: number) {
   return new Promise(res => {
@@ -79,7 +87,7 @@ describe('GSEControl editor component', () => {
 
     editor.changeDataSet.click();
     await timeout(200);
-    await sendMouse({ type: 'click', position: [400, 420] });
+    await sendMouse({ type: 'click', position: [400, 450] });
 
     expect(editEvent).to.have.been.calledOnce;
     expect(editEvent.args[0][0].detail.edit).to.satisfy(isUpdate);

@@ -1,10 +1,8 @@
 import { LitElement, TemplateResult, html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 
-import '@material/mwc-dialog';
-import type { Dialog } from '@material/mwc-dialog';
-
 // import '@scopedelement/material-web/iconbutton/icon-button.js';
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import type { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -32,7 +30,7 @@ export default class BaseElementEditor extends LitElement {
   @state()
   selectedDataSet?: Element | null;
 
-  @query('mwc-dialog') selectDataSetDialog!: Dialog;
+  @query('.dialog.select') selectDataSetDialog!: MdDialog;
 
   @query('.new.dataset') newDataSet!: MdIconButton;
 
@@ -77,6 +75,10 @@ export default class BaseElementEditor extends LitElement {
     );
   }
 
+  private showSelectDataSetDialog(): void {
+    this.selectDataSetDialog.show();
+  }
+
   protected renderSelectDataSetDialog(): TemplateResult {
     const items = Array.from(
       this.selectCtrlBlock?.parentElement?.querySelectorAll(
@@ -90,9 +92,9 @@ export default class BaseElementEditor extends LitElement {
       },
     }));
 
-    return html`<mwc-dialog>
-      <action-list .items=${items} filterable></action-list>
-    </mwc-dialog>`;
+    return html`<md-dialog class="dialog select">
+      <action-list slot="content" .items=${items} filterable></action-list>
+    </md-dialog>`;
   }
 
   protected renderDataSetElementContainer(): TemplateResult {
@@ -109,7 +111,7 @@ export default class BaseElementEditor extends LitElement {
             slot="change"
             ?disabled=${!!findControlBlockSubscription(this.selectCtrlBlock!)
               .length}
-            @click=${() => this.selectDataSetDialog.show()}
+            @click=${this.showSelectDataSetDialog}
             ><md-icon>swap_vert</md-icon></md-icon-button
           >
           <md-icon-button

@@ -178,15 +178,12 @@ export class SampledValueControlEditor extends BaseElementEditor {
       grid-gap: 12px;
       padding: 8px 12px 16px;
       grid-template-columns: repeat(3, 1fr);
+      z-index: 0;
     }
 
     .content.dataSet {
       display: flex;
       flex-direction: column;
-    }
-
-    .selectionlist {
-      z-index: 2;
     }
 
     mwc-list-item {

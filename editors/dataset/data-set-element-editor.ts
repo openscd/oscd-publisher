@@ -8,9 +8,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import '@material/mwc-dialog';
-import type { Dialog } from '@material/mwc-dialog';
-
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 // import '@scopedelement/material-web/icon/icon.js'
 
@@ -126,15 +124,19 @@ export class DataSetElementEditor extends LitElement {
 
   @query('#dapickerbutton') daPickerButton!: MdTextButton;
 
-  @query('#dapicker') daPickerDialog!: Dialog;
+  @query('#dapicker') daPickerDialog!: MdDialog;
 
   @query('#dapicker > oscd-tree-grid') daPicker!: TreeGrid;
 
+  @query('.da.picker.save') daPickerSaveButton!: MdTextButton;
+
   @query('#dopickerbutton') doPickerButton!: MdTextButton;
 
-  @query('#dopicker') doPickerDialog!: Dialog;
+  @query('#dopicker') doPickerDialog!: MdDialog;
 
   @query('#dopicker > oscd-tree-grid') doPicker!: TreeGrid;
+
+  @query('.do.picker.save') doPickerSaveButton!: MdTextButton;
 
   public resetInputs(): void {
     this.element = null; // removes inputs and forces a re-render
@@ -298,17 +300,21 @@ export class DataSetElementEditor extends LitElement {
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.doPickerDialog?.show()}
       >Add data object<md-icon slot="icon">playlist_add</me-icon></md-text-button
-      ><mwc-dialog id="dopicker" heading="Add Data Objects">
-        <oscd-tree-grid .tree=${dataObjectTree(server)}></oscd-tree-grid>
-        <md-text-button
-          slot="secondaryAction"
-          @click=${() => this.doPickerDialog?.close()}
-        >Close</md-text-button>
-        <md-text-button
-          slot="primaryAction"
-          @click=${this.saveDataObjects}
-        >Save<md-icon slot="icon">save</md-icon></md-text-button>
-      </mwc-dialog>`;
+      ><md-dialog id="dopicker">
+        <div slot="headline">Add Data Objects</div>
+        <oscd-tree-grid slot="content" .tree=${dataObjectTree(
+          server
+        )}></oscd-tree-grid>
+        <div slot="actions">
+          <md-text-button
+            @click=${() => this.doPickerDialog?.close()}
+          >Close</md-text-button>
+          <md-text-button 
+            class="do picker save"
+            @click=${this.saveDataObjects}
+          >Save<md-icon slot="icon">save</md-icon></md-text-button>
+        </div>
+      </md-dialog>`;
   }
 
   private renderDataAttributePicker(): TemplateResult {
@@ -320,17 +326,22 @@ export class DataSetElementEditor extends LitElement {
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.daPickerDialog.show()}
       >Add data attribute<md-icon slot="icon">playlist_add</me-icon></md-text-button
-      ><mwc-dialog id="dapicker" heading="Add Data Attributes"
-        ><oscd-tree-grid .tree="${dataAttributeTree(server)}"></oscd-tree-grid>
-        <md-text-button
-          slot="secondaryAction"
-          @click=${() => this.daPickerDialog?.close()}
-        >Close</md-text-button>
-        <md-text-button
-          slot="primaryAction"
-          @click=${this.saveDataAttributes}
-        >Save<md-icon slot="icon">Save</md-icon></md-text-button>
-      </mwc-dialog>`;
+      ><md-dialog id="dapicker">
+        <div slot="headline">Add Data Attributes</div>
+        <oscd-tree-grid slot="content" .tree="${dataAttributeTree(
+          server
+        )}"></oscd-tree-grid>
+        <div slot="actions">
+          <md-text-button @click=${() =>
+            this.daPickerDialog?.close()}>Close</md-text-button>
+          <md-text-button class="da picker save" @click=${
+            this.saveDataAttributes
+          } >
+            Save
+            <md-icon slot="icon">Save</md-icon>
+          </md-text-button>
+        </div>
+      </md-dialog>`;
   }
 
   private renderDataPickers(): TemplateResult {
@@ -446,12 +457,9 @@ export class DataSetElementEditor extends LitElement {
       text-overflow: ellipsis;
     }
 
-    mwc-dialog {
-      --mdc-dialog-max-width: 92vw;
-    }
-
-    action-list {
-      z-index: 0;
+    md-dialog {
+      min-width: 80%;
+      min-height: 80%;
     }
 
     *[iconTrailing='search'] {

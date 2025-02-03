@@ -43,6 +43,7 @@ export const styles = css`
     background-color: var(--mdc-theme-surface);
     overflow-y: scroll;
     display: flex;
+    z-index: 0;
   }
 
   .listitem.header {

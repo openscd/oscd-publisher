@@ -10,10 +10,14 @@ import {
   isRemove,
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+
 import { dataSetDoc } from './data-set-editor.testfiles.js';
 
 import './data-set-element-editor.js';
 import type { DataSetElementEditor } from './data-set-element-editor.js';
+
+window.customElements.define('md-dialog', MdDialog);
 
 const doc = new DOMParser().parseFromString(dataSetDoc, 'application/xml');
 const dataSet = doc.querySelector('LDevice[inst="ldInst1"] DataSet')!;
@@ -133,11 +137,7 @@ describe('DataSet element editor', () => {
       ],
     ];
 
-    (
-      editor.daPickerDialog.querySelector(
-        '*[slot="primaryAction"]'
-      ) as HTMLElement
-    ).click();
+    editor.daPickerSaveButton.click();
 
     expect(editEvent).to.have.be.calledOnce;
     expect(editEvent.args[0][0].detail.edit.length).to.equal(2);
@@ -182,11 +182,7 @@ describe('DataSet element editor', () => {
       ],
     ];
 
-    (
-      editor.doPickerDialog.querySelector(
-        '*[slot="primaryAction"]'
-      ) as HTMLElement
-    ).click();
+    editor.doPickerSaveButton.click();
 
     expect(editEvent).to.have.be.calledOnce;
     expect(editEvent.args[0][0].detail.edit.length).to.equal(2);
