@@ -15,6 +15,7 @@ import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedB
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 import { SclCheckbox } from '@openenergytools/scl-checkbox';
 import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
+import { TreeGrid } from '@openenergytools/tree-grid';
 
 import './editors/report/report-control-editor.js';
 import './editors/gsecontrol/gse-control-editor.js';
@@ -30,6 +31,7 @@ window.customElements.define('md-icon', MdIcon);
 window.customElements.define('scl-select', SclSelect);
 window.customElements.define('scl-checkbox', SclCheckbox);
 window.customElements.define('md-checkbox', MdCheckbox);
+window.customElements.define('oscd-tree-grid', TreeGrid);
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends LitElement {
@@ -137,6 +139,10 @@ export default class PublisherPlugin extends LitElement {
       font-family: var(--oscd-theme-text-font);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
       --md-dialog-container-color: var(--oscd-base3);
+
+      --md-list-item-activated-background: rgb(
+        from var(--oscd-primary) r g b / 0.38
+      );
     }
 
     .hidden {

@@ -29,11 +29,11 @@
     "@scopedelement/material-web":"3.10.0",
     "@openenergytools/filterable-lists": "1.0.0",
     "@openenergytools/scl-checkbox": "^2.0.0",
-    "@openenergytools/scl-lib": "^0.14.5",
+    "@openenergytools/scl-lib": "^1.2.3",
     "@openenergytools/scl-select": "^2.0.1",
     "@openenergytools/scl-text-field": "^2.0.2",
     "@openenergytools/open-scd-core": "^0.0.5",
-    "@openscd/oscd-tree-grid": "^0.0.1-alpha.12",
+    "@openenergytools/tree-grid": "1.0.1",
     "lit": "^3.0.0"
   },
   "devDependencies": {

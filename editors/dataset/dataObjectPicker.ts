@@ -1,5 +1,6 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { identity } from '@openenergytools/scl-lib';
-import { Tree } from '@openscd/oscd-tree-grid';
+import { Tree } from '@openenergytools/tree-grid';
 
 function subDataObjectsObject(sdo: Element): Tree {
   const tree: Tree = {};

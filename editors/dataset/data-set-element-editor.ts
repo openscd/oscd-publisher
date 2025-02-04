@@ -12,9 +12,8 @@ import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
 // import '@scopedelement/material-web/icon/icon.js'
 
-import '@openscd/oscd-tree-grid';
 import { newEditEvent } from '@openenergytools/open-scd-core';
-import type { TreeGrid } from '@openscd/oscd-tree-grid';
+import type { TreeGrid } from '@openenergytools/tree-grid';
 import {
   canAddFCDA,
   find,
