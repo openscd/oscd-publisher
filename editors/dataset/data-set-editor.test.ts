@@ -11,6 +11,7 @@ import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js
 import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { SclTextField } from '@openenergytools/scl-text-field';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+import { SclSelect } from '@openenergytools/scl-select';
 
 import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
@@ -23,6 +24,7 @@ window.customElements.define('md-text-button', MdTextButton);
 window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('md-icon-button', MdIconButton);
 window.customElements.define('md-icon', MdIcon);
+window.customElements.define('scl-select', SclSelect);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect, fixture, html } from '@open-wc/testing';
 import { SclTextField } from '@openenergytools/scl-text-field';
+import { SclSelect } from '@openenergytools/scl-select';
 
 import { SinonSpy, spy } from 'sinon';
 
@@ -11,6 +12,7 @@ import './gse-control-element-editor.js';
 import type { GseControlElementEditor } from './gse-control-element-editor.js';
 
 window.customElements.define('scl-text-field', SclTextField);
+window.customElements.define('scl-select', SclSelect);
 
 describe('GSEControl element editor component', () => {
   let editor: GseControlElementEditor;

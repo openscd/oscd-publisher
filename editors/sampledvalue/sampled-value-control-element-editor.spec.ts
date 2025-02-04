@@ -15,6 +15,7 @@ import './sampled-value-control-element-editor.js';
 import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
 window.customElements.define('scl-text-field', SclTextField);
+window.customElements.define('scl-select', SclSelect);
 
 describe('SampledValueControl element editor component', () => {
   let editor: SampledValueControlElementEditor;

@@ -9,6 +9,7 @@ import '@scopedelement/material-web/radio/radio.js';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { SclTextField } from '@openenergytools/scl-text-field';
+import { SclSelect } from '@openenergytools/scl-select';
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
@@ -24,6 +25,7 @@ window.customElements.define('md-text-button', MdTextButton);
 window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('md-icon-button', MdIconButton);
 window.customElements.define('md-icon', MdIcon);
+window.customElements.define('scl-select', SclSelect);
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends LitElement {
