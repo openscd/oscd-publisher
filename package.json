@@ -28,7 +28,7 @@
   "dependencies": {
     "@scopedelement/material-web":"3.10.0",
     "@openenergytools/filterable-lists": "1.0.0",
-    "@openenergytools/scl-checkbox": "^1.0.3",
+    "@openenergytools/scl-checkbox": "^2.0.0",
     "@openenergytools/scl-lib": "^0.14.5",
     "@openenergytools/scl-select": "^2.0.1",
     "@openenergytools/scl-text-field": "^2.0.2",

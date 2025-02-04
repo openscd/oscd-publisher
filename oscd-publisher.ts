@@ -13,6 +13,8 @@ import { SclSelect } from '@openenergytools/scl-select';
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import './editors/report/report-control-editor.js';
 import './editors/gsecontrol/gse-control-editor.js';
@@ -26,6 +28,8 @@ window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('md-icon-button', MdIconButton);
 window.customElements.define('md-icon', MdIcon);
 window.customElements.define('scl-select', SclSelect);
+window.customElements.define('scl-checkbox', SclCheckbox);
+window.customElements.define('md-checkbox', MdCheckbox);
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends LitElement {

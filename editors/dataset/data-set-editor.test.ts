@@ -12,6 +12,8 @@ import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButto
 import { SclTextField } from '@openenergytools/scl-text-field';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { SclSelect } from '@openenergytools/scl-select';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
@@ -25,6 +27,8 @@ window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('md-icon-button', MdIconButton);
 window.customElements.define('md-icon', MdIcon);
 window.customElements.define('scl-select', SclSelect);
+window.customElements.define('scl-checkbox', SclCheckbox);
+window.customElements.define('md-checkbox', MdCheckbox);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

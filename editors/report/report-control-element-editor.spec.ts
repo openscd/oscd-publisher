@@ -4,6 +4,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 
 import { SinonSpy, spy } from 'sinon';
 import { SclTextField } from '@openenergytools/scl-text-field';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import {
   isInsert,
@@ -17,6 +18,7 @@ import './report-control-element-editor.js';
 import type { ReportControlElementEditor } from './report-control-element-editor.js';
 
 window.customElements.define('scl-text-field', SclTextField);
+window.customElements.define('scl-checkbox', SclCheckbox);
 
 describe('ReportControl element editor component', () => {
   let editor: ReportControlElementEditor;

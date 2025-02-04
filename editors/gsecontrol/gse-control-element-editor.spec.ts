@@ -3,6 +3,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { SclTextField } from '@openenergytools/scl-text-field';
 import { SclSelect } from '@openenergytools/scl-select';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { SinonSpy, spy } from 'sinon';
 
@@ -13,6 +14,7 @@ import type { GseControlElementEditor } from './gse-control-element-editor.js';
 
 window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('scl-select', SclSelect);
+window.customElements.define('scl-checkbox', SclCheckbox);
 
 describe('GSEControl element editor component', () => {
   let editor: GseControlElementEditor;

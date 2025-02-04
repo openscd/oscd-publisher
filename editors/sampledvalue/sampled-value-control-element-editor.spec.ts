@@ -6,6 +6,7 @@ import { SinonSpy, spy } from 'sinon';
 
 import { SclSelect } from '@openenergytools/scl-select';
 import { SclTextField } from '@openenergytools/scl-text-field';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { isUpdate } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
@@ -16,6 +17,7 @@ import type { SampledValueControlElementEditor } from './sampled-value-control-e
 
 window.customElements.define('scl-text-field', SclTextField);
 window.customElements.define('scl-select', SclSelect);
+window.customElements.define('scl-checkbox', SclCheckbox);
 
 describe('SampledValueControl element editor component', () => {
   let editor: SampledValueControlElementEditor;
