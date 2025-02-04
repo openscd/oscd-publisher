@@ -11,6 +11,7 @@ import {
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import { dataSetDoc } from './data-set-editor.testfiles.js';
 
@@ -18,6 +19,7 @@ import './data-set-element-editor.js';
 import type { DataSetElementEditor } from './data-set-element-editor.js';
 
 window.customElements.define('md-dialog', MdDialog);
+window.customElements.define('scl-text-field', SclTextField);
 
 const doc = new DOMParser().parseFromString(dataSetDoc, 'application/xml');
 const dataSet = doc.querySelector('LDevice[inst="ldInst1"] DataSet')!;
@@ -80,7 +82,7 @@ describe('DataSet element editor', () => {
     await setViewport({ width: 800, height: 1200 });
     await sendMouse({ type: 'click', position: [740, 600] }); // open menu
     await timeout(200); // await menu to be opened
-    await sendMouse({ type: 'click', position: [740, 700] }); // click on move up
+    await sendMouse({ type: 'click', position: [740, 680] }); // click on move up
 
     const toBeMovedFCDA = dataSet.querySelectorAll(':scope > FCDA')[1];
     const reference = toBeMovedFCDA.previousElementSibling;
@@ -99,7 +101,7 @@ describe('DataSet element editor', () => {
     await setViewport({ width: 800, height: 1200 });
     await sendMouse({ type: 'click', position: [740, 600] }); // open menu
     await timeout(200); // await menu to be opened
-    await sendMouse({ type: 'click', position: [740, 740] }); // click on move down
+    await sendMouse({ type: 'click', position: [740, 700] }); // click on move down
 
     const toBeMovedFCDA = dataSet.querySelectorAll(':scope > FCDA')[1];
     const reference = toBeMovedFCDA.nextElementSibling?.nextElementSibling;

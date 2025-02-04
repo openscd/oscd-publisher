@@ -3,6 +3,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { SinonSpy, spy } from 'sinon';
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import {
   isInsert,
@@ -14,6 +15,8 @@ import { reportControlDoc } from './reportControl.testfiles.js';
 
 import './report-control-element-editor.js';
 import type { ReportControlElementEditor } from './report-control-element-editor.js';
+
+window.customElements.define('scl-text-field', SclTextField);
 
 describe('ReportControl element editor component', () => {
   let editor: ReportControlElementEditor;

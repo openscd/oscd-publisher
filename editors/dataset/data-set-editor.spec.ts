@@ -6,6 +6,10 @@ import { sendMouse } from '@web/test-runner-commands';
 
 import { SinonSpy, spy } from 'sinon';
 
+import { SclTextField } from '@openenergytools/scl-text-field';
+import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+
 import {
   isInsert,
   isRemove,
@@ -14,6 +18,10 @@ import {
 import { dataSetDoc } from './data-set-editor.testfiles.js';
 
 import './data-set-editor.js';
+
+window.customElements.define('scl-text-field', SclTextField);
+window.customElements.define('md-icon-button', MdIconButton);
+window.customElements.define('md-icon', MdIcon);
 
 const doc = new DOMParser().parseFromString(dataSetDoc, 'application/xml');
 

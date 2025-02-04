@@ -14,6 +14,8 @@ import { smvControlDoc } from './smvControl.testfiles.js';
 import './sampled-value-control-element-editor.js';
 import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
+window.customElements.define('scl-text-field', SclTextField);
+
 describe('SampledValueControl element editor component', () => {
   let editor: SampledValueControlElementEditor;
   let editEvent: SinonSpy;

@@ -8,6 +8,9 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
+import { SclTextField } from '@openenergytools/scl-text-field';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 
 import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
@@ -17,6 +20,9 @@ import type { DataSetEditor } from './data-set-editor.js';
 window.customElements.define('md-dialog', MdDialog);
 window.customElements.define('md-outlined-button', MdOutlinedButton);
 window.customElements.define('md-text-button', MdTextButton);
+window.customElements.define('scl-text-field', SclTextField);
+window.customElements.define('md-icon-button', MdIconButton);
+window.customElements.define('md-icon', MdIcon);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {
