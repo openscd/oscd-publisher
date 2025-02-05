@@ -17,7 +17,7 @@ jobs:
         run: npm ci
 
       - name: Install playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium
 
       - name: Run unit tests
         run: npm run-script test:unit
@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Install playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium
 
       - name: Run visual test
         run: npm run-script test:visual
