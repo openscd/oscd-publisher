@@ -10,9 +10,9 @@ import {
   otherReportControlDoc,
 } from './reportControl.testfiles.js';
 
-import '../../oscd-publisher.js'; // for loading of components only
-import './report-control-editor.js';
-import type { ReportControlEditor } from './report-control-editor.js';
+import { ReportControlEditor } from './report-control-editor.js';
+
+window.customElements.define('report-control-editor', ReportControlEditor);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

@@ -3,38 +3,25 @@ import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-import '@material/mwc-radio';
-import '@scopedelement/material-web/radio/radio.js';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 
-import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
-import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
-import { SclTextField } from '@openenergytools/scl-text-field';
-import { SclSelect } from '@openenergytools/scl-select';
-import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
-import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
-import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-import { SclCheckbox } from '@openenergytools/scl-checkbox';
-import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
-import { TreeGrid } from '@openenergytools/tree-grid';
+import { MdRadio } from '@scopedelement/material-web/radio/radio.js';
 
-import './editors/report/report-control-editor.js';
-import './editors/gsecontrol/gse-control-editor.js';
-import './editors/dataset/data-set-editor.js';
-import './editors/sampledvalue/sampled-value-control-editor.js';
-
-window.customElements.define('md-dialog', MdDialog);
-window.customElements.define('md-outlined-button', MdOutlinedButton);
-window.customElements.define('md-text-button', MdTextButton);
-window.customElements.define('scl-text-field', SclTextField);
-window.customElements.define('md-icon-button', MdIconButton);
-window.customElements.define('md-icon', MdIcon);
-window.customElements.define('scl-select', SclSelect);
-window.customElements.define('scl-checkbox', SclCheckbox);
-window.customElements.define('md-checkbox', MdCheckbox);
-window.customElements.define('oscd-tree-grid', TreeGrid);
+import { DataSetEditor } from './editors/dataset/data-set-editor.js';
+import { GseControlEditor } from './editors/gsecontrol/gse-control-editor.js';
+import { ReportControlEditor } from './editors/report/report-control-editor.js';
+import { SampledValueControlEditor } from './editors/sampledvalue/sampled-value-control-editor.js';
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
-export default class PublisherPlugin extends LitElement {
+export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
+  static scopedElements = {
+    'md-radio': MdRadio,
+    'report-control-editor': ReportControlEditor,
+    'gse-control-editor': GseControlEditor,
+    'sampled-value-control-editor': SampledValueControlEditor,
+    'data-set-editor': DataSetEditor,
+  };
+
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   doc!: XMLDocument;

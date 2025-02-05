@@ -5,32 +5,11 @@ import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
-import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
-import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
-import { SclTextField } from '@openenergytools/scl-text-field';
-import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
-import { SclSelect } from '@openenergytools/scl-select';
-import { SclCheckbox } from '@openenergytools/scl-checkbox';
-import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
-import { TreeGrid } from '@openenergytools/tree-grid';
-
 import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
 
-import './data-set-editor.js';
-import type { DataSetEditor } from './data-set-editor.js';
+import { DataSetEditor } from './data-set-editor.js';
 
-window.customElements.define('md-dialog', MdDialog);
-window.customElements.define('md-outlined-button', MdOutlinedButton);
-window.customElements.define('md-text-button', MdTextButton);
-window.customElements.define('scl-text-field', SclTextField);
-window.customElements.define('md-icon-button', MdIconButton);
-window.customElements.define('md-icon', MdIcon);
-window.customElements.define('scl-select', SclSelect);
-window.customElements.define('scl-checkbox', SclCheckbox);
-window.customElements.define('md-checkbox', MdCheckbox);
-window.customElements.define('oscd-tree-grid', TreeGrid);
+window.customElements.define('data-set-editor', DataSetEditor);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

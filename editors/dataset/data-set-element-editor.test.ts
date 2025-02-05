@@ -7,9 +7,9 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { dataSetDoc } from './data-set-editor.testfiles.js';
 
-import '../../oscd-publisher.js'; // for loading of components only
-import './data-set-element-editor.js';
-import type { DataSetElementEditor } from './data-set-element-editor.js';
+import { DataSetElementEditor } from './data-set-element-editor.js';
+
+window.customElements.define('data-set-element-editor', DataSetElementEditor);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

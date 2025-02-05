@@ -9,9 +9,12 @@ import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import { smvControlDoc } from './smvControl.testfiles.js';
 
-import '../../oscd-publisher.js'; // for loading of components only
-import './sampled-value-control-element-editor.js';
-import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
+import { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
+
+window.customElements.define(
+  'sampled-value-control-element-editor',
+  SampledValueControlElementEditor
+);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

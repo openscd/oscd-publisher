@@ -11,18 +11,14 @@ import {
   isUpdate,
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
-import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
-import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
-import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-
 import { smvControlDoc } from './smvControl.testfiles.js';
 
-import './sampled-value-control-editor.js';
-import type { SampledValueControlEditor } from './sampled-value-control-editor.js';
+import { SampledValueControlEditor } from './sampled-value-control-editor.js';
 
-window.customElements.define('md-outlined-button', MdOutlinedButton);
-window.customElements.define('md-text-button', MdTextButton);
-window.customElements.define('md-dialog', MdDialog);
+window.customElements.define(
+  'sampled-value-control-editor',
+  SampledValueControlEditor
+);
 
 function timeout(ms: number) {
   return new Promise(res => {

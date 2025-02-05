@@ -1,25 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { query } from 'lit/decorators.js';
 
-import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { newEditEvent } from '@openenergytools/open-scd-core';
-import { identity, removeControlBlock } from '@openenergytools/scl-lib';
 import {
   ActionItem,
   ActionList,
 } from '@openenergytools/filterable-lists/dist/ActionList.js';
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
+import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
-import './sampled-value-control-element-editor.js';
-import '../dataset/data-set-element-editor.js';
-import type { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
-import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
+import { newEditEvent } from '@openenergytools/open-scd-core';
+import { identity, removeControlBlock } from '@openenergytools/scl-lib';
 
-// import { styles, updateElementReference } from '../../foundation.js';
 import { styles } from '../../foundation.js';
-import BaseElementEditor from '../base-element-editor.js';
+import { BaseElementEditor } from '../base-element-editor.js';
+
+import { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
+import { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
 function smvControlPath(smvControl: Element): string {
   const id = identity(smvControl);
@@ -30,8 +29,17 @@ function smvControlPath(smvControl: Element): string {
   return paths.join('>');
 }
 
-@customElement('sampled-value-control-editor')
 export class SampledValueControlEditor extends BaseElementEditor {
+  static scopedElements = {
+    'action-list': ActionList,
+    'data-set-element-editor': DataSetElementEditor,
+    'md-outlined-button': MdOutlinedButton,
+    'sampled-value-control-element-editor': SampledValueControlElementEditor,
+    'md-icon-button': MdIconButton,
+    'md-icon': MdIcon,
+    'md-dialog': MdDialog,
+  };
+
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('.change.scl.element')

@@ -7,9 +7,12 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { otherSmvControlDoc, smvControlDoc } from './smvControl.testfiles.js';
 
-import '../../oscd-publisher.js'; // for loading of components only
-import './sampled-value-control-editor.js';
-import type { SampledValueControlEditor } from './sampled-value-control-editor.js';
+import { SampledValueControlEditor } from './sampled-value-control-editor.js';
+
+window.customElements.define(
+  'sampled-value-control-editor',
+  SampledValueControlEditor
+);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

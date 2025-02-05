@@ -3,8 +3,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { SinonSpy, spy } from 'sinon';
-import { SclTextField } from '@openenergytools/scl-text-field';
-import { SclCheckbox } from '@openenergytools/scl-checkbox';
 
 import {
   isInsert,
@@ -14,11 +12,18 @@ import {
 
 import { reportControlDoc } from './reportControl.testfiles.js';
 
-import './report-control-element-editor.js';
-import type { ReportControlElementEditor } from './report-control-element-editor.js';
+import { ReportControlElementEditor } from './report-control-element-editor.js';
 
-window.customElements.define('scl-text-field', SclTextField);
-window.customElements.define('scl-checkbox', SclCheckbox);
+window.customElements.define(
+  'report-control-element-editor',
+  ReportControlElementEditor
+);
+
+function timeout(ms: number) {
+  return new Promise(res => {
+    setTimeout(res, ms);
+  });
+}
 
 describe('ReportControl element editor component', () => {
   let editor: ReportControlElementEditor;
@@ -54,7 +59,7 @@ describe('ReportControl element editor component', () => {
     editor.reportControlInputs![7].value = '43';
 
     editor.rptEnabledInput.nullSwitch?.click();
-    await editor.updateComplete;
+    await timeout(100);
 
     editor.reportControlSave.click();
 
@@ -93,7 +98,7 @@ describe('ReportControl element editor component', () => {
     editor.optFieldsInputs![4].value = 'false';
     editor.optFieldsInputs![5].value = 'false';
     editor.optFieldsInputs![6].nullSwitch?.click();
-    await editor.updateComplete;
+    await timeout(100);
 
     editor.optFieldsSave.click();
 
@@ -123,7 +128,7 @@ describe('ReportControl element editor component', () => {
     editor.trgOpsInputs![4].nullSwitch?.click();
     await editor.updateComplete;
 
-    await editor.updateComplete;
+    await timeout(100);
     editor.trgOpsSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -159,7 +164,7 @@ describe('ReportControl element editor component', () => {
     editor.trgOpsInputs![2].value = 'true';
     await editor.updateComplete;
 
-    await editor.updateComplete;
+    await timeout(100);
     editor.trgOpsSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -191,7 +196,7 @@ describe('ReportControl element editor component', () => {
     editor.optFieldsInputs![2].value = 'true';
     await editor.updateComplete;
 
-    await editor.updateComplete;
+    await timeout(100);
     editor.optFieldsSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -221,7 +226,7 @@ describe('ReportControl element editor component', () => {
 
     editor.trgOpsInputs![2].nullSwitch?.click();
     editor.trgOpsInputs![2].value = 'true';
-    await editor.updateComplete;
+    await timeout(100);
 
     editor.trgOpsSave.click();
     await editor.updateComplete;

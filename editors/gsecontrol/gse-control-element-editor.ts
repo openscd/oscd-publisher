@@ -1,17 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import {
-  customElement,
-  property,
-  query,
-  queryAll,
-  state,
-} from 'lit/decorators.js';
+import { property, query, queryAll, state } from 'lit/decorators.js';
 
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-
-// import '@scopedelement/material-web/checkbox/checkbox.js'
-import type { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+import { SclCheckbox } from '@openenergytools/scl-checkbox';
+import { SclSelect } from '@openenergytools/scl-select';
+import { SclTextField } from '@openenergytools/scl-text-field';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import {
@@ -21,15 +19,6 @@ import {
   identity,
   updateGSEControl,
 } from '@openenergytools/scl-lib';
-
-import '@openenergytools/scl-checkbox';
-import '@openenergytools/scl-select';
-// eslint-disable-next-line import/no-duplicates
-import '@openenergytools/scl-text-field';
-import type { SclCheckbox } from '@openenergytools/scl-checkbox';
-import type { SclSelect } from '@openenergytools/scl-select';
-// eslint-disable-next-line import/no-duplicates
-import { SclTextField } from '@openenergytools/scl-text-field';
 
 import {
   maxLength,
@@ -61,8 +50,16 @@ const gsePlaceholders: Record<string, string> = {
   'VLAN-PRIORITY': '4',
 };
 
-@customElement('gse-control-element-editor')
-export class GseControlElementEditor extends LitElement {
+export class GseControlElementEditor extends ScopedElementsMixin(LitElement) {
+  static scopedElements = {
+    'scl-text-field': SclTextField,
+    'scl-select': SclSelect,
+    'scl-checkbox': SclCheckbox,
+    'md-text-button': MdTextButton,
+    'md-icon': MdIcon,
+    'md-checkbox': MdCheckbox,
+  };
+
   /** The element being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   element: Element | null = null;

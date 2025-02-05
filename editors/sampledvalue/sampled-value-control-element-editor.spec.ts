@@ -4,20 +4,25 @@ import { expect, fixture, html } from '@open-wc/testing';
 
 import { SinonSpy, spy } from 'sinon';
 
-import { SclSelect } from '@openenergytools/scl-select';
 import { SclTextField } from '@openenergytools/scl-text-field';
-import { SclCheckbox } from '@openenergytools/scl-checkbox';
+import { SclSelect } from '@openenergytools/scl-select';
 
 import { isUpdate } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
 import { smvControlDoc } from './smvControl.testfiles.js';
 
-import './sampled-value-control-element-editor.js';
-import type { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
+import { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
 
-window.customElements.define('scl-text-field', SclTextField);
-window.customElements.define('scl-select', SclSelect);
-window.customElements.define('scl-checkbox', SclCheckbox);
+window.customElements.define(
+  'sampled-value-control-element-editor',
+  SampledValueControlElementEditor
+);
+
+function timeout(ms: number) {
+  return new Promise(res => {
+    setTimeout(res, ms);
+  });
+}
 
 describe('SampledValueControl element editor component', () => {
   let editor: SampledValueControlElementEditor;
@@ -84,7 +89,7 @@ describe('SampledValueControl element editor component', () => {
     editor.sMVInputs![3].nullSwitch?.click();
     await editor.updateComplete;
 
-    await editor.updateComplete;
+    await timeout(150);
     editor.smvSave.click();
 
     expect(editEvent).to.be.calledOnce;
@@ -106,7 +111,9 @@ describe('SampledValueControl element editor component', () => {
     editor.smvOptsInputs![5].value = 'false';
     editor.smvOptsInputs![6].value = 'false';
 
+    await timeout(150);
     await editor.updateComplete;
+
     editor.smvOptsSave.click();
 
     expect(editEvent).to.be.calledOnce;

@@ -1,7 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { LitElement, TemplateResult, html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 
-// import '@scopedelement/material-web/iconbutton/icon-button.js';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import type { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 
@@ -13,9 +15,7 @@ import {
 } from '@openenergytools/scl-lib';
 import '@openenergytools/filterable-lists/dist/action-list.js';
 
-import './dataset/data-set-element-editor.js';
-
-export default class BaseElementEditor extends LitElement {
+export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   doc!: XMLDocument;

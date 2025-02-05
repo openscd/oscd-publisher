@@ -1,7 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
+import {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -10,23 +16,18 @@ import {
   identity,
   removeDataSet,
 } from '@openenergytools/scl-lib';
-import '@openenergytools/filterable-lists/dist/action-list.js';
-import type {
-  ActionItem,
-  ActionList,
-} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
-import './data-set-element-editor.js';
-import type { DataSetElementEditor } from './data-set-element-editor.js';
+import { DataSetElementEditor } from './data-set-element-editor.js';
 
-import {
-  pathIdentity,
-  styles,
-  //  updateElementReference,
-} from '../../foundation.js';
+import { pathIdentity, styles } from '../../foundation.js';
 
-@customElement('data-set-editor')
-export class DataSetEditor extends LitElement {
+export class DataSetEditor extends ScopedElementsMixin(LitElement) {
+  static scopedElements = {
+    'action-list': ActionList,
+    'data-set-element-editor': DataSetElementEditor,
+    'md-outlined-button': MdOutlinedButton,
+  };
+
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   doc!: XMLDocument;
@@ -170,10 +171,6 @@ export class DataSetEditor extends LitElement {
 
     md-icon-button[icon='playlist_add'] {
       pointer-events: all;
-    }
-
-    mwc-list-item {
-      --mdc-list-item-meta-size: 48px;
     }
   `;
 }

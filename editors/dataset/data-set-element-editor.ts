@@ -1,19 +1,20 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, LitElement, TemplateResult } from 'lit';
-import {
-  customElement,
-  property,
-  query,
-  queryAll,
-  state,
-} from 'lit/decorators.js';
+import { property, query, queryAll, state } from 'lit/decorators.js';
 
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
+import {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-// import '@scopedelement/material-web/icon/icon.js'
+import { SclTextField } from '@openenergytools/scl-text-field';
+import { TreeGrid } from '@openenergytools/tree-grid';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
-import type { TreeGrid } from '@openenergytools/tree-grid';
 import {
   canAddFCDA,
   find,
@@ -22,15 +23,6 @@ import {
   removeFCDA,
   updateDataSet,
 } from '@openenergytools/scl-lib';
-import '@openenergytools/filterable-lists/dist/action-list.js';
-// eslint-disable-next-line import/no-duplicates
-import '@openenergytools/scl-text-field';
-import type {
-  ActionItem,
-  ActionList,
-} from '@openenergytools/filterable-lists/dist/ActionList.js';
-// eslint-disable-next-line import/no-duplicates
-import { SclTextField } from '@openenergytools/scl-text-field';
 
 import { addFCDAs, addFCDOs } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
@@ -83,8 +75,16 @@ function loadIcon(percent: number): string {
   return 'stroke_full';
 }
 
-@customElement('data-set-element-editor')
-export class DataSetElementEditor extends LitElement {
+export class DataSetElementEditor extends ScopedElementsMixin(LitElement) {
+  static scopedElements = {
+    'action-list': ActionList,
+    'md-text-button': MdTextButton,
+    'md-dialog': MdDialog,
+    'md-icon': MdIcon,
+    'tree-grid': TreeGrid,
+    'scl-text-field': SclTextField,
+  };
+
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
   doc!: XMLDocument;
@@ -125,7 +125,7 @@ export class DataSetElementEditor extends LitElement {
 
   @query('#dapicker') daPickerDialog!: MdDialog;
 
-  @query('#dapicker > oscd-tree-grid') daPicker!: TreeGrid;
+  @query('#dapicker > tree-grid') daPicker!: TreeGrid;
 
   @query('.da.picker.save') daPickerSaveButton!: MdTextButton;
 
@@ -133,7 +133,7 @@ export class DataSetElementEditor extends LitElement {
 
   @query('#dopicker') doPickerDialog!: MdDialog;
 
-  @query('#dopicker > oscd-tree-grid') doPicker!: TreeGrid;
+  @query('#dopicker > tree-grid') doPicker!: TreeGrid;
 
   @query('.do.picker.save') doPickerSaveButton!: MdTextButton;
 
@@ -147,7 +147,7 @@ export class DataSetElementEditor extends LitElement {
       if (input instanceof SclTextField) input.reset();
   }
 
-  private onInputChange(): void {
+  onInputChange(): void {
     if (!this.element) return;
 
     this.someDiffOnInputs = Array.from(this.inputs ?? []).some(
@@ -301,9 +301,7 @@ export class DataSetElementEditor extends LitElement {
       >Add data object<md-icon slot="icon">playlist_add</me-icon></md-text-button
       ><md-dialog id="dopicker">
         <div slot="headline">Add Data Objects</div>
-        <oscd-tree-grid slot="content" .tree=${dataObjectTree(
-          server
-        )}></oscd-tree-grid>
+        <tree-grid slot="content" .tree=${dataObjectTree(server)}></tree-grid>
         <div slot="actions">
           <md-text-button
             @click=${() => this.doPickerDialog?.close()}
@@ -324,18 +322,23 @@ export class DataSetElementEditor extends LitElement {
         icon="playlist_add"
         ?disabled=${!canAddFCDA(this.element!)}
         @click=${() => this.daPickerDialog.show()}
-      >Add data attribute<md-icon slot="icon">playlist_add</me-icon></md-text-button
+        >Add data attribute<md-icon slot="icon"
+          >playlist_add</md-icon
+        ></md-text-button
       ><md-dialog id="dapicker">
         <div slot="headline">Add Data Attributes</div>
-        <oscd-tree-grid slot="content" .tree="${dataAttributeTree(
-          server
-        )}"></oscd-tree-grid>
+        <tree-grid
+          slot="content"
+          .tree="${dataAttributeTree(server)}"
+        ></tree-grid>
         <div slot="actions">
-          <md-text-button @click=${() =>
-            this.daPickerDialog?.close()}>Close</md-text-button>
-          <md-text-button class="da picker save" @click=${
-            this.saveDataAttributes
-          } >
+          <md-text-button @click=${() => this.daPickerDialog?.close()}
+            >Close</md-text-button
+          >
+          <md-text-button
+            class="da picker save"
+            @click=${this.saveDataAttributes}
+          >
             Save
             <md-icon slot="icon">Save</md-icon>
           </md-text-button>

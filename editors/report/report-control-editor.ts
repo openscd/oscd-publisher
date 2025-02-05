@@ -1,7 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { query } from 'lit/decorators.js';
 
+import {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
 
 import '@openenergytools/filterable-lists/dist/action-list.js';
@@ -11,25 +18,24 @@ import {
   identity,
   removeControlBlock,
 } from '@openenergytools/scl-lib';
-import type {
-  ActionItem,
-  ActionList,
-} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
-import './report-control-element-editor.js';
-import '../dataset/data-set-element-editor.js';
-import type { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
-import type { ReportControlElementEditor } from './report-control-element-editor.js';
+import { pathIdentity, styles } from '../../foundation.js';
 
-import {
-  pathIdentity,
-  styles,
-  //  updateElementReference,
-} from '../../foundation.js';
-import BaseElementEditor from '../base-element-editor.js';
+import { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
+import { ReportControlElementEditor } from './report-control-element-editor.js';
+import { BaseElementEditor } from '../base-element-editor.js';
 
-@customElement('report-control-editor')
 export class ReportControlEditor extends BaseElementEditor {
+  static scopedElements = {
+    'action-list': ActionList,
+    'data-set-element-editor': DataSetElementEditor,
+    'md-outlined-button': MdOutlinedButton,
+    'report-control-element-editor': ReportControlElementEditor,
+    'md-icon-button': MdIconButton,
+    'md-icon': MdIcon,
+    'md-dialog': MdDialog,
+  };
+
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('.change.scl.element') selectReportControlButton!: MdOutlinedButton;

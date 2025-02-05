@@ -7,9 +7,9 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { gseControlDoc, otherGseControlDoc } from './gseControl.testfiles.js';
 
-import '../../oscd-publisher.js'; // for loading of components only
-import './gse-control-editor.js';
-import type { GseControlEditor } from './gse-control-editor.js';
+import { GseControlEditor } from './gse-control-editor.js';
+
+window.customElements.define('gse-control-editor', GseControlEditor);
 
 const factor = window.process && process.env.CI ? 4 : 2;
 function timeout(ms: number) {

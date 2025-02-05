@@ -12,18 +12,11 @@ import {
   isUpdate,
 } from '@openenergytools/scl-lib/dist/foundation/utils.js';
 
-import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
-import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
-import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
-
 import { reportControlDoc } from './reportControl.testfiles.js';
 
-import './report-control-editor.js';
-import type { ReportControlEditor } from './report-control-editor.js';
+import { ReportControlEditor } from './report-control-editor.js';
 
-window.customElements.define('md-outlined-button', MdOutlinedButton);
-window.customElements.define('md-text-button', MdTextButton);
-window.customElements.define('md-dialog', MdDialog);
+window.customElements.define('report-control-editor', ReportControlEditor);
 
 function timeout(ms: number) {
   return new Promise(res => {

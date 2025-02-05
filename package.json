@@ -34,6 +34,7 @@
     "@openenergytools/scl-text-field": "^2.0.2",
     "@openenergytools/open-scd-core": "^0.0.5",
     "@openenergytools/tree-grid": "1.0.1",
+    "@open-wc/scoped-elements": "^3.0.5",
     "lit": "^3.0.0"
   },
   "devDependencies": {
