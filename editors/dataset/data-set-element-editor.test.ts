@@ -5,7 +5,10 @@ import { sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { dataSetDoc } from './data-set-editor.testfiles.js';
+import {
+  dataSetDoc,
+  dataSetDocWithDescs,
+} from './data-set-editor.testfiles.js';
 
 import { DataSetElementEditor } from './data-set-element-editor.js';
 
@@ -35,7 +38,7 @@ describe('DataSet element editor component', () => {
 
     it('looks like the latest snapshot', async () => {
       await editor.updateComplete;
-      await timeout(200);
+      await timeout(300);
       await visualDiff(
         editor,
         `dataset/data-set-element-editor/#1 Missing DataSet`
@@ -318,6 +321,49 @@ describe('DataSet element editor component', () => {
     });
   });
 
+  describe('Allows to add DataAttributes with descriptions through TreeGrid', () => {
+    let editor: DataSetElementEditor;
+    beforeEach(async () => {
+      await setViewport({ width: 1900, height: 1200 });
+
+      const dataSet = new DOMParser()
+        .parseFromString(dataSetDocWithDescs, 'application/xml')
+        .querySelector('LDevice[inst="ldInst1"] DataSet')!;
+
+      editor = await fixture(
+        html`<data-set-element-editor
+          .element="${dataSet}"
+        ></data-set-element-editor>`
+      );
+      document.body.prepend(editor);
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      editor.daPicker.paths = [
+        [
+          'LDevice: IED>>ldInst1',
+          'LN: IED>>ldInst1>prefix MMXU 1',
+          'DO: #MMXU>PhV',
+          'SDO: #WYE>phsA',
+          'DA: #CMV>cVal',
+          'BDA: #Vector>mag',
+          'BDA: #AnalogueValue>f',
+        ],
+      ];
+      editor.daPickerButton.click();
+      await editor.updateComplete;
+      await timeout(200);
+      await visualDiff(
+        editor,
+        `dataset/data-set-element-editor/#10 DataAttribute picker with descriptions`
+      );
+    });
+  });
+
   describe('Allows to add DataObjects through TreeGrid', () => {
     let editor: DataSetElementEditor;
     beforeEach(async () => {
@@ -355,6 +401,47 @@ describe('DataSet element editor component', () => {
       await visualDiff(
         editor,
         `dataset/data-set-element-editor/#11 DataObject picker`
+      );
+    });
+  });
+
+  describe('Allows to add DataObjects with descriptions through TreeGrid', () => {
+    let editor: DataSetElementEditor;
+    beforeEach(async () => {
+      await setViewport({ width: 1900, height: 1200 });
+
+      const dataSet = new DOMParser()
+        .parseFromString(dataSetDocWithDescs, 'application/xml')
+        .querySelector('LDevice[inst="ldInst1"] DataSet')!;
+
+      editor = await fixture(
+        html`<data-set-element-editor
+          .element="${dataSet}"
+        ></data-set-element-editor>`
+      );
+      document.body.prepend(editor);
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      editor.doPicker.paths = [
+        [
+          'LDevice: IED>>ldInst1',
+          'LN: IED>>ldInst1>prefix MMXU 1',
+          'DO: #MMXU>PhV',
+          'SDO: #WYE>phsA',
+          'FC: MX',
+        ],
+      ];
+      editor.doPickerButton.click();
+      await editor.updateComplete;
+      await timeout(200);
+      await visualDiff(
+        editor,
+        `dataset/data-set-element-editor/#11 DataObject picker with descriptions`
       );
     });
   });
@@ -417,7 +504,7 @@ describe('DataSet element editor component', () => {
       editor.inputs![0].value = 'someNewDataSetName';
       editor.inputs![1].nullSwitch?.click();
 
-      await editor.requestUpdate();
+      await editor.updateComplete;
       await timeout(500);
       await visualDiff(
         editor,

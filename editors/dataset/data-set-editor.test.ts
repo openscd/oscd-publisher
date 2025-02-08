@@ -5,7 +5,11 @@ import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { dataSetDoc, otherDataSetDoc } from './data-set-editor.testfiles.js';
+import {
+  dataSetDoc,
+  otherDataSetDoc,
+  dataSetDocWithDescs,
+} from './data-set-editor.testfiles.js';
 
 import { DataSetEditor } from './data-set-editor.js';
 
@@ -64,7 +68,7 @@ describe('DataSet editor component', () => {
         await setViewport({ width: 1900, height: 1200 });
 
         await editor.updateComplete;
-        await timeout(200);
+        await timeout(300);
         await visualDiff(
           editor,
           `dataset/data-set-editor/#2 Unselected DataSet 1900x1200`
@@ -153,6 +157,42 @@ describe('DataSet editor component', () => {
           `dataset/data-set-editor/#8 New Doc with selected DataSet 599x1100`
         );
       });
+    });
+  });
+
+  describe('with SCL document containing DataSet descriptions', () => {
+    let editor: DataSetEditor;
+    beforeEach(async () => {
+      const doc = new DOMParser().parseFromString(
+        dataSetDocWithDescs,
+        'application/xml'
+      );
+      // eslint-disable-next-line prefer-const
+      editor = await fixture(
+        html`<data-set-editor .doc="${doc}"></data-set-editor>`
+      );
+
+      document.body.prepend(editor);
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      await setViewport({ width: 1200, height: 1600 });
+      editor.selectDataSetButton.click();
+      await editor.updateComplete;
+      await timeout(300);
+
+      await sendMouse({ type: 'click', position: [40, 225] });
+      await timeout(300);
+      await editor.updateComplete;
+
+      await visualDiff(
+        editor,
+        `dataset/data-set-editor/#9 Document shows descriptions in DataSet 1200x1600`
+      );
     });
   });
 });

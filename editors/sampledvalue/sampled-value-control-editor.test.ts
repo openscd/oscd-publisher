@@ -5,7 +5,11 @@ import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { otherSmvControlDoc, smvControlDoc } from './smvControl.testfiles.js';
+import {
+  otherSmvControlDoc,
+  smvControlDoc,
+  smvControlDocWithDescs,
+} from './smvControl.testfiles.js';
 
 import { SampledValueControlEditor } from './sampled-value-control-editor.js';
 
@@ -179,36 +183,80 @@ describe('SampledValueControl editor component', () => {
           `smvcontrol/sampled-value-control-editor/#8 New Doc with selected SampledValueControl 599x1100`
         );
       });
+
+      describe('with unreferenced DataSet', () => {
+        beforeEach(async () => {
+          await setViewport({ width: 1200, height: 800 });
+          await sendMouse({ type: 'click', position: [150, 340] });
+          await timeout(200);
+        });
+
+        it('on 1900x120 looks like the latest snapshot', async () => {
+          await setViewport({ width: 1900, height: 1200 });
+
+          await timeout(200);
+          await visualDiff(
+            editor,
+            `smvcontrol/sampled-value-control-editor/#9 Selected SampledValueControl with unreferenced DataSet`
+          );
+        });
+
+        it('data set selection dialog looks like', async () => {
+          await setViewport({ width: 1900, height: 1200 });
+
+          await editor.changeDataSet.click();
+
+          await timeout(200);
+          await visualDiff(
+            editor,
+            `smvcontrol/sampled-value-control-editor/#10 Create new DataSet inline the selected GSEControl`
+          );
+        });
+      });
+    });
+  });
+
+  describe('with SCL document containing DataSet descriptions', () => {
+    let editor: SampledValueControlEditor;
+    beforeEach(async () => {
+      const doc = new DOMParser().parseFromString(
+        smvControlDocWithDescs,
+        'application/xml'
+      );
+      // eslint-disable-next-line prefer-const
+      editor = await fixture(
+        html`<sampled-value-control-editor
+          .doc="${doc}"
+        ></sampled-value-control-editor>`
+      );
+
+      document.body.prepend(editor);
     });
 
-    describe('with unreferenced DataSet', () => {
-      beforeEach(async () => {
-        await setViewport({ width: 1200, height: 800 });
-        await sendMouse({ type: 'click', position: [150, 340] });
-        await timeout(200);
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      await setViewport({ width: 1900, height: 1400 });
+      editor.selectSampledValueControlButton.click();
+      await editor.updateComplete;
+      await timeout(200);
+
+      await sendMouse({ type: 'click', position: [150, 185] });
+      await editor.updateComplete;
+
+      const containerBottom =
+        editor.dataSetElementEditor.getBoundingClientRect().bottom;
+      window.scrollBy({
+        top: containerBottom - window.innerHeight + 200,
       });
 
-      it('on 1900x120 looks like the latest snapshot', async () => {
-        await setViewport({ width: 1900, height: 1200 });
-
-        await timeout(200);
-        await visualDiff(
-          editor,
-          `smvcontrol/sampled-value-control-editor/#9 Selected SampledValueControl with unreferenced DataSet`
-        );
-      });
-
-      it('data set selection dialog looks like', async () => {
-        await setViewport({ width: 1900, height: 1200 });
-
-        await editor.changeDataSet.click();
-
-        await timeout(200);
-        await visualDiff(
-          editor,
-          `smvcontrol/sampled-value-control-editor/#10 Create new DataSet inline the selected GSEControl`
-        );
-      });
+      await timeout(200);
+      await visualDiff(
+        editor,
+        `smvcontrol/sampled-value-control-editor/#11 Document shows descriptions in SampledValueControl DataSet 1900x1400`
+      );
     });
   });
 });

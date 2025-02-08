@@ -5,7 +5,11 @@ import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { gseControlDoc, otherGseControlDoc } from './gseControl.testfiles.js';
+import {
+  gseControlDoc,
+  otherGseControlDoc,
+  gseControlDocWithDescs,
+} from './gseControl.testfiles.js';
 
 import { GseControlEditor } from './gse-control-editor.js';
 
@@ -208,6 +212,48 @@ describe('GSEControl editor component', () => {
           `gsecontrol/gse-control-editor/#10 Create new DataSet inline the selected GSEControl`
         );
       });
+    });
+  });
+
+  describe('with SCL document containing DataSet descriptions', () => {
+    let editor: GseControlEditor;
+    beforeEach(async () => {
+      const doc = new DOMParser().parseFromString(
+        gseControlDocWithDescs,
+        'application/xml'
+      );
+      // eslint-disable-next-line prefer-const
+      editor = await fixture(
+        html`<gse-control-editor .doc="${doc}"></gse-control-editor>`
+      );
+
+      document.body.prepend(editor);
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      await setViewport({ width: 1900, height: 1400 });
+      editor.selectGSEControlButton.click();
+      await editor.updateComplete;
+      await timeout(200);
+
+      await sendMouse({ type: 'click', position: [150, 185] });
+      await editor.updateComplete;
+
+      const containerBottom =
+        editor.dataSetElementEditor.getBoundingClientRect().bottom;
+      window.scrollBy({
+        top: containerBottom - window.innerHeight + 200,
+      });
+
+      await timeout(200);
+      await visualDiff(
+        editor,
+        `gsecontrol/gse-control-editor/#11 Document shows descriptions in DataSet 1900x1400`
+      );
     });
   });
 });

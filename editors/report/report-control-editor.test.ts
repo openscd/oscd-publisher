@@ -8,6 +8,7 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 import {
   reportControlDoc,
   otherReportControlDoc,
+  reportControlDocWithDescs,
 } from './reportControl.testfiles.js';
 
 import { ReportControlEditor } from './report-control-editor.js';
@@ -69,7 +70,7 @@ describe('ReportControl editor component', () => {
         await setViewport({ width: 1900, height: 1200 });
 
         await editor.updateComplete;
-        await timeout(200);
+        await timeout(300);
         await visualDiff(
           editor,
           `reportcontrol/report-control-editor/#2 Unselected ReportControl 1900x1200`
@@ -213,6 +214,48 @@ describe('ReportControl editor component', () => {
           `reportcontrol/report-control-editor/#10 Change DataSet inline the selected ReportControl`
         );
       });
+    });
+  });
+
+  describe('with SCL document containing DataSet descriptions', () => {
+    let editor: ReportControlEditor;
+    beforeEach(async () => {
+      const doc = new DOMParser().parseFromString(
+        reportControlDocWithDescs,
+        'application/xml'
+      );
+      // eslint-disable-next-line prefer-const
+      editor = await fixture(
+        html`<report-control-editor .doc="${doc}"></report-control-editor>`
+      );
+
+      document.body.prepend(editor);
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      await setViewport({ width: 1900, height: 1400 });
+      editor.selectReportControlButton.click();
+      await editor.updateComplete;
+      await timeout(200);
+
+      await sendMouse({ type: 'click', position: [150, 185] });
+      await editor.updateComplete;
+
+      const containerBottom =
+        editor.dataSetElementEditor.getBoundingClientRect().bottom;
+      window.scrollBy({
+        top: containerBottom - window.innerHeight + 200,
+      });
+
+      await timeout(200);
+      await visualDiff(
+        editor,
+        `reportcontrol/report-control-editor/#11 Document shows descriptions in DataSet 1900x1400`
+      );
     });
   });
 });

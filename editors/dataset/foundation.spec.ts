@@ -1,7 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from '@open-wc/testing';
 
-import { addFCDAs, addFCDOs } from './foundation.js';
+import { addFCDAs, addFCDOs, getFcdaInstDesc } from './foundation.js';
+import { fcdaDescriptions } from './foundation.testfiles.js';
 
 describe('Utility functions for FCDA element', () => {
   describe('addFCDAs', () => {
@@ -181,6 +182,77 @@ describe('Utility functions for FCDA element', () => {
         { path: [lDevice, anyLn, dO, sDO], fc: fc2 },
       ];
       expect(addFCDOs(dataSet, fcPaths).length).to.equal(1);
+    });
+  });
+});
+
+describe('Descriptions for FCDAs', () => {
+  let doc: Document;
+  describe('addFCDAs', () => {
+    beforeEach(async () => {
+      doc = new DOMParser().parseFromString(fcdaDescriptions, 'text/xml');
+    });
+
+    it('retrieves descriptions of LDevice, LN0, DOI and DAI using desc', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA'))[0]!;
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({
+        LDevice: 'First logical device',
+        LN: 'Configuration LN',
+        DOI: 'Behaviour',
+        DAI: 'State',
+      });
+    });
+
+    it('retrieves descriptions of DOI using d attribute', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[3];
+      expect(getFcdaInstDesc(fcda).DOI).to.equal('Mode');
+    });
+
+    it('retrieves descriptions of LN SDI objects using d attribute', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[8];
+      expect(getFcdaInstDesc(fcda).SDI![0]).to.equal('Red Phase');
+    });
+
+    it('retrieves descriptions of LN SDI objects using desc attribute', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[9];
+      expect(getFcdaInstDesc(fcda).SDI![0]).to.equal('Phase B');
+    });
+
+    it('provides SDI desc with LDevice, LN, DOI not having the desc attribute', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[10];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({
+        SDI: ['Phase B+'],
+      });
+    });
+
+    it('provides nested SDI desc', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[17];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({
+        DAI: 'fundamental',
+        LDevice: 'First logical device',
+        LN: 'Line',
+        SDI: ['Phase C', 'complex value', 'magnitude'],
+      });
+    });
+
+    it('correctly handles a missing DOI', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[13];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({});
+    });
+
+    it('correctly handles a missing DAI', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[14];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({});
+    });
+
+    it('correctly handles a missing SDI', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[15];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({});
+    });
+
+    it('correctly handles a missing LDevice', () => {
+      const fcda = Array.from(doc.querySelectorAll('DataSet > FCDA')!)[16];
+      expect(getFcdaInstDesc(fcda)).to.deep.equal({});
     });
   });
 });

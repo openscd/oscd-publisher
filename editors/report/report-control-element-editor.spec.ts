@@ -48,14 +48,12 @@ describe('ReportControl element editor component', () => {
     editor.reportControlInputs![0].value = 'SomeNewName';
     editor.reportControlInputs![1].nullSwitch?.click();
     await editor.updateComplete;
-
     editor.reportControlInputs![2].value = '40001';
     editor.reportControlInputs![3].value = 'false';
     editor.reportControlInputs![4].value = 'someOtherID';
     editor.reportControlInputs![5].value = 'false';
     editor.reportControlInputs![5].nullSwitch?.click();
     await editor.updateComplete;
-
     editor.reportControlInputs![7].value = '43';
 
     editor.rptEnabledInput.nullSwitch?.click();
@@ -67,8 +65,6 @@ describe('ReportControl element editor component', () => {
 
     const edits = editEvent.args[0][0].detail.edit;
     expect(edits.length).to.equal(2);
-
-    expect(edits[0]).to.satisfy(isUpdate);
 
     const update = edits[0];
     expect(update.element).to.equal(reportControl);

@@ -24,7 +24,7 @@ import {
   updateDataSet,
 } from '@openenergytools/scl-lib';
 
-import { addFCDAs, addFCDOs } from './foundation.js';
+import { addFCDAs, addFCDOs, getFcdaInstDesc } from './foundation.js';
 import { dataAttributeTree } from './dataAttributePicker.js';
 import { dataObjectTree } from './dataObjectPicker.js';
 
@@ -275,9 +275,15 @@ export class DataSetElementEditor extends ScopedElementsMixin(LitElement) {
           },
         });
 
+      const description = Object.values(getFcdaInstDesc(fcda))
+        .flat(Infinity as 1)
+        .join(' > ');
+
       return {
-        headline: `${doName}${daName ? `.${daName} [${fc}]` : ` [${fc}]`}`,
-        supportingText: `${ldInst}/${prefix}${lnClass}${lnInst}`,
+        headline: `${ldInst}/${prefix}${lnClass}${lnInst}.${doName}${
+          daName ? `.${daName} [${fc}]` : ` [${fc}]`
+        }`,
+        supportingText: description,
         actions,
       };
     });
@@ -285,6 +291,7 @@ export class DataSetElementEditor extends ScopedElementsMixin(LitElement) {
     return html`<action-list
       class="list fcda"
       .items=${items}
+      height="84"
       filterable
       searchhelper="Filter Data"
     ></action-list>`;
@@ -382,7 +389,7 @@ export class DataSetElementEditor extends ScopedElementsMixin(LitElement) {
         id="${identity(this.element)}"
         label="desc"
         .value=${this.desc}
-        supportingText="DateSet Description"
+        supportingText="DataSet Description"
         nullable
         @input=${() => this.onInputChange()}
       >
