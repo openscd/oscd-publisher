@@ -112,8 +112,48 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   }
 
   protected copyControlBlock(): void {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const todo = this.controlBlockCopyOptions;
+    const selectedOptions = this.controlBlockCopyOptions.filter(
+      o => o.selected
+    );
+
+    if (selectedOptions.length === 0) {
+      this.copyControlBlockDialog.close();
+      return;
+    }
+
+    const inserts = selectedOptions.flatMap(o => {
+      const lnQuery = this.buildLnQuery(o.control);
+      const ln = o.ied.querySelector(lnQuery);
+      const dataSet = this.getDataSet(o.control);
+
+      if (!ln || !dataSet) {
+        throw new Error('ControlBlock or DataSet not found');
+      }
+
+      const controlCopy = o.control.cloneNode(true) as Element;
+      const controlInsert = {
+        parent: ln,
+        node: controlCopy,
+        reference: null,
+      };
+
+      const dataSetCcopy = dataSet.cloneNode(true) as Element;
+      const dataSetInsert = {
+        parent: ln,
+        node: dataSetCcopy,
+        reference: null,
+      };
+
+      return [controlInsert, dataSetInsert];
+    });
+
+    this.dispatchEvent(
+      newEditEvent(inserts, {
+        title: `Copy control block to ${selectedOptions.length} IEDs`,
+      })
+    );
+
+    this.copyControlBlockDialog.close();
   }
 
   private addNewDataSet(control: Element): void {
@@ -183,8 +223,8 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
             </label>`
         )}
         <div>
-          <md-outlined-button @click=${() => this.copyControlBlock()}
-            >Copy</md-outlined-button
+          <md-outlined-button @click=${this.copyControlBlock}
+            >Copy 2</md-outlined-button
           >
         </div>
       </div>
