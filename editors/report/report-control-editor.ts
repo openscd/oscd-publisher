@@ -128,10 +128,7 @@ export class ReportControlEditor extends BaseElementEditor {
               this.dataSetElementEditor.resetInputs();
 
             this.selectCtrlBlock = rpControl;
-            this.selectedDataSet =
-              rpControl.parentElement?.querySelector(
-                `:scope > DataSet[name="${rpControl.getAttribute('datSet')}"]`
-              ) ?? null;
+            this.selectedDataSet = this.getDataSet(rpControl);
 
             this.selectionList.classList.add('hidden');
             this.selectReportControlButton.classList.remove('hidden');

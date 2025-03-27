@@ -10,6 +10,7 @@ import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -20,7 +21,10 @@ import { pathIdentity, styles } from '../../foundation.js';
 import { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
 import { GseControlElementEditor } from './gse-control-element-editor.js';
 
-import { BaseElementEditor } from '../base-element-editor.js';
+import {
+  BaseElementEditor,
+  ControlBlockCopyStatus,
+} from '../base-element-editor.js';
 
 export class GseControlEditor extends BaseElementEditor {
   static scopedElements = {
@@ -31,6 +35,7 @@ export class GseControlEditor extends BaseElementEditor {
     'md-icon-button': MdIconButton,
     'md-icon': MdIcon,
     'md-dialog': MdDialog,
+    'md-checkbox': MdCheckbox,
   };
 
   @query('.selectionlist') selectionList!: ActionList;
@@ -78,85 +83,148 @@ export class GseControlEditor extends BaseElementEditor {
     return html``;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  protected getCopyControlBlockCopyStatus(
+    controlBlock: Element,
+    otherIED: Element
+  ): ControlBlockCopyStatus {
+    const lnQuery = this.buildLnQuery(controlBlock);
+    const ln = otherIED.querySelector(lnQuery);
+
+    if (!ln) {
+      return ControlBlockCopyStatus.IEDStructureIncompatible;
+    }
+
+    const controlInOtherIED = ln.querySelector(
+      `${controlBlock.tagName}[name="${controlBlock.getAttribute('name')}"]`
+    );
+    const hasControl = Boolean(controlInOtherIED);
+
+    const dataSet = this.getDataSet(controlBlock);
+    const hasDataSet =
+      dataSet !== null &&
+      Boolean(
+        ln.querySelector(`DataSet[name="${dataSet?.getAttribute('name')}"]`)
+      );
+
+    if (hasDataSet || hasControl) {
+      return ControlBlockCopyStatus.ControlBlockOrDataSetAlreadyExists;
+    }
+
+    // TODO: Check if IED structure is compatible
+    const hasCompatibleIEDStructure = true;
+    if (!hasCompatibleIEDStructure) {
+      return ControlBlockCopyStatus.IEDStructureIncompatible;
+    }
+
+    return ControlBlockCopyStatus.CanCopy;
+  }
+
   private renderSelectionList(): TemplateResult {
-    const items = Array.from(this.doc.querySelectorAll(':root > IED')).flatMap(
-      ied => {
-        const gseControls = Array.from(
-          ied.querySelectorAll(
-            ':scope > AccessPoint > Server > LDevice > LN0 > GSEControl'
-          )
-        );
+    // TODO: Store ieds as objects
+    const items = this.queryIEDs().flatMap(ied => {
+      const gseControls = Array.from(
+        ied.querySelectorAll(
+          ':scope > AccessPoint > Server > LDevice > LN0 > GSEControl'
+        )
+      );
 
-        const item: ActionItem = {
-          headline: `${ied.getAttribute('name')}`,
-          startingIcon: 'developer_board',
-          divider: true,
-          filtergroup: gseControls.map(
-            gseControl => gseControl.getAttribute('name') ?? ''
-          ),
-          actions: [
-            {
-              icon: 'playlist_add',
-              callback: () => {
-                const insertGseControl = createGSEControl(ied);
-                if (insertGseControl)
-                  this.dispatchEvent(
-                    newEditEvent(insertGseControl, {
-                      title: 'Create New GSEControl',
-                    })
-                  );
-              },
-            },
-          ],
-        };
-
-        const dataset: ActionItem[] = gseControls.map(gseControl => ({
-          headline: `${gseControl.getAttribute('name')}`,
-          supportingText: `${pathIdentity(gseControl)}`,
-          primaryAction: () => {
-            if (this.selectCtrlBlock === gseControl) return;
-
-            if (this.gseControlElementEditor)
-              this.gseControlElementEditor.resetInputs();
-
-            if (this.dataSetElementEditor)
-              this.dataSetElementEditor.resetInputs();
-
-            this.selectCtrlBlock = gseControl;
-            this.selectedDataSet =
-              gseControl.parentElement?.querySelector(
-                `DataSet[name="${gseControl.getAttribute('datSet')}"]`
-              ) ?? null;
-
-            this.selectionList.classList.add('hidden');
-            this.selectGSEControlButton.classList.remove('hidden');
-          },
-          actions: [
-            {
-              icon: 'delete',
-              callback: () => {
+      const item: ActionItem = {
+        headline: `${ied.getAttribute('name')}`,
+        startingIcon: 'developer_board',
+        divider: true,
+        filtergroup: gseControls.map(
+          gseControl => gseControl.getAttribute('name') ?? ''
+        ),
+        actions: [
+          {
+            icon: 'playlist_add',
+            callback: () => {
+              const insertGseControl = createGSEControl(ied);
+              if (insertGseControl)
                 this.dispatchEvent(
-                  newEditEvent(removeControlBlock({ node: gseControl }), {
-                    title: 'Remove GSEControl',
+                  newEditEvent(insertGseControl, {
+                    title: 'Create New GSEControl',
                   })
                 );
-
-                this.selectCtrlBlock = undefined;
-              },
             },
-          ],
-        }));
+          },
+        ],
+      };
 
-        return [item, ...dataset];
-      }
-    );
+      const dataset: ActionItem[] = gseControls.map(gseControl => ({
+        headline: `${gseControl.getAttribute('name')}`,
+        supportingText: `${pathIdentity(gseControl)}`,
+        primaryAction: () => {
+          if (this.selectCtrlBlock === gseControl) return;
 
-    return html`<action-list
-      class="selectionlist"
-      filterable
-      searchhelper="Filter GSEControl's"
-      .items=${items}
-    ></action-list>`;
+          if (this.gseControlElementEditor)
+            this.gseControlElementEditor.resetInputs();
+
+          if (this.dataSetElementEditor)
+            this.dataSetElementEditor.resetInputs();
+
+          this.selectCtrlBlock = gseControl;
+          this.selectedDataSet = this.getDataSet(gseControl);
+
+          this.selectionList.classList.add('hidden');
+          this.selectGSEControlButton.classList.remove('hidden');
+        },
+        actions: [
+          {
+            icon: 'folder_copy',
+            callback: () => {
+              const lDevice = gseControl.closest('LDevice');
+              if (!lDevice) {
+                throw new Error('GSEControl has no LDevice parent');
+              }
+
+              const otherIEDs = this.queryIEDs().filter(
+                otherIED => ied !== otherIED
+              );
+
+              this.controlBlockCopyOptions = otherIEDs.map(otherIED => {
+                const status = this.getCopyControlBlockCopyStatus(
+                  gseControl,
+                  otherIED
+                );
+
+                return {
+                  ied: otherIED,
+                  control: gseControl,
+                  status,
+                  selected: status === ControlBlockCopyStatus.CanCopy,
+                };
+              });
+
+              this.copyControlBlockDialog.show();
+            },
+          },
+          {
+            icon: 'delete',
+            callback: () => {
+              this.dispatchEvent(
+                newEditEvent(removeControlBlock({ node: gseControl }), {
+                  title: 'Remove GSEControl',
+                })
+              );
+
+              this.selectCtrlBlock = undefined;
+            },
+          },
+        ],
+      }));
+
+      return [item, ...dataset];
+    });
+
+    return html` ${this.renderCopyControlBlockDialog()}
+      <action-list
+        class="selectionlist"
+        filterable
+        searchhelper="Filter GSEControl's"
+        .items=${items}
+      ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {
@@ -218,6 +286,12 @@ export class GseControlEditor extends BaseElementEditor {
       .elementeditorcontainer {
         display: block;
       }
+    }
+
+    .copy-option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
   `;
 }

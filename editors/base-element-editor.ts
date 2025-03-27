@@ -15,6 +15,20 @@ import {
 } from '@openenergytools/scl-lib';
 import '@openenergytools/filterable-lists/dist/action-list.js';
 
+// eslint-disable-next-line no-shadow
+export enum ControlBlockCopyStatus {
+  CanCopy = 'CanCopy',
+  IEDStructureIncompatible = 'IEDStructureIncompatible',
+  ControlBlockOrDataSetAlreadyExists = 'ControlBlockOrDataSetAlreadyExists',
+}
+
+export interface ControlBlockCopyOption {
+  ied: Element;
+  control: Element;
+  status: ControlBlockCopyStatus;
+  selected: boolean;
+}
+
 export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
   @property({ attribute: false })
@@ -30,7 +44,12 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   @state()
   selectedDataSet?: Element | null;
 
+  @state()
+  controlBlockCopyOptions: ControlBlockCopyOption[] = [];
+
   @query('.dialog.select') selectDataSetDialog!: MdDialog;
+
+  @query('.dialog.copy') copyControlBlockDialog!: MdDialog;
 
   @query('.new.dataset') newDataSet!: MdIconButton;
 
@@ -52,6 +71,49 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
     this.selectedDataSet = dataSet;
 
     this.selectDataSetDialog.close();
+  }
+
+  protected queryIEDs(): Element[] {
+    return Array.from(this.doc.querySelectorAll(':root > IED'));
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected buildLnQuery(control: Element): string {
+    const lDevice = control.closest('LDevice');
+    const lnOrLn0 = control.closest('LN0') ?? control.closest('LN');
+
+    if (!lnOrLn0) {
+      throw new Error('ControlBlock must be a child of LN or LN0');
+    }
+
+    let lnQuery = '';
+
+    if (lnOrLn0.tagName === 'LN0') {
+      lnQuery = 'LN0';
+    } else {
+      const lnClass = lnOrLn0.getAttribute('lnClass');
+      const prefix = lnOrLn0.getAttribute('prefix');
+      const inst = lnOrLn0.getAttribute('inst');
+      lnQuery = `LN[lnClass="${lnClass}"][inst="${inst}"][prefix="${prefix}"]`;
+    }
+
+    return `:scope > AccessPoint > Server > LDevice[inst="${lDevice?.getAttribute(
+      'inst'
+    )}"] > ${lnQuery}`;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected getDataSet(control: Element): Element | null {
+    return (
+      control.parentElement?.querySelector(
+        `DataSet[name="${control.getAttribute('datSet')}"]`
+      ) ?? null
+    );
+  }
+
+  protected copyControlBlock(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const todo = this.controlBlockCopyOptions;
   }
 
   private addNewDataSet(control: Element): void {
@@ -94,6 +156,38 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
 
     return html`<md-dialog class="dialog select">
       <action-list slot="content" .items=${items} filterable></action-list>
+    </md-dialog>`;
+  }
+
+  protected renderCopyControlBlockDialog(): TemplateResult {
+    return html`<md-dialog
+      class="dialog copy"
+      @close=${() => {
+        this.controlBlockCopyOptions = [];
+      }}
+    >
+      <div slot="content" class="copy-option-list">
+        ${this.controlBlockCopyOptions.map(
+          option =>
+            html`<label>
+              ${option.ied.getAttribute('name')}
+              <md-checkbox
+                ?checked=${option.selected}
+                @change=${() => {
+                  // eslint-disable-next-line no-param-reassign
+                  option.selected = !option.selected;
+                }}
+                ?disabled=${option.status !== ControlBlockCopyStatus.CanCopy}
+              >
+              </md-checkbox>
+            </label>`
+        )}
+        <div>
+          <md-outlined-button @click=${() => this.copyControlBlock()}
+            >Copy</md-outlined-button
+          >
+        </div>
+      </div>
     </md-dialog>`;
   }
 
