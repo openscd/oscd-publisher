@@ -101,6 +101,11 @@ export class GseControlEditor extends BaseElementEditor {
     const hasControl = Boolean(controlInOtherIED);
 
     const dataSet = this.getDataSet(controlBlock);
+
+    if (!dataSet) {
+      throw new Error('ControlBlock has no DataSet');
+    }
+
     const hasDataSet =
       dataSet !== null &&
       Boolean(
@@ -111,10 +116,14 @@ export class GseControlEditor extends BaseElementEditor {
       return ControlBlockCopyStatus.ControlBlockOrDataSetAlreadyExists;
     }
 
-    // TODO: Check if IED structure is compatible
-    const hasCompatibleIEDStructure = true;
-    if (!hasCompatibleIEDStructure) {
-      return ControlBlockCopyStatus.IEDStructureIncompatible;
+    const fcdas = Array.from(dataSet.querySelectorAll('FCDA'));
+    for (const fcda of fcdas) {
+      const isCompatible = this.isFCDACompatibleWithIED(fcda, otherIED);
+
+      if (!isCompatible) {
+        // console.log(`FCDA is not compatible`, fcda);
+        return ControlBlockCopyStatus.IEDStructureIncompatible;
+      }
     }
 
     return ControlBlockCopyStatus.CanCopy;
@@ -188,6 +197,8 @@ export class GseControlEditor extends BaseElementEditor {
                   gseControl,
                   otherIED
                 );
+
+                // console.log(`IED ${otherIED.getAttribute('name')}: ${status}`);
 
                 return {
                   ied: otherIED,

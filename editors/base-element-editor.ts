@@ -78,6 +78,13 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  protected queryLDevice(ied: Element, inst: string): Element | null {
+    return ied.querySelector(
+      `:scope > AccessPoint > Server > LDevice[inst="${inst}"]`
+    );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   protected buildLnQuery(control: Element): string {
     const lDevice = control.closest('LDevice');
     const lnOrLn0 = control.closest('LN0') ?? control.closest('LN');
@@ -109,6 +116,131 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
         `DataSet[name="${control.getAttribute('datSet')}"]`
       ) ?? null
     );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected hasDataType(
+    dataTypeTemplates: Element,
+    lnType: string,
+    doSegments: string[],
+    daSegments: string[]
+  ): boolean {
+    const lNodeType = dataTypeTemplates.querySelector(
+      `LNodeType[id="${lnType}"]`
+    );
+    if (!lNodeType) {
+      return false;
+    }
+
+    let currentElement = lNodeType;
+
+    for (const doSegement of doSegments) {
+      const dataObject = currentElement.querySelector(
+        `DO[name="${doSegement}"], SDO[name="${doSegement}"]`
+      );
+      if (!dataObject) {
+        return false;
+      }
+
+      // console.log('DO', dataObject);
+
+      const doType = dataObject.getAttribute('type');
+      if (!doType) {
+        return false;
+      }
+
+      const doTypeElement = dataTypeTemplates.querySelector(
+        `DOType[id="${doType}"]`
+      );
+      if (!doTypeElement) {
+        return false;
+      }
+
+      // console.log('DOType', doTypeElement);
+
+      currentElement = doTypeElement;
+    }
+
+    for (const [index, daSegment] of daSegments.entries()) {
+      // TODO: Handle enum types
+      const dataAttribute = currentElement.querySelector(
+        `DA[name="${daSegment}"], BDA[name="${daSegment}"]`
+      );
+      if (!dataAttribute) {
+        return false;
+      }
+
+      // console.log('DA', dataAttribute);
+
+      if (index === daSegments.length - 1) {
+        // Do not search for type, because last entry is a leaf node and should be basic type
+        break;
+      }
+
+      const daType = dataAttribute.getAttribute('type');
+      if (!daType) {
+        return false;
+      }
+
+      const daTypeElement = dataTypeTemplates.querySelector(
+        `DAType[id="${daType}"]`
+      );
+      if (!daTypeElement) {
+        return false;
+      }
+
+      // console.log('DAType', daTypeElement);
+
+      currentElement = daTypeElement;
+    }
+
+    return true;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected isFCDACompatibleWithIED(fcda: Element, ied: Element): boolean {
+    const ldInst = fcda.getAttribute('ldInst');
+    const lnClass = fcda.getAttribute('lnClass');
+    const doName = fcda.getAttribute('doName');
+    const daName = fcda.getAttribute('daName');
+
+    const daSegments = daName ? daName.split('.') : [];
+
+    if (!ldInst || !lnClass || !doName) {
+      return false;
+    }
+
+    const doSegments = doName.split('.');
+
+    if (doSegments.length === 0) {
+      return false;
+    }
+
+    const lDevice = this.queryLDevice(ied, ldInst);
+    if (!lDevice) {
+      return false;
+    }
+
+    const ln = lDevice.querySelector(
+      `:scope > LN0[lnClass="${lnClass}"], :scope > LN[lnClass="${lnClass}"]`
+    );
+    if (!ln) {
+      return false;
+    }
+
+    const lnType = ln.getAttribute('lnType');
+    if (!lnType) {
+      return false;
+    }
+
+    const dataTypeTemplates =
+      ied.parentElement?.querySelector('DataTypeTemplates');
+    if (!dataTypeTemplates) {
+      return false;
+    }
+
+    // console.log(`Checking ${ied.getAttribute('name')} for ${lnType}, ${doSegments}, ${daSegments}`);
+    return this.hasDataType(dataTypeTemplates, lnType, doSegments, daSegments);
   }
 
   protected copyControlBlock(): void {
@@ -220,6 +352,7 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
                 ?disabled=${option.status !== ControlBlockCopyStatus.CanCopy}
               >
               </md-checkbox>
+              <div>${option.status}</div>
             </label>`
         )}
         <div>
