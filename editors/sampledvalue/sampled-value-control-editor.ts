@@ -10,12 +10,16 @@ import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import { newEditEvent } from '@openenergytools/open-scd-core';
 import { identity, removeControlBlock } from '@openenergytools/scl-lib';
 
 import { styles } from '../../foundation.js';
-import { BaseElementEditor } from '../base-element-editor.js';
+import {
+  BaseElementEditor,
+  ControlBlockCopyStatus,
+} from '../base-element-editor.js';
 
 import { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
 import { SampledValueControlElementEditor } from './sampled-value-control-element-editor.js';
@@ -38,6 +42,7 @@ export class SampledValueControlEditor extends BaseElementEditor {
     'md-icon-button': MdIconButton,
     'md-icon': MdIcon,
     'md-dialog': MdDialog,
+    'md-checkbox': MdCheckbox,
   };
 
   @query('.selectionlist') selectionList!: ActionList;
@@ -128,6 +133,35 @@ export class SampledValueControlEditor extends BaseElementEditor {
           },
           actions: [
             {
+              icon: 'folder_copy',
+              callback: () => {
+                const lDevice = smvControl.closest('LDevice');
+                if (!lDevice) {
+                  throw new Error('GSEControl has no LDevice parent');
+                }
+
+                const otherIEDs = this.queryIEDs().filter(
+                  otherIED => ied !== otherIED
+                );
+
+                this.controlBlockCopyOptions = otherIEDs.map(otherIED => {
+                  const status = this.getCopyControlBlockCopyStatus(
+                    smvControl,
+                    otherIED
+                  );
+
+                  return {
+                    ied: otherIED,
+                    control: smvControl,
+                    status,
+                    selected: status === ControlBlockCopyStatus.CanCopy,
+                  };
+                });
+
+                this.copyControlBlockDialog.show();
+              },
+            },
+            {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
@@ -146,12 +180,13 @@ export class SampledValueControlEditor extends BaseElementEditor {
       }
     );
 
-    return html`<action-list
-      class="selectionlist"
-      filterable
-      searchhelper="Filter SampledValueControl's"
-      .items=${items}
-    ></action-list>`;
+    return html` ${this.renderCopyControlBlockDialog()}
+      <action-list
+        class="selectionlist"
+        filterable
+        searchhelper="Filter SampledValueControl's"
+        .items=${items}
+      ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {

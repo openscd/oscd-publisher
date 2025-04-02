@@ -83,52 +83,6 @@ export class GseControlEditor extends BaseElementEditor {
     return html``;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  protected getCopyControlBlockCopyStatus(
-    controlBlock: Element,
-    otherIED: Element
-  ): ControlBlockCopyStatus {
-    const lnQuery = this.buildLnQuery(controlBlock);
-    const ln = otherIED.querySelector(lnQuery);
-
-    if (!ln) {
-      return ControlBlockCopyStatus.IEDStructureIncompatible;
-    }
-
-    const controlInOtherIED = ln.querySelector(
-      `${controlBlock.tagName}[name="${controlBlock.getAttribute('name')}"]`
-    );
-    const hasControl = Boolean(controlInOtherIED);
-
-    const dataSet = this.getDataSet(controlBlock);
-
-    if (!dataSet) {
-      throw new Error('ControlBlock has no DataSet');
-    }
-
-    const hasDataSet =
-      dataSet !== null &&
-      Boolean(
-        ln.querySelector(`DataSet[name="${dataSet?.getAttribute('name')}"]`)
-      );
-
-    if (hasDataSet || hasControl) {
-      return ControlBlockCopyStatus.ControlBlockOrDataSetAlreadyExists;
-    }
-
-    const fcdas = Array.from(dataSet.querySelectorAll('FCDA'));
-    for (const fcda of fcdas) {
-      const isCompatible = this.isFCDACompatibleWithIED(fcda, otherIED);
-
-      if (!isCompatible) {
-        // console.log(`FCDA is not compatible`, fcda);
-        return ControlBlockCopyStatus.IEDStructureIncompatible;
-      }
-    }
-
-    return ControlBlockCopyStatus.CanCopy;
-  }
-
   private renderSelectionList(): TemplateResult {
     // TODO: Store ieds as objects
     const items = this.queryIEDs().flatMap(ied => {

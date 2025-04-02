@@ -85,7 +85,25 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  protected buildLnQuery(control: Element): string {
+  protected buildLnQuery(
+    lnClass: string,
+    inst: string,
+    prefix: string | null
+  ): string {
+    const ln0Query = `:scope > LN0[lnClass="${lnClass}"]`;
+    let lnQuery = `:scope > LN[lnClass="${lnClass}"][inst="${inst}"]`;
+
+    if (prefix) {
+      lnQuery += `[prefix="${prefix}"]`;
+    } else {
+      lnQuery += `:not([prefix]), ${lnQuery}[prefix=""]`;
+    }
+
+    return `${ln0Query}, ${lnQuery}`;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected buildLnQueryForControl(control: Element): string {
     const lDevice = control.closest('LDevice');
     const lnOrLn0 = control.closest('LN0') ?? control.closest('LN');
 
@@ -99,6 +117,7 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
       lnQuery = 'LN0';
     } else {
       const lnClass = lnOrLn0.getAttribute('lnClass');
+      // TODO: Handle optional prefix
       const prefix = lnOrLn0.getAttribute('prefix');
       const inst = lnOrLn0.getAttribute('inst');
       lnQuery = `LN[lnClass="${lnClass}"][inst="${inst}"][prefix="${prefix}"]`;
@@ -201,12 +220,14 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   protected isFCDACompatibleWithIED(fcda: Element, ied: Element): boolean {
     const ldInst = fcda.getAttribute('ldInst');
     const lnClass = fcda.getAttribute('lnClass');
+    const prefix = fcda.getAttribute('prefix');
+    const lnInst = fcda.getAttribute('lnInst');
     const doName = fcda.getAttribute('doName');
     const daName = fcda.getAttribute('daName');
 
     const daSegments = daName ? daName.split('.') : [];
 
-    if (!ldInst || !lnClass || !doName) {
+    if (!ldInst || !lnClass || !doName || !lnInst) {
       return false;
     }
 
@@ -221,9 +242,8 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
       return false;
     }
 
-    const ln = lDevice.querySelector(
-      `:scope > LN0[lnClass="${lnClass}"], :scope > LN[lnClass="${lnClass}"]`
-    );
+    const lnQuery = this.buildLnQuery(lnClass, lnInst, prefix);
+    const ln = lDevice.querySelector(lnQuery);
     if (!ln) {
       return false;
     }
@@ -243,6 +263,52 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
     return this.hasDataType(dataTypeTemplates, lnType, doSegments, daSegments);
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  protected getCopyControlBlockCopyStatus(
+    controlBlock: Element,
+    otherIED: Element
+  ): ControlBlockCopyStatus {
+    const lnQuery = this.buildLnQueryForControl(controlBlock);
+    const ln = otherIED.querySelector(lnQuery);
+
+    if (!ln) {
+      return ControlBlockCopyStatus.IEDStructureIncompatible;
+    }
+
+    const controlInOtherIED = ln.querySelector(
+      `${controlBlock.tagName}[name="${controlBlock.getAttribute('name')}"]`
+    );
+    const hasControl = Boolean(controlInOtherIED);
+
+    const dataSet = this.getDataSet(controlBlock);
+
+    if (!dataSet) {
+      throw new Error('ControlBlock has no DataSet');
+    }
+
+    const hasDataSet =
+      dataSet !== null &&
+      Boolean(
+        ln.querySelector(`DataSet[name="${dataSet?.getAttribute('name')}"]`)
+      );
+
+    if (hasDataSet || hasControl) {
+      return ControlBlockCopyStatus.ControlBlockOrDataSetAlreadyExists;
+    }
+
+    const fcdas = Array.from(dataSet.querySelectorAll('FCDA'));
+    for (const fcda of fcdas) {
+      const isCompatible = this.isFCDACompatibleWithIED(fcda, otherIED);
+
+      if (!isCompatible) {
+        // console.log(`FCDA is not compatible`, fcda);
+        return ControlBlockCopyStatus.IEDStructureIncompatible;
+      }
+    }
+
+    return ControlBlockCopyStatus.CanCopy;
+  }
+
   protected copyControlBlock(): void {
     const selectedOptions = this.controlBlockCopyOptions.filter(
       o => o.selected
@@ -254,7 +320,7 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
     }
 
     const inserts = selectedOptions.flatMap(o => {
-      const lnQuery = this.buildLnQuery(o.control);
+      const lnQuery = this.buildLnQueryForControl(o.control);
       const ln = o.ied.querySelector(lnQuery);
       const dataSet = this.getDataSet(o.control);
 

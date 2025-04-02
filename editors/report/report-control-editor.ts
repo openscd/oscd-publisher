@@ -10,6 +10,7 @@ import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import { MdOutlinedButton } from '@scopedelement/material-web/button/MdOutlinedButton.js';
+import { MdCheckbox } from '@scopedelement/material-web/checkbox/MdCheckbox.js';
 
 import '@openenergytools/filterable-lists/dist/action-list.js';
 import { newEditEvent } from '@openenergytools/open-scd-core';
@@ -23,7 +24,10 @@ import { pathIdentity, styles } from '../../foundation.js';
 
 import { DataSetElementEditor } from '../dataset/data-set-element-editor.js';
 import { ReportControlElementEditor } from './report-control-element-editor.js';
-import { BaseElementEditor } from '../base-element-editor.js';
+import {
+  BaseElementEditor,
+  ControlBlockCopyStatus,
+} from '../base-element-editor.js';
 
 export class ReportControlEditor extends BaseElementEditor {
   static scopedElements = {
@@ -34,6 +38,7 @@ export class ReportControlEditor extends BaseElementEditor {
     'md-icon-button': MdIconButton,
     'md-icon': MdIcon,
     'md-dialog': MdDialog,
+    'md-checkbox': MdCheckbox,
   };
 
   @query('.selectionlist') selectionList!: ActionList;
@@ -135,6 +140,35 @@ export class ReportControlEditor extends BaseElementEditor {
           },
           actions: [
             {
+              icon: 'folder_copy',
+              callback: () => {
+                const lDevice = rpControl.closest('LDevice');
+                if (!lDevice) {
+                  throw new Error('GSEControl has no LDevice parent');
+                }
+
+                const otherIEDs = this.queryIEDs().filter(
+                  otherIED => ied !== otherIED
+                );
+
+                this.controlBlockCopyOptions = otherIEDs.map(otherIED => {
+                  const status = this.getCopyControlBlockCopyStatus(
+                    rpControl,
+                    otherIED
+                  );
+
+                  return {
+                    ied: otherIED,
+                    control: rpControl,
+                    status,
+                    selected: status === ControlBlockCopyStatus.CanCopy,
+                  };
+                });
+
+                this.copyControlBlockDialog.show();
+              },
+            },
+            {
               icon: 'delete',
               callback: () => {
                 this.dispatchEvent(
@@ -153,12 +187,13 @@ export class ReportControlEditor extends BaseElementEditor {
       }
     );
 
-    return html`<action-list
-      class="selectionlist"
-      filterable
-      searchhelper="Filter ReportControl's"
-      .items=${items}
-    ></action-list>`;
+    return html`${this.renderCopyControlBlockDialog()}
+      <action-list
+        class="selectionlist"
+        filterable
+        searchhelper="Filter ReportControl's"
+        .items=${items}
+      ></action-list>`;
   }
 
   private renderToggleButton(): TemplateResult {
