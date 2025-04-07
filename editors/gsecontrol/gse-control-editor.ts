@@ -84,7 +84,6 @@ export class GseControlEditor extends BaseElementEditor {
   }
 
   private renderSelectionList(): TemplateResult {
-    // TODO: Store ieds as objects
     const items = this.queryIEDs().flatMap(ied => {
       const gseControls = Array.from(
         ied.querySelectorAll(
@@ -257,6 +256,28 @@ export class GseControlEditor extends BaseElementEditor {
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    .copy-button {
+      align-self: flex-end;
+    }
+
+    .copy-optin-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-option-description {
+      min-width: 240px;
+    }
+
+    .copy-option-description-ied {
+      font-weight: bold;
+    }
+
+    .copy-option-description-status {
+      font-size: 0.8em;
     }
   `;
 }

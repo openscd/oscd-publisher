@@ -246,5 +246,33 @@ export class SampledValueControlEditor extends BaseElementEditor {
         display: block;
       }
     }
+
+    .copy-option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .copy-button {
+      align-self: flex-end;
+    }
+
+    .copy-optin-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-option-description {
+      min-width: 240px;
+    }
+
+    .copy-option-description-ied {
+      font-weight: bold;
+    }
+
+    .copy-option-description-status {
+      font-size: 0.8em;
+    }
   `;
 }

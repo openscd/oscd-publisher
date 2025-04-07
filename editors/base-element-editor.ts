@@ -228,6 +228,20 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
     this.selectDataSetDialog.show();
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  private getCopyStatusText(status: ControlBlockCopyStatus): string {
+    switch (status) {
+      case ControlBlockCopyStatus.CanCopy:
+        return 'Copy possible';
+      case ControlBlockCopyStatus.IEDStructureIncompatible:
+        return 'IED structure incompatible';
+      case ControlBlockCopyStatus.ControlBlockOrDataSetAlreadyExists:
+        return 'Control block or data set already exists';
+      default:
+        return '';
+    }
+  }
+
   protected renderSelectDataSetDialog(): TemplateResult {
     const items = Array.from(
       this.selectCtrlBlock?.parentElement?.querySelectorAll(
@@ -256,8 +270,15 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
       <div slot="content" class="copy-option-list">
         ${this.controlBlockCopyOptions.map(
           option =>
-            html`<label>
-              ${option.ied.getAttribute('name')}
+            html` <label class="copy-optin-row">
+              <div class="copy-option-description">
+                <div class="copy-option-description-ied">
+                  ${option.ied.getAttribute('name')}
+                </div>
+                <div class="copy-option-description-status">
+                  ${this.getCopyStatusText(option.status)}
+                </div>
+              </div>
               <md-checkbox
                 ?checked=${option.selected}
                 @change=${() => {
@@ -267,12 +288,11 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
                 ?disabled=${option.status !== ControlBlockCopyStatus.CanCopy}
               >
               </md-checkbox>
-              <div>${option.status}</div>
             </label>`
         )}
-        <div>
+        <div class="copy-button">
           <md-outlined-button @click=${this.copyControlBlock}
-            >Copy 2</md-outlined-button
+            >Copy</md-outlined-button
           >
         </div>
       </div>
