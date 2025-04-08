@@ -151,8 +151,6 @@ export class GseControlEditor extends BaseElementEditor {
                   otherIED
                 );
 
-                // console.log(`IED ${otherIED.getAttribute('name')}: ${status}`);
-
                 return {
                   ied: otherIED,
                   control: gseControl,

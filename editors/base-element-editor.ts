@@ -151,7 +151,6 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
       const isCompatible = isFCDACompatibleWithIED(fcda, otherIED);
 
       if (!isCompatible) {
-        // console.log(`FCDA is not compatible`, fcda);
         return ControlBlockCopyStatus.IEDStructureIncompatible;
       }
     }
