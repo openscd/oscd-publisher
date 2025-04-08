@@ -42,7 +42,7 @@ describe('GSEControl editor component', () => {
   });
 
   it('allows to insert new GSEControl element', async () => {
-    await sendMouse({ type: 'click', position: [760, 100] });
+    await sendMouse({ type: 'click', position: [688, 100] });
 
     expect(editEvent).to.have.been.calledOnce;
     expect(editEvent.args[0][0].detail.edit[0]).to.satisfy(isInsert);
