@@ -2,7 +2,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from '@open-wc/testing';
 import { iedWithLDevice, copyControlDoc } from './xml.testfiles.js';
-import { queryLDevice, queryLN } from './xml.js';
+import {
+  isFCDACompatibleWithIED,
+  queryDataTypeLeaf,
+  queryLDevice,
+  queryLN,
+} from './xml.js';
 
 function parseXml(str: string): Document {
   return new DOMParser().parseFromString(str, 'application/xml');
@@ -63,6 +68,83 @@ describe('Xml utility', () => {
 
       expect(ln).to.not.be.null;
       expect(ln?.getAttribute('id')).to.equal('ToBeCopied_MMXU');
+    });
+  });
+
+  describe('queryDataTypeLeaf', () => {
+    it('should fetch DO leaf', () => {
+      const dataTypeTemplates = doc.querySelector('DataTypeTemplates')!;
+      const lnType = 'CILO$oscd$_eb5ec6bb69650d07';
+
+      const leaf = queryDataTypeLeaf(dataTypeTemplates, lnType, ['EnaOpn'], []);
+
+      expect(leaf).to.not.be.null;
+      expect(leaf?.tagName).to.equal('DOType');
+      expect(leaf?.getAttribute('id')).to.equal(
+        'EnaOpn$oscd$_55462dcb3eb76dd6'
+      );
+    });
+
+    it('should return null if dataType is not found', () => {
+      const dataTypeTemplates = doc.querySelector('DataTypeTemplates')!;
+      const lnType = 'MMXU$oscd$_8046c36011040649';
+
+      const leaf = queryDataTypeLeaf(
+        dataTypeTemplates,
+        lnType,
+        ['A', 'phsA'],
+        ['cVal', 'ang', 'f']
+      );
+
+      expect(leaf).to.be.null;
+    });
+
+    it('should fetch DA leaf', () => {
+      const dataTypeTemplates = doc.querySelector('DataTypeTemplates')!;
+      const lnType = 'MMXU$oscd$_bcec88edb16399a2';
+
+      const leaf = queryDataTypeLeaf(
+        dataTypeTemplates,
+        lnType,
+        ['A', 'phsA'],
+        ['cVal', 'ang', 'f']
+      );
+
+      expect(leaf).to.not.be.null;
+      expect(leaf?.tagName).to.equal('DAType');
+      expect(leaf?.getAttribute('id')).to.equal('ang$oscd$_ed49c2f7a55ad05a');
+    });
+  });
+
+  describe('isFCDACompatibleWithIED', () => {
+    it('should return true for compatible FCDA', () => {
+      const fcda = doc.querySelector(
+        'IED[name="ToBeCopied"] LDevice[inst="LD1"] > LN0 > DataSet > FCDA'
+      )!;
+      const ied = doc.querySelector('IED[name="ToCopieTo8"]')!;
+
+      const isCompatible = isFCDACompatibleWithIED(fcda, ied);
+      expect(isCompatible).to.be.true;
+    });
+
+    it('should return false if IED is missing LDevice', () => {
+      const fcda = doc.querySelector(
+        'IED[name="ToBeCopied"] LDevice[inst="LD1"] > LN0 > DataSet > FCDA'
+      )!;
+      const ied = doc.querySelector('IED[name="ToCopieTo1"]')!;
+
+      const isCompatible = isFCDACompatibleWithIED(fcda, ied);
+      expect(isCompatible).to.be.false;
+    });
+
+    it('should return false if data type is incompatible', () => {
+      const fcda = doc.querySelector(
+        'IED[name="ToBeCopied"] LDevice[inst="LD1"] > LN0 > DataSet > FCDA'
+      )!;
+      const ied = doc.querySelector('IED[name="ToCopieTo4"]')!;
+
+      const isCompatible = isFCDACompatibleWithIED(fcda, ied);
+      expect(isCompatible).to.be.false;
     });
   });
 });
