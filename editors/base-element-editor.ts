@@ -60,6 +60,10 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
 
   @query('.change.dataset') changeDataSet!: MdIconButton;
 
+  get hasCopyControlSelected(): boolean {
+    return this.controlBlockCopyOptions.some(o => o.selected);
+  }
+
   protected selectDataSet(dataSet: Element): void {
     const name = dataSet.getAttribute('name');
     if (!name || !this.selectCtrlBlock) return;
@@ -283,6 +287,7 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
                 @change=${() => {
                   // eslint-disable-next-line no-param-reassign
                   option.selected = !option.selected;
+                  this.requestUpdate();
                 }}
                 ?disabled=${option.status !== ControlBlockCopyStatus.CanCopy}
               >
@@ -290,7 +295,13 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
             </label>`
         )}
         <div class="copy-button">
-          <md-outlined-button @click=${this.copyControlBlock}
+          <md-outlined-button
+            @click=${() => this.copyControlBlockDialog.close()}
+            >Close</md-outlined-button
+          >
+          <md-outlined-button
+            @click=${this.copyControlBlock}
+            ?disabled=${!this.hasCopyControlSelected}
             >Copy</md-outlined-button
           >
         </div>

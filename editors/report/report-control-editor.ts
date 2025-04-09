@@ -144,7 +144,7 @@ export class ReportControlEditor extends BaseElementEditor {
               callback: () => {
                 const lDevice = rpControl.closest('LDevice');
                 if (!lDevice) {
-                  throw new Error('GSEControl has no LDevice parent');
+                  throw new Error('ReportControl has no LDevice parent');
                 }
 
                 const otherIEDs = this.queryIEDs().filter(
