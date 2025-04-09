@@ -43,7 +43,7 @@ describe('ReportControl editor component', () => {
   });
 
   it('allows to insert new ReportControl element', async () => {
-    await sendMouse({ type: 'click', position: [760, 100] });
+    await sendMouse({ type: 'click', position: [688, 100] });
 
     expect(editEvent).to.have.been.calledOnce;
 
