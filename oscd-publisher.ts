@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 
@@ -11,6 +10,8 @@ import { DataSetEditor } from './editors/dataset/data-set-editor.js';
 import { GseControlEditor } from './editors/gsecontrol/gse-control-editor.js';
 import { ReportControlEditor } from './editors/report/report-control-editor.js';
 import { SampledValueControlEditor } from './editors/sampledvalue/sampled-value-control-editor.js';
+
+type PublisherType = 'Report' | 'GOOSE' | 'SampledValue' | 'DataSet';
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
@@ -31,8 +32,59 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
   editCount = 0;
 
   @state()
-  private publisherType: 'Report' | 'GOOSE' | 'SampledValue' | 'DataSet' =
-    'GOOSE';
+  private publisherType: PublisherType = 'GOOSE';
+
+  private filterValues: Record<PublisherType, string> = {
+    Report: '',
+    GOOSE: '',
+    SampledValue: '',
+    DataSet: '',
+  };
+
+  private handleSearchChange =
+    (type: PublisherType) => (event: CustomEvent) => {
+      this.filterValues[type] = event.detail.value;
+      this.requestUpdate();
+    };
+
+  private handlePublisherTypeChange(newType: PublisherType) {
+    this.publisherType = newType;
+  }
+
+  private renderEditor() {
+    switch (this.publisherType) {
+      case 'Report':
+        return html`<report-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.Report}
+          @search-change=${this.handleSearchChange('Report')}
+        ></report-control-editor>`;
+      case 'GOOSE':
+        return html`<gse-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.GOOSE}
+          @search-change=${this.handleSearchChange('GOOSE')}
+        ></gse-control-editor>`;
+      case 'SampledValue':
+        return html`<sampled-value-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.SampledValue}
+          @search-change=${this.handleSearchChange('SampledValue')}
+        ></sampled-value-control-editor>`;
+      case 'DataSet':
+        return html`<data-set-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.DataSet}
+          @search-change=${this.handleSearchChange('DataSet')}
+        ></data-set-editor>`;
+      default:
+        return nothing;
+    }
+  }
 
   render() {
     return html`<form class="publishertypeselector">
@@ -41,9 +93,7 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
             id="report-radio"
             value="report"
             ?checked=${this.publisherType === 'Report'}
-            @change=${() => {
-              this.publisherType = 'Report';
-            }}
+            @change=${() => this.handlePublisherTypeChange('Report')}
           ></md-radio>
           <label for="report-radio">Report</label>
         </span>
@@ -52,9 +102,7 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
             id="goose-radio"
             value="goose"
             ?checked=${this.publisherType === 'GOOSE'}
-            @change=${() => {
-              this.publisherType = 'GOOSE';
-            }}
+            @change=${() => this.handlePublisherTypeChange('GOOSE')}
           ></md-radio>
           <label for="goose-radio">GOOSE</label>
         </span>
@@ -63,9 +111,7 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
             id="smv-radio"
             value="smv"
             ?checked=${this.publisherType === 'SampledValue'}
-            @change=${() => {
-              this.publisherType = 'SampledValue';
-            }}
+            @change=${() => this.handlePublisherTypeChange('SampledValue')}
           ></md-radio>
           <label for="smv-radio">SampledValue</label>
         </span>
@@ -74,41 +120,12 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
             id="ds-radio"
             value="ds"
             ?checked=${this.publisherType === 'DataSet'}
-            @change=${() => {
-              this.publisherType = 'DataSet';
-            }}
+            @change=${() => this.handlePublisherTypeChange('DataSet')}
           ></md-radio>
           <label for="ds-radio">DataSet</label>
         </span>
       </form>
-      <report-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${classMap({
-          hidden: this.publisherType !== 'Report',
-        })}"
-      ></report-control-editor
-      ><gse-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${classMap({
-          hidden: this.publisherType !== 'GOOSE',
-        })}"
-      ></gse-control-editor
-      ><sampled-value-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${classMap({
-          hidden: this.publisherType !== 'SampledValue',
-        })}"
-      ></sampled-value-control-editor
-      ><data-set-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${classMap({
-          hidden: this.publisherType !== 'DataSet',
-        })}"
-      ></data-set-editor>`;
+      ${this.renderEditor()} `;
   }
 
   static styles = css`
@@ -123,7 +140,7 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
       --md-sys-color-on-primary: var(--oscd-base2);
       --md-sys-color-on-surface-variant: var(--oscd-base00);
       --md-menu-container-color: var(--oscd-base3);
-      font-family: var(--oscd-theme-text-font);
+      font-family: var(--oscd-theme-text-font, Roboto);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
       --md-dialog-container-color: var(--oscd-base3);
 

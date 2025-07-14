@@ -36,6 +36,17 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
   @property({ type: Number })
   editCount = 0;
 
+  @property({ type: String }) searchValue = '';
+
+  private handleSearchChange = (event: CustomEvent) => {
+    this.dispatchEvent(
+      new CustomEvent('search-change', {
+        detail: event.detail,
+        bubbles: true,
+      })
+    );
+  };
+
   @state()
   selectedDataSet?: Element;
 
@@ -137,6 +148,8 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
     return html`<action-list
       class="selectionlist"
       .items=${items}
+      .searchValue=${this.searchValue}
+      @search-change=${this.handleSearchChange}
       filterable
       searchhelper="Filter DataSet's"
     ></action-list>`;

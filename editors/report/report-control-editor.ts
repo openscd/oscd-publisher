@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
-import { query } from 'lit/decorators.js';
+import { query, property } from 'lit/decorators.js';
 
 import {
   ActionItem,
@@ -39,6 +39,17 @@ export class ReportControlEditor extends BaseElementEditor {
     'md-icon': MdIcon,
     'md-dialog': MdDialog,
     'md-checkbox': MdCheckbox,
+  };
+
+  @property({ type: String }) searchValue = '';
+
+  private handleSearchChange = (event: CustomEvent) => {
+    this.dispatchEvent(
+      new CustomEvent('search-change', {
+        detail: event.detail,
+        bubbles: true,
+      })
+    );
   };
 
   @query('.selectionlist') selectionList!: ActionList;
@@ -193,6 +204,8 @@ export class ReportControlEditor extends BaseElementEditor {
         filterable
         searchhelper="Filter ReportControl's"
         .items=${items}
+        .searchValue=${this.searchValue}
+        @search-change=${this.handleSearchChange}
       ></action-list>`;
   }
 
