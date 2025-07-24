@@ -24,16 +24,16 @@ function timeout(ms: number) {
   });
 }
 
+const doc = new DOMParser().parseFromString(
+  reportControlDoc,
+  'application/xml'
+);
+
 describe('ReportControl editor component', () => {
   let editor: ReportControlEditor;
   let editEvent: SinonSpy;
 
   beforeEach(async () => {
-    const doc = new DOMParser().parseFromString(
-      reportControlDoc,
-      'application/xml'
-    );
-
     editor = await fixture(
       html`<report-control-editor .doc="${doc}"></report-control-editor>`
     );
@@ -92,5 +92,19 @@ describe('ReportControl editor component', () => {
     expect(editEvent.args[0][0].detail.edit.attributes.datSet).to.equal(
       'datSet2'
     );
+  });
+
+  it('sets searchValue on ActionList when passed as a prop', async () => {
+    const el = await fixture(
+      html`<report-control-editor
+        .doc="${doc}"
+        searchValue="Report1"
+      ></report-control-editor>`
+    );
+    await (el as ReportControlEditor).updateComplete;
+
+    const actionList = (el as ReportControlEditor).selectionList;
+    expect(actionList).to.exist;
+    expect(actionList.searchValue).to.equal('Report1');
   });
 });

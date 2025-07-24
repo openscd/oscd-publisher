@@ -23,16 +23,13 @@ function timeout(ms: number) {
   });
 }
 
+const doc = new DOMParser().parseFromString(gseControlDoc, 'application/xml');
+
 describe('GSEControl editor component', () => {
   let editor: GseControlEditor;
   let editEvent: SinonSpy;
 
   beforeEach(async () => {
-    const doc = new DOMParser().parseFromString(
-      gseControlDoc,
-      'application/xml'
-    );
-
     editor = await fixture(
       html`<gse-control-editor .doc="${doc}"></gse-control-editor>`
     );
@@ -90,5 +87,19 @@ describe('GSEControl editor component', () => {
     expect(editEvent.args[0][0].detail.edit.attributes.datSet).to.equal(
       'datSet2'
     );
+  });
+
+  it('sets searchValue on ActionList when passed as a prop', async () => {
+    const el = await fixture(
+      html`<gse-control-editor
+        .doc="${doc}"
+        searchValue="GSE1"
+      ></gse-control-editor>`
+    );
+    await (el as GseControlEditor).updateComplete;
+
+    const actionList = (el as GseControlEditor).selectionList;
+    expect(actionList).to.exist;
+    expect(actionList.searchValue).to.equal('GSE1');
   });
 });

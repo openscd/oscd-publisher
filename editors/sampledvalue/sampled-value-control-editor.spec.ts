@@ -26,16 +26,13 @@ function timeout(ms: number) {
   });
 }
 
+const doc = new DOMParser().parseFromString(smvControlDoc, 'application/xml');
+
 describe('SampledValueControl editor component', () => {
   let editor: SampledValueControlEditor;
   let editEvent: SinonSpy;
 
   beforeEach(async () => {
-    const doc = new DOMParser().parseFromString(
-      smvControlDoc,
-      'application/xml'
-    );
-
     editor = await fixture(
       html`<sampled-value-control-editor
         .doc="${doc}"
@@ -84,5 +81,19 @@ describe('SampledValueControl editor component', () => {
     expect(editEvent.args[0][0].detail.edit.attributes.datSet).to.equal(
       'datSet2'
     );
+  });
+
+  it('sets searchValue on ActionList when passed as a prop', async () => {
+    const el = await fixture(
+      html`<sampled-value-control-editor
+        .doc="${doc}"
+        searchValue="SV1"
+      ></sampled-value-control-editor>`
+    );
+    await (el as SampledValueControlEditor).updateComplete;
+
+    const actionList = (el as SampledValueControlEditor).selectionList;
+    expect(actionList).to.exist;
+    expect(actionList.searchValue).to.equal('SV1');
   });
 });
