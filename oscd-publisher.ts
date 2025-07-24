@@ -11,7 +11,16 @@ import { GseControlEditor } from './editors/gsecontrol/gse-control-editor.js';
 import { ReportControlEditor } from './editors/report/report-control-editor.js';
 import { SampledValueControlEditor } from './editors/sampledvalue/sampled-value-control-editor.js';
 
+const EditorSelector = {
+  Report: 'report-control-editor',
+  GOOSE: 'gse-control-editor',
+  SampledValue: 'sampled-value-control-editor',
+  DataSet: 'data-set-editor',
+} as const;
+
 type PublisherType = 'Report' | 'GOOSE' | 'SampledValue' | 'DataSet';
+
+type EditorSelectorType = (typeof EditorSelector)[keyof typeof EditorSelector];
 
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
@@ -47,7 +56,20 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
       this.requestUpdate();
     };
 
+  private saveCurrentSearchValue() {
+    const selector: EditorSelectorType = EditorSelector[this.publisherType];
+    const editor = this.renderRoot.querySelector(selector) as {
+      selectionList?: { searchValue: string };
+    } | null;
+
+    if (editor) {
+      this.filterValues[this.publisherType] =
+        editor.selectionList?.searchValue || '';
+    }
+  }
+
   private handlePublisherTypeChange(newType: PublisherType) {
+    this.saveCurrentSearchValue();
     this.publisherType = newType;
   }
 

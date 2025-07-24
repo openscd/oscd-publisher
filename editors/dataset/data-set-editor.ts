@@ -38,15 +38,6 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
 
   @property({ type: String }) searchValue = '';
 
-  private handleSearchChange = (event: CustomEvent) => {
-    this.dispatchEvent(
-      new CustomEvent('search-change', {
-        detail: event.detail,
-        bubbles: true,
-      })
-    );
-  };
-
   @state()
   selectedDataSet?: Element;
 
@@ -71,6 +62,13 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
 
     super.update(props);
   } */
+
+  updated(changedProps: Map<string | number | symbol, unknown>) {
+    super.updated?.(changedProps);
+    if (changedProps.has('searchValue') && this.selectionList) {
+      this.selectionList.searchValue = this.searchValue;
+    }
+  }
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectedDataSet)
@@ -148,8 +146,6 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
     return html`<action-list
       class="selectionlist"
       .items=${items}
-      .searchValue=${this.searchValue}
-      @search-change=${this.handleSearchChange}
       filterable
       searchhelper="Filter DataSet's"
     ></action-list>`;

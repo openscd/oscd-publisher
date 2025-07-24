@@ -40,15 +40,6 @@ export class GseControlEditor extends BaseElementEditor {
 
   @property({ type: String }) searchValue = '';
 
-  private handleSearchChange = (event: CustomEvent) => {
-    this.dispatchEvent(
-      new CustomEvent('search-change', {
-        detail: event.detail,
-        bubbles: true,
-      })
-    );
-  };
-
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('.change.scl.element') selectGSEControlButton!: MdOutlinedButton;
@@ -79,6 +70,13 @@ export class GseControlEditor extends BaseElementEditor {
         (this.selectionList.selected as ListItem).selected = false; 
     }
   } */
+
+  updated(changedProps: Map<string | number | symbol, unknown>) {
+    super.updated?.(changedProps);
+    if (changedProps.has('searchValue') && this.selectionList) {
+      this.selectionList.searchValue = this.searchValue;
+    }
+  }
 
   protected renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)
@@ -197,8 +195,6 @@ export class GseControlEditor extends BaseElementEditor {
         filterable
         searchhelper="Filter GSEControl's"
         .items=${items}
-        .searchValue=${this.searchValue}
-        @search-change=${this.handleSearchChange}
       ></action-list>`;
   }
 

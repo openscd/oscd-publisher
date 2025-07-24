@@ -41,17 +41,6 @@ export class ReportControlEditor extends BaseElementEditor {
     'md-checkbox': MdCheckbox,
   };
 
-  @property({ type: String }) searchValue = '';
-
-  private handleSearchChange = (event: CustomEvent) => {
-    this.dispatchEvent(
-      new CustomEvent('search-change', {
-        detail: event.detail,
-        bubbles: true,
-      })
-    );
-  };
-
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('.change.scl.element') selectReportControlButton!: MdOutlinedButton;
@@ -61,6 +50,8 @@ export class ReportControlEditor extends BaseElementEditor {
 
   @query('data-set-element-editor')
   dataSetElementEditor!: DataSetElementEditor;
+
+  @property({ type: String }) searchValue = '';
 
   /** Resets selected Report and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
@@ -86,6 +77,13 @@ export class ReportControlEditor extends BaseElementEditor {
         (this.selectionList.selected as ListItem).selected = false; 
     }
   } */
+
+  updated(changedProps: Map<string | number | symbol, unknown>) {
+    super.updated?.(changedProps);
+    if (changedProps.has('searchValue') && this.selectionList) {
+      this.selectionList.searchValue = this.searchValue;
+    }
+  }
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)
@@ -204,8 +202,6 @@ export class ReportControlEditor extends BaseElementEditor {
         filterable
         searchhelper="Filter ReportControl's"
         .items=${items}
-        .searchValue=${this.searchValue}
-        @search-change=${this.handleSearchChange}
       ></action-list>`;
   }
 
