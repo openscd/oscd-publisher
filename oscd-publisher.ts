@@ -50,12 +50,6 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
     DataSet: '',
   };
 
-  private handleSearchChange =
-    (type: PublisherType) => (event: CustomEvent) => {
-      this.filterValues[type] = event.detail.value;
-      this.requestUpdate();
-    };
-
   private saveCurrentSearchValue() {
     const selector: EditorSelectorType = EditorSelector[this.publisherType];
     const editor = this.renderRoot.querySelector(selector) as {
@@ -80,28 +74,24 @@ export default class PublisherPlugin extends ScopedElementsMixin(LitElement) {
           .doc=${this.doc}
           .editCount=${this.editCount}
           .searchValue=${this.filterValues.Report}
-          @search-change=${this.handleSearchChange('Report')}
         ></report-control-editor>`;
       case 'GOOSE':
         return html`<gse-control-editor
           .doc=${this.doc}
           .editCount=${this.editCount}
           .searchValue=${this.filterValues.GOOSE}
-          @search-change=${this.handleSearchChange('GOOSE')}
         ></gse-control-editor>`;
       case 'SampledValue':
         return html`<sampled-value-control-editor
           .doc=${this.doc}
           .editCount=${this.editCount}
           .searchValue=${this.filterValues.SampledValue}
-          @search-change=${this.handleSearchChange('SampledValue')}
         ></sampled-value-control-editor>`;
       case 'DataSet':
         return html`<data-set-editor
           .doc=${this.doc}
           .editCount=${this.editCount}
           .searchValue=${this.filterValues.DataSet}
-          @search-change=${this.handleSearchChange('DataSet')}
         ></data-set-editor>`;
       default:
         return nothing;

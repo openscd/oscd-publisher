@@ -14,6 +14,7 @@ import {
   identity,
 } from '@openenergytools/scl-lib';
 import '@openenergytools/filterable-lists/dist/action-list.js';
+import { ActionList } from '@openenergytools/filterable-lists/dist/ActionList.js';
 import {
   isFCDACompatibleWithIED,
   queryLDevice,
@@ -43,6 +44,10 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   @property({ type: Number })
   editCount = -1;
 
+  /** Search/filter value for action-lists */
+  @property({ type: String })
+  searchValue = '';
+
   @state()
   selectCtrlBlock?: Element;
 
@@ -59,6 +64,15 @@ export class BaseElementEditor extends ScopedElementsMixin(LitElement) {
   @query('.new.dataset') newDataSet!: MdIconButton;
 
   @query('.change.dataset') changeDataSet!: MdIconButton;
+
+  @query('.selectionlist') selectionList?: ActionList | null;
+
+  updated(changedProps: Map<string | number | symbol, unknown>) {
+    super.updated?.(changedProps);
+    if (changedProps.has('searchValue') && this.selectionList) {
+      this.selectionList.searchValue = this.searchValue;
+    }
+  }
 
   get hasCopyControlSelected(): boolean {
     return this.controlBlockCopyOptions.some(o => o.selected);

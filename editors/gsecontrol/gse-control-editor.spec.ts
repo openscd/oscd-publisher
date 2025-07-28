@@ -100,6 +100,6 @@ describe('GSEControl editor component', () => {
 
     const actionList = (el as GseControlEditor).selectionList;
     expect(actionList).to.exist;
-    expect(actionList.searchValue).to.equal('GSE1');
+    expect(actionList?.searchValue).to.equal('GSE1');
   });
 });

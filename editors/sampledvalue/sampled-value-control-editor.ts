@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
-import { query, property } from 'lit/decorators.js';
+import { query } from 'lit/decorators.js';
 
 import {
   ActionItem,
@@ -45,8 +45,6 @@ export class SampledValueControlEditor extends BaseElementEditor {
     'md-checkbox': MdCheckbox,
   };
 
-  @property({ type: String }) searchValue = '';
-
   @query('.selectionlist') selectionList!: ActionList;
 
   @query('.change.scl.element')
@@ -82,13 +80,6 @@ export class SampledValueControlEditor extends BaseElementEditor {
         (this.selectionList.selected as ListItem).selected = false; 
     }
   } */
-
-  updated(changedProps: Map<string | number | symbol, unknown>) {
-    super.updated?.(changedProps);
-    if (changedProps.has('searchValue') && this.selectionList) {
-      this.selectionList.searchValue = this.searchValue;
-    }
-  }
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)

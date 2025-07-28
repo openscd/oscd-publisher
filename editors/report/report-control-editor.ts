@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { css, html, TemplateResult } from 'lit';
-import { query, property } from 'lit/decorators.js';
+import { query } from 'lit/decorators.js';
 
 import {
   ActionItem,
@@ -51,8 +51,6 @@ export class ReportControlEditor extends BaseElementEditor {
   @query('data-set-element-editor')
   dataSetElementEditor!: DataSetElementEditor;
 
-  @property({ type: String }) searchValue = '';
-
   /** Resets selected Report and its DataSet, if not existing in new doc 
   update(props: Map<string | number | symbol, unknown>): void {
     super.update(props);
@@ -77,13 +75,6 @@ export class ReportControlEditor extends BaseElementEditor {
         (this.selectionList.selected as ListItem).selected = false; 
     }
   } */
-
-  updated(changedProps: Map<string | number | symbol, unknown>) {
-    super.updated?.(changedProps);
-    if (changedProps.has('searchValue') && this.selectionList) {
-      this.selectionList.searchValue = this.searchValue;
-    }
-  }
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectCtrlBlock !== undefined)
