@@ -170,8 +170,6 @@ export class SampledValueControlElementEditor extends ScopedElementsMixin(
     );
 
     this.resetInputs();
-
-    this.onSampledValueControlInputChange();
   }
 
   private onSMVInputChange(): void {
@@ -472,11 +470,10 @@ export class SampledValueControlElementEditor extends ScopedElementsMixin(
       ><md-text-button
         class="smvcontrol save"
         label="save"
-        icon="save"
         ?disabled=${!this.sampledValueControlDiff}
         @click="${this.saveSampledValueControlChanges}"
-        >Save<md-icon slot="save"></md-icon
-      ></md-text-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
     </div>`;
   }
 
