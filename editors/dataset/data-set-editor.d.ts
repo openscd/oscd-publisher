@@ -13,6 +13,7 @@ export declare class DataSetEditor extends DataSetEditor_base {
     doc: XMLDocument;
     /** SCL change indicator */
     editCount: number;
+    searchValue: string;
     selectedDataSet?: Element;
     selectionList: ActionList;
     selectDataSetButton: MdOutlinedButton;
@@ -31,6 +32,7 @@ export declare class DataSetEditor extends DataSetEditor_base {
   
       super.update(props);
     } */
+    updated(changedProps: Map<string | number | symbol, unknown>): void;
     private renderElementEditorContainer;
     private renderSelectionList;
     private renderToggleButton;

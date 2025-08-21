@@ -122,19 +122,6 @@ let e$2;function r$1(r){return (n,o)=>e$4(n,o,{get(){return (this.renderRoot??(e
  * SPDX-License-Identifier: BSD-3-Clause
  */function n$4(n){return (o,r)=>{const{slot:e}=n??{},s="slot"+(e?`[name=${e}]`:":not([name])");return e$4(o,r,{get(){const t=this.renderRoot?.querySelector(s);return t?.assignedNodes(n)??[]}})}}
 
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const t={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},e$1=t=>(...e)=>({_$litDirective$:t,values:e});class i$2{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i;}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
-
-/**
- * @license
- * Copyright 2018 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */const e=e$1(class extends i$2{constructor(t$1){if(super(t$1),t$1.type!==t.ATTRIBUTE||"class"!==t$1.name||t$1.strings?.length>2)throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.")}render(t){return " "+Object.keys(t).filter((s=>t[s])).join(" ")+" "}update(s,[i]){if(void 0===this.st){this.st=new Set,void 0!==s.strings&&(this.nt=new Set(s.strings.join(" ").split(/\s/).filter((t=>""!==t))));for(const t in i)i[t]&&!this.nt?.has(t)&&this.st.add(t);return this.render(i)}const r=s.element.classList;for(const t of this.st)t in i||(r.remove(t),this.st.delete(t));for(const t in i){const s=!!i[t];s===this.st.has(t)||this.nt?.has(t)||(s?(r.add(t),this.st.add(t)):(r.remove(t),this.st.delete(t)));}return T}});
-
 const appliedClassMixins = new WeakMap();
 
 /** Vefify if the Mixin was previously applyed
@@ -540,6 +527,19 @@ MdFocusRing$2 = __decorate([
 class MdFocusRing$1 extends FocusRing$1 {
 }
 MdFocusRing$1.styles = [styles$B];
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},e$1=t=>(...e)=>({_$litDirective$:t,values:e});class i$2{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i;}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
+
+/**
+ * @license
+ * Copyright 2018 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const e=e$1(class extends i$2{constructor(t$1){if(super(t$1),t$1.type!==t.ATTRIBUTE||"class"!==t$1.name||t$1.strings?.length>2)throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.")}render(t){return " "+Object.keys(t).filter((s=>t[s])).join(" ")+" "}update(s,[i]){if(void 0===this.st){this.st=new Set,void 0!==s.strings&&(this.nt=new Set(s.strings.join(" ").split(/\s/).filter((t=>""!==t))));for(const t in i)i[t]&&!this.nt?.has(t)&&this.st.add(t);return this.render(i)}const r=s.element.classList;for(const t of this.st)t in i||(r.remove(t),this.st.delete(t));for(const t in i){const s=!!i[t];s===this.st.has(t)||this.nt?.has(t)||(s?(r.add(t),this.st.add(t)):(r.remove(t),this.st.delete(t)));}return T}});
 
 /**
  * @license
@@ -7032,19 +7032,33 @@ class FilterListBase extends ScopedElementsMixin(r$4) {
         /** Placeholder for search input field */
         this.searchhelper = 'search';
         this.searchRegex = /.*/i;
+        this._searchValue = '';
+    }
+    /** Current search filter value. Updates search regex when changed. */
+    set searchValue(value) {
+        const oldVal = this._searchValue;
+        if (oldVal === value)
+            return;
+        this._searchValue = value;
+        this.searchRegex = searchRegex(value);
+    }
+    get searchValue() {
+        return this._searchValue;
     }
     onFilter() {
-        var _a;
-        this.searchRegex = searchRegex((_a = this.searchInput) === null || _a === void 0 ? void 0 : _a.value);
+        if (!this.searchInput)
+            return;
+        this.searchValue = this.searchInput.value;
     }
     renderSearchField() {
         return this.filterable
             ? x `<md-outlined-text-field
+          .value=${this._searchValue}
           placeholder="${this.searchhelper}"
           @input="${debounce$1(() => this.onFilter())}"
         >
-          <md-icon slot="leading-icon">search</md-icon></md-outlined-text-field
-        >`
+          <md-icon slot="leading-icon">search</md-icon>
+        </md-outlined-text-field>`
             : x ``;
     }
 }
@@ -7060,6 +7074,12 @@ __decorate([
 __decorate([
     e$3('md-outlined-text-field')
 ], FilterListBase.prototype, "searchInput", void 0);
+__decorate([
+    r$2()
+], FilterListBase.prototype, "_searchValue", void 0);
+__decorate([
+    n$5({ type: String })
+], FilterListBase.prototype, "searchValue", null);
 
 function term(item) {
     var _a, _b, _c;
@@ -41155,6 +41175,7 @@ class DataSetEditor extends ScopedElementsMixin(r$4) {
         super(...arguments);
         /** SCL change indicator */
         this.editCount = 0;
+        this.searchValue = '';
     }
     /** Resets selected DataSet, if not existing in new doc
     update(props: Map<string | number | symbol, unknown>): void {
@@ -41170,6 +41191,13 @@ class DataSetEditor extends ScopedElementsMixin(r$4) {
   
       super.update(props);
     } */
+    updated(changedProps) {
+        var _a;
+        (_a = super.updated) === null || _a === void 0 ? void 0 : _a.call(this, changedProps);
+        if (changedProps.has('searchValue') && this.selectionList) {
+            this.selectionList.searchValue = this.searchValue;
+        }
+    }
     renderElementEditorContainer() {
         if (this.selectedDataSet)
             return x `<div class="elementeditorcontainer">
@@ -41273,6 +41301,9 @@ __decorate([
 __decorate([
     n$5({ type: Number })
 ], DataSetEditor.prototype, "editCount", void 0);
+__decorate([
+    n$5({ type: String })
+], DataSetEditor.prototype, "searchValue", void 0);
 __decorate([
     r$2()
 ], DataSetEditor.prototype, "selectedDataSet", void 0);
@@ -43642,7 +43673,16 @@ class BaseElementEditor extends ScopedElementsMixin(r$4) {
         super(...arguments);
         /** SCL change indicator */
         this.editCount = -1;
+        /** Search/filter value for action-lists */
+        this.searchValue = '';
         this.controlBlockCopyOptions = [];
+    }
+    updated(changedProps) {
+        var _a;
+        (_a = super.updated) === null || _a === void 0 ? void 0 : _a.call(this, changedProps);
+        if (changedProps.has('searchValue') && this.selectionList) {
+            this.selectionList.searchValue = this.searchValue;
+        }
     }
     get hasCopyControlSelected() {
         return this.controlBlockCopyOptions.some(o => o.selected);
@@ -43865,6 +43905,9 @@ __decorate([
     n$5({ type: Number })
 ], BaseElementEditor.prototype, "editCount", void 0);
 __decorate([
+    n$5({ type: String })
+], BaseElementEditor.prototype, "searchValue", void 0);
+__decorate([
     r$2()
 ], BaseElementEditor.prototype, "selectCtrlBlock", void 0);
 __decorate([
@@ -43885,6 +43928,9 @@ __decorate([
 __decorate([
     e$3('.change.dataset')
 ], BaseElementEditor.prototype, "changeDataSet", void 0);
+__decorate([
+    e$3('.selectionlist')
+], BaseElementEditor.prototype, "selectionList", void 0);
 
 class GseControlEditor extends BaseElementEditor {
     /** Resets selected GOOSE and its DataSet, if not existing in new doc
@@ -43944,6 +43990,7 @@ class GseControlEditor extends BaseElementEditor {
                 headline: `${gseControl.getAttribute('name')}`,
                 supportingText: `${pathIdentity(gseControl)}`,
                 primaryAction: () => {
+                    var _a;
                     if (this.selectCtrlBlock === gseControl)
                         return;
                     if (this.gseControlElementEditor)
@@ -43952,7 +43999,7 @@ class GseControlEditor extends BaseElementEditor {
                         this.dataSetElementEditor.resetInputs();
                     this.selectCtrlBlock = gseControl;
                     this.selectedDataSet = this.getDataSet(gseControl);
-                    this.selectionList.classList.add('hidden');
+                    (_a = this.selectionList) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
                     this.selectGSEControlButton.classList.remove('hidden');
                 },
                 actions: [
@@ -44001,7 +44048,8 @@ class GseControlEditor extends BaseElementEditor {
         return x `<md-outlined-button
       class="change scl element"
       @click=${() => {
-            this.selectionList.classList.remove('hidden');
+            var _a;
+            (_a = this.selectionList) === null || _a === void 0 ? void 0 : _a.classList.remove('hidden');
             this.selectGSEControlButton.classList.add('hidden');
         }}
       >Selected GOOSE</md-outlined-button
@@ -44095,9 +44143,6 @@ GseControlEditor.styles = i$5 `
       font-size: 0.8em;
     }
   `;
-__decorate([
-    e$3('.selectionlist')
-], GseControlEditor.prototype, "selectionList", void 0);
 __decorate([
     e$3('.change.scl.element')
 ], GseControlEditor.prototype, "selectGSEControlButton", void 0);
@@ -45519,6 +45564,12 @@ __decorate([
     e$3('data-set-element-editor')
 ], SampledValueControlEditor.prototype, "dataSetElementEditor", void 0);
 
+const EditorSelector = {
+    Report: 'report-control-editor',
+    GOOSE: 'gse-control-editor',
+    SampledValue: 'sampled-value-control-editor',
+    DataSet: 'data-set-editor',
+};
 /** An editor [[`plugin`]] to configure `Report`, `GOOSE`, `SampledValue` control blocks and its `DataSet` */
 class PublisherPlugin extends ScopedElementsMixin(r$4) {
     constructor() {
@@ -45526,6 +45577,55 @@ class PublisherPlugin extends ScopedElementsMixin(r$4) {
         /** SCL change indicator */
         this.editCount = 0;
         this.publisherType = 'GOOSE';
+        this.filterValues = {
+            Report: '',
+            GOOSE: '',
+            SampledValue: '',
+            DataSet: '',
+        };
+    }
+    saveCurrentSearchValue() {
+        var _a;
+        const selector = EditorSelector[this.publisherType];
+        const editor = this.renderRoot.querySelector(selector);
+        if (editor) {
+            this.filterValues[this.publisherType] =
+                ((_a = editor.selectionList) === null || _a === void 0 ? void 0 : _a.searchValue) || '';
+        }
+    }
+    handlePublisherTypeChange(newType) {
+        this.saveCurrentSearchValue();
+        this.publisherType = newType;
+    }
+    renderEditor() {
+        switch (this.publisherType) {
+            case 'Report':
+                return x `<report-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.Report}
+        ></report-control-editor>`;
+            case 'GOOSE':
+                return x `<gse-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.GOOSE}
+        ></gse-control-editor>`;
+            case 'SampledValue':
+                return x `<sampled-value-control-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.SampledValue}
+        ></sampled-value-control-editor>`;
+            case 'DataSet':
+                return x `<data-set-editor
+          .doc=${this.doc}
+          .editCount=${this.editCount}
+          .searchValue=${this.filterValues.DataSet}
+        ></data-set-editor>`;
+            default:
+                return E;
+        }
     }
     render() {
         return x `<form class="publishertypeselector">
@@ -45534,9 +45634,7 @@ class PublisherPlugin extends ScopedElementsMixin(r$4) {
             id="report-radio"
             value="report"
             ?checked=${this.publisherType === 'Report'}
-            @change=${() => {
-            this.publisherType = 'Report';
-        }}
+            @change=${() => this.handlePublisherTypeChange('Report')}
           ></md-radio>
           <label for="report-radio">Report</label>
         </span>
@@ -45545,9 +45643,7 @@ class PublisherPlugin extends ScopedElementsMixin(r$4) {
             id="goose-radio"
             value="goose"
             ?checked=${this.publisherType === 'GOOSE'}
-            @change=${() => {
-            this.publisherType = 'GOOSE';
-        }}
+            @change=${() => this.handlePublisherTypeChange('GOOSE')}
           ></md-radio>
           <label for="goose-radio">GOOSE</label>
         </span>
@@ -45556,9 +45652,7 @@ class PublisherPlugin extends ScopedElementsMixin(r$4) {
             id="smv-radio"
             value="smv"
             ?checked=${this.publisherType === 'SampledValue'}
-            @change=${() => {
-            this.publisherType = 'SampledValue';
-        }}
+            @change=${() => this.handlePublisherTypeChange('SampledValue')}
           ></md-radio>
           <label for="smv-radio">SampledValue</label>
         </span>
@@ -45567,41 +45661,12 @@ class PublisherPlugin extends ScopedElementsMixin(r$4) {
             id="ds-radio"
             value="ds"
             ?checked=${this.publisherType === 'DataSet'}
-            @change=${() => {
-            this.publisherType = 'DataSet';
-        }}
+            @change=${() => this.handlePublisherTypeChange('DataSet')}
           ></md-radio>
           <label for="ds-radio">DataSet</label>
         </span>
       </form>
-      <report-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${e({
-            hidden: this.publisherType !== 'Report',
-        })}"
-      ></report-control-editor
-      ><gse-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${e({
-            hidden: this.publisherType !== 'GOOSE',
-        })}"
-      ></gse-control-editor
-      ><sampled-value-control-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${e({
-            hidden: this.publisherType !== 'SampledValue',
-        })}"
-      ></sampled-value-control-editor
-      ><data-set-editor
-        .doc=${this.doc}
-        editCount="${this.editCount}"
-        class="${e({
-            hidden: this.publisherType !== 'DataSet',
-        })}"
-      ></data-set-editor>`;
+      ${this.renderEditor()} `;
     }
 }
 PublisherPlugin.scopedElements = {
@@ -45623,7 +45688,7 @@ PublisherPlugin.styles = i$5 `
       --md-sys-color-on-primary: var(--oscd-base2);
       --md-sys-color-on-surface-variant: var(--oscd-base00);
       --md-menu-container-color: var(--oscd-base3);
-      font-family: var(--oscd-theme-text-font);
+      font-family: var(--oscd-theme-text-font, Roboto);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
       --md-dialog-container-color: var(--oscd-base3);
 

@@ -2,6 +2,7 @@ import { LitElement, TemplateResult } from 'lit';
 import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
 import type { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
 import '@openenergytools/filterable-lists/dist/action-list.js';
+import { ActionList } from '@openenergytools/filterable-lists/dist/ActionList.js';
 export declare enum ControlBlockCopyStatus {
     CanCopy = "CanCopy",
     IEDStructureIncompatible = "IEDStructureIncompatible",
@@ -19,6 +20,8 @@ export declare class BaseElementEditor extends BaseElementEditor_base {
     doc: XMLDocument;
     /** SCL change indicator */
     editCount: number;
+    /** Search/filter value for action-lists */
+    searchValue: string;
     selectCtrlBlock?: Element;
     selectedDataSet?: Element | null;
     controlBlockCopyOptions: ControlBlockCopyOption[];
@@ -26,6 +29,8 @@ export declare class BaseElementEditor extends BaseElementEditor_base {
     copyControlBlockDialog: MdDialog;
     newDataSet: MdIconButton;
     changeDataSet: MdIconButton;
+    selectionList?: ActionList | null;
+    updated(changedProps: Map<string | number | symbol, unknown>): void;
     get hasCopyControlSelected(): boolean;
     protected selectDataSet(dataSet: Element): void;
     protected queryIEDs(): Element[];

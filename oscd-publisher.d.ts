@@ -19,6 +19,10 @@ export default class PublisherPlugin extends PublisherPlugin_base {
     /** SCL change indicator */
     editCount: number;
     private publisherType;
+    private filterValues;
+    private saveCurrentSearchValue;
+    private handlePublisherTypeChange;
+    private renderEditor;
     render(): import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }

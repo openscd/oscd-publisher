@@ -19,7 +19,6 @@ export declare class GseControlEditor extends BaseElementEditor {
         'md-dialog': typeof MdDialog;
         'md-checkbox': typeof MdCheckbox;
     };
-    selectionList: ActionList;
     selectGSEControlButton: MdOutlinedButton;
     gseControlElementEditor: GseControlElementEditor;
     dataSetElementEditor: DataSetElementEditor;
