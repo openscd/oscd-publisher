@@ -36,6 +36,8 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
   @property({ type: Number })
   editCount = 0;
 
+  @property({ type: String }) searchValue = '';
+
   @state()
   selectedDataSet?: Element;
 
@@ -60,6 +62,13 @@ export class DataSetEditor extends ScopedElementsMixin(LitElement) {
 
     super.update(props);
   } */
+
+  updated(changedProps: Map<string | number | symbol, unknown>) {
+    super.updated?.(changedProps);
+    if (changedProps.has('searchValue') && this.selectionList) {
+      this.selectionList.searchValue = this.searchValue;
+    }
+  }
 
   private renderElementEditorContainer(): TemplateResult {
     if (this.selectedDataSet)

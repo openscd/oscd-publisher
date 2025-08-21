@@ -52,4 +52,15 @@ describe('DataSet editor component', () => {
       'DataSet'
     );
   });
+
+  it('sets searchValue on ActionList when passed as a prop', async () => {
+    const el = await fixture(
+      html`<data-set-editor .doc="${doc}" searchValue="IED1"></data-set-editor>`
+    );
+    await (el as DataSetEditor).updateComplete;
+
+    const actionList = (el as DataSetEditor).selectionList;
+    expect(actionList).to.exist;
+    expect(actionList.searchValue).to.equal('IED1');
+  });
 });
