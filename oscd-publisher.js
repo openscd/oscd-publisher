@@ -44963,7 +44963,6 @@ class SampledValueControlElementEditor extends ScopedElementsMixin(r$4) {
             attributes: sampledValueControlAttrs,
         }), { title: `Update SampledValueControl ${identity(this.element)}` }));
         this.resetInputs();
-        this.onSampledValueControlInputChange();
     }
     onSMVInputChange() {
         var _a;
@@ -45212,11 +45211,10 @@ class SampledValueControlElementEditor extends ScopedElementsMixin(r$4) {
       ><md-text-button
         class="smvcontrol save"
         label="save"
-        icon="save"
         ?disabled=${!this.sampledValueControlDiff}
         @click="${this.saveSampledValueControlChanges}"
-        >Save<md-icon slot="save"></md-icon
-      ></md-text-button>
+        >Save<md-icon slot="icon">save</md-icon></md-text-button
+      >
     </div>`;
     }
     render() {
